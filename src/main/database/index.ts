@@ -1,0 +1,95 @@
+import Database from 'better-sqlite3'
+import { TANIM_Mevzuat } from './tables/TANIM_Mevzuat'
+import { TANIM_Personel } from './tables/TANIM_Personel'
+import { TANIM_Birim } from './tables/TANIM_Birim'
+import { TANIM_Asama } from './tables/TANIM_Asama'
+import { DATA_TeminDosyasi } from './tables/DATA_TeminDosyasi'
+
+export const TablePrefixLogic = {
+  DATA: 'OPERASYONEL SÜREÇLER VE DOSYALAR (Temin Dosyaları, Teklifler, Siparişler)',
+  TANIM: 'SİSTEM AYARLARI VE KONFİGÜRASYON (Mevzuat, Limitler, Firmalar, Personel)',
+  LOG: 'SİSTEM LOGLARI VE KULLANICI HAREKETLERİ'
+}
+
+export const schema = {
+  database: 'DOGRUDAN_TEMIN_DB',
+  app_title: 'DT Asistan',
+  developer: {
+    name: 'İlyas BOZDEMİR',
+    web: 'https://ilyasbozdemir.dev',
+    github: 'https://github.com/ilyasbozdemir'
+  },
+  version: '1.0.0-alpha.1',
+  /**
+   * Tablo tanımları — sıra önemlidir (FK bağımlılıkları).
+   * Tüm tanım (TANIM_*) tabloları DATA_* tablolarından önce oluşturulmalı.
+   */
+  tables: [
+    // --- Sistem Tanımları ---
+    TANIM_Mevzuat, // Yıllara göre limitler ve vergi oranları
+    TANIM_Birim, // Kurum birimleri (Müdürlükler)
+    TANIM_Personel, // Personel havuzu
+    TANIM_Asama, // İşlem aşamaları (Status)
+    // --- Operasyonel Veriler ---
+    DATA_TeminDosyasi // Her bir temin kaydı
+  ]
+}
+
+export function initializeDatabase(db: Database.Database, institutionName: string): void {
+  // Temel ayarlar tablosu
+  db.exec(`
+    CREATE TABLE IF NOT EXISTS settings (
+      key   TEXT PRIMARY KEY,
+      value TEXT
+    );
+    INSERT OR REPLACE INTO settings (key, value) VALUES ('institutionName', '${institutionName.replace(/'/g, "''")}');
+    INSERT OR REPLACE INTO settings (key, value) VALUES ('dbVersion', '${schema.version}');
+    INSERT OR REPLACE INTO settings (key, value) VALUES ('appTitle', '${schema.app_title}');
+    INSERT OR REPLACE INTO settings (key, value) VALUES ('adminName', 'İlyas BOZDEMİR');
+    INSERT OR REPLACE INTO settings (key, value) VALUES ('adminTitle', 'Sistem Yöneticisi');
+  `)
+
+  // Migrations for existing databases
+  try {
+    db.exec('ALTER TABLE DATA_TeminDosyasi ADD COLUMN fonksiyonel_kod TEXT;')
+  } catch (e) {
+    // Column already exists, ignore
+  }
+  try {
+    db.exec('ALTER TABLE DATA_TeminDosyasi ADD COLUMN ekonomik_kod TEXT;')
+  } catch (e) {
+    // Column already exists, ignore
+  }
+
+  // Tüm tabloları sırayla oluştur
+  schema.tables.forEach((table: any) => {
+    const columnsSql = table.columns
+      .map((col: any) => {
+        let colDef = '"' + col.name + '" ' + col.type
+        if (col.primaryKey) colDef += ' PRIMARY KEY'
+        if (col.autoIncrement) colDef += ' AUTOINCREMENT'
+        if (col.unique) colDef += ' UNIQUE'
+        if (col.notNull) colDef += ' NOT NULL'
+        if (col.default !== undefined) {
+          colDef += ' DEFAULT ' + (typeof col.default === 'string' ? col.default : col.default)
+        }
+        return colDef
+      })
+      .join(', ')
+
+    db.exec('CREATE TABLE IF NOT EXISTS ' + table.name + ' (' + columnsSql + ');')
+
+    // Başlangıç verileri
+    if (table.initialData && table.initialData.length > 0) {
+      table.initialData.forEach((row: any) => {
+        const keys = Object.keys(row)
+        const values = Object.values(row).map((v) =>
+          typeof v === 'string' ? "'" + (v as string).replace(/'/g, "''") + "'" : v
+        )
+        db.exec(
+          `INSERT OR IGNORE INTO ${table.name} (${keys.join(', ')}) VALUES (${values.join(', ')});`
+        )
+      })
+    }
+  })
+}

@@ -1,0 +1,234 @@
+import React, { useState } from 'react'
+import { Link } from '@tanstack/react-router'
+import {
+  Home,
+  Settings,
+  FileText,
+  Users,
+  Building2,
+  BookOpen,
+  ClipboardList,
+  BarChart3,
+  Scale,
+  ChevronLeft,
+  ChevronRight,
+  LogOut,
+  LayoutGrid,
+  Database,
+  PackageSearch
+} from 'lucide-react'
+import { cn } from '../../utils/cn'
+import { useSettingsStore } from '../../store/settingsStore'
+import { useWorkspaceStore } from '../../store/workspaceStore'
+import { useQueryClient } from '@tanstack/react-query'
+
+const menuGroups = [
+  {
+    title: 'Ana Menü',
+    items: [{ name: 'Gösterge Paneli', path: '/', icon: Home }]
+  },
+  {
+    title: 'Süreç Yönetimi',
+    items: [
+      { name: 'Doğrudan Temin', path: '/dosyalar', icon: FileText },
+      { name: 'Takip & Durum', path: '/takip', icon: ClipboardList },
+      { name: 'Belgeler & Formlar', path: '/belgeler', icon: BookOpen }
+    ]
+  },
+  {
+    title: 'Kayıtlar & Tanımlar',
+    items: [
+      { name: 'Birim Yönetimi', path: '/birimler', icon: LayoutGrid },
+      { name: 'Ambar Tanımları', path: '/ambar', icon: Database },
+      { name: 'Malzeme Listesi', path: '/malzemeler', icon: PackageSearch },
+      { name: 'Firmalar / Tedarikçiler', path: '/firmalar', icon: Building2 },
+      { name: 'Personel Yönetimi', path: '/personel', icon: Users },
+      { name: 'Kurum Bilgileri', path: '/kurum', icon: Building2 }
+    ]
+  },
+  {
+    title: 'Sistem',
+    items: [
+      { name: 'Raporlar', path: '/raporlar', icon: BarChart3 },
+      { name: 'Mevzuat & Limitler', path: '/mevzuat', icon: Scale },
+      { name: 'Ayarlar', path: '/ayarlar', icon: Settings }
+    ]
+  }
+]
+
+export function Sidebar(): React.JSX.Element {
+  const [isCollapsed, setIsCollapsed] = useState(false)
+  const { institutionName, institutionLogo, adminUsername, institutionCode, loadSettings } =
+    useSettingsStore()
+  const { closeWorkspace, fileName } = useWorkspaceStore()
+  const queryClient = useQueryClient()
+
+  const handleCloseWorkspace = async (): Promise<void> => {
+    await closeWorkspace()
+    queryClient.clear()
+  }
+
+  React.useEffect(() => {
+    loadSettings()
+  }, [loadSettings])
+
+  const getInitials = (name: string): string => {
+    if (!name) return 'SY'
+    return name
+      .split(' ')
+      .map((n) => n[0])
+      .filter(Boolean)
+      .join('')
+      .toUpperCase()
+      .slice(0, 2)
+  }
+
+  return (
+    <div
+      className={cn(
+        'h-screen bg-sidebar-bg text-sidebar-text flex flex-col shadow-xl shrink-0 transition-all duration-300 relative z-50 border-r border-sidebar-border',
+        isCollapsed ? 'w-20' : 'w-64'
+      )}
+    >
+      {/* Toggle Button Wrapper (No-Drag) */}
+      <button
+        type="button"
+        className={cn(
+          "absolute -right-2.5 top-1/2 -translate-y-1/2 z-50",
+          "flex items-center justify-center",
+          "w-5 h-5 rounded-full cursor-pointer group",
+          "bg-sidebar-bg hover:bg-sidebar-hover-bg",
+          "text-sidebar-text hover:text-sidebar-hover-text",
+          "border border-sidebar-border",
+          "shadow-md hover:shadow-lg hover:scale-105 active:scale-95",
+          "transition-all duration-300 ease-out"
+        )}
+        style={{ WebkitAppRegion: 'no-drag' } as React.CSSProperties}
+        onClick={() => setIsCollapsed(!isCollapsed)}
+        title={isCollapsed ? "Menüyü Genişlet" : "Menüyü Daralt"}
+      >
+        {isCollapsed ? (
+          <ChevronRight size={10} className="transition-transform duration-200 group-hover:translate-x-0.5" />
+        ) : (
+          <ChevronLeft size={10} className="transition-transform duration-200 group-hover:-translate-x-0.5" />
+        )}
+      </button>
+
+      <div
+        className={cn(
+          'flex flex-col items-center border-b border-sidebar-border transition-all duration-300',
+          isCollapsed ? 'py-4 px-0' : 'py-6 px-4'
+        )}
+      >
+        <div
+          className={cn(
+            'rounded-full border-2 border-sidebar-border bg-sidebar-hover-bg flex items-center justify-center overflow-hidden shadow-inner transition-all duration-300 shrink-0',
+            isCollapsed ? 'w-10 h-10' : 'w-16 h-16'
+          )}
+        >
+          {institutionLogo ? (
+            <img src={institutionLogo} alt="Logo" className="w-full h-full object-cover" />
+          ) : (
+            <Building2 className={cn('text-sidebar-active-text', isCollapsed ? 'w-5 h-5' : 'w-8 h-8')} />
+          )}
+        </div>
+        {!isCollapsed && (
+          <div className="flex flex-col items-center mt-3 text-center w-full px-1">
+            <span className="text-sidebar-text/70 text-[10px] font-semibold tracking-wider uppercase mt-1 w-full px-2 wrap-break-word leading-normal">
+              {institutionName}
+            </span>
+
+            <span className="text-sidebar-hover-text font-bold text-base tracking-wide whitespace-nowrap truncate leading-tight mt-1">
+              DT Asistan
+            </span>
+          </div>
+        )}
+      </div>
+
+      {/* Navigation Groups */}
+      <div className="flex-1 overflow-y-auto py-4 px-3 space-y-6 custom-scrollbar">
+        {menuGroups.map((group, idx) => (
+          <div key={idx} className="space-y-1.5">
+            {!isCollapsed && (
+              <h3 className="px-3 text-[10px] font-bold text-sidebar-text/50 uppercase tracking-widest">
+                {group.title}
+              </h3>
+            )}
+            <ul className="space-y-1">
+              {group.items.map((item) => (
+                <li key={item.name}>
+                  <Link
+                    to={item.path}
+                    className={cn(
+                      'flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-semibold transition-all duration-200 border border-transparent cursor-pointer',
+                      'hover:bg-sidebar-hover-bg hover:text-sidebar-hover-text',
+                      'active:scale-[0.98]'
+                    )}
+                    activeProps={{
+                      className:
+                        'bg-sidebar-active-bg text-sidebar-active-text border-sidebar-active-border shadow-sm shadow-blue-500/5 font-bold'
+                    }}
+                  >
+                    <item.icon size={18} className="shrink-0" />
+                    {!isCollapsed && (
+                      <span className="text-sm font-medium whitespace-nowrap">{item.name}</span>
+                    )}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+        ))}
+      </div>
+
+      <div className="p-4 border-t border-sidebar-border space-y-3">
+        <Link
+          to="/profil"
+          className={cn(
+            'flex items-center rounded-md bg-sidebar-hover-bg/50 hover:bg-sidebar-hover-bg transition-all border border-transparent hover:border-sidebar-border cursor-pointer',
+            isCollapsed ? 'justify-center p-2' : 'px-2 py-2'
+          )}
+          title="Kullanıcı Profili ve Güvenlik Ayarlarına Git"
+        >
+          <div className="w-8 h-8 rounded-full bg-sidebar-active-text/20 flex items-center justify-center shrink-0 overflow-hidden border border-sidebar-border bg-white/10">
+            {institutionLogo ? (
+              <img src={institutionLogo} alt="Profil" className="w-full h-full object-cover" />
+            ) : (
+              <span className="text-sidebar-hover-text text-xs font-bold">
+                {getInitials(adminUsername || 'SY')}
+              </span>
+            )}
+          </div>
+          {!isCollapsed && (
+            <div className="ml-3 overflow-hidden flex-1">
+              <p className="text-sm font-medium text-sidebar-hover-text truncate" title={adminUsername}>
+                {adminUsername}
+              </p>
+              <p className="text-[10px] text-sidebar-text/75 truncate" title={institutionCode}>
+                Kurum Kodu: {institutionCode}
+              </p>
+            </div>
+          )}
+        </Link>
+
+        <button
+          onClick={handleCloseWorkspace}
+          className={cn(
+            'w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg text-xs font-semibold text-sidebar-text/80 hover:text-red-400 hover:bg-red-500/10 transition-colors border border-sidebar-border hover:border-red-500/20',
+            isCollapsed ? 'py-2 px-0' : 'py-2'
+          )}
+          title="Kurum Dosyasını Kapat (.dtm)"
+        >
+          <LogOut size={16} />
+          {!isCollapsed && <span>Kurum Dosyasını Kapat</span>}
+        </button>
+
+        {!isCollapsed && (
+          <div className="text-[10px] text-center text-sidebar-text/50 font-medium px-2 py-1 truncate bg-sidebar-hover-bg/30 rounded border border-sidebar-border/40">
+            Dosya: {fileName}
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}

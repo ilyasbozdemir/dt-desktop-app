@@ -1,0 +1,321 @@
+import React, { useState } from 'react'
+import {
+  FolderOpen,
+  PlusCircle,
+  Building,
+  User,
+  KeyRound,
+  ShieldAlert,
+  Minus,
+  Square,
+  X,
+  Sun,
+  Moon,
+  Eye,
+  EyeOff
+} from 'lucide-react'
+import { useWorkspaceStore } from '../../store/workspaceStore'
+import { useQueryClient } from '@tanstack/react-query'
+import { useTheme } from '../../components/providers/ThemeProvider'
+
+export default function LauncherScreen(): React.ReactNode {
+  const { openWorkspace, createWorkspace } = useWorkspaceStore()
+  const queryClient = useQueryClient()
+  const { theme, setTheme } = useTheme()
+
+  // Modal states for creating a new institution
+  const [showCreateModal, setShowCreateModal] = useState(false)
+  const [pendingFilePath, setPendingFilePath] = useState<string | null>(null)
+
+  const [institutionName, setInstitutionName] = useState('')
+  const [institutionCode, setInstitutionCode] = useState('')
+  const [username, setUsername] = useState('admin')
+  const [password, setPassword] = useState('')
+  const [creating, setCreating] = useState(false)
+  const [showPassword, setShowPassword] = useState(false)
+
+  const handleCreateNewFile = async (): Promise<void> => {
+    try {
+      const res = await window.electron?.ipcRenderer.invoke('dialog:showSaveDialog')
+      if (!res.canceled && res.filePath) {
+        // Dosya yolundan dosya adını (uzantısız) çıkar
+        const fileName = res.filePath.split(/[/\\]/).pop() || 'Yeni Kurum'
+        const projectName = fileName.replace(/\.dtm$/i, '')
+
+        setPendingFilePath(res.filePath)
+        setInstitutionName(projectName)
+        setShowCreateModal(true)
+      }
+    } catch (e) {
+      console.error(e)
+    }
+  }
+
+  const handleModalSubmit = async (e: React.FormEvent): Promise<void> => {
+    e.preventDefault()
+    if (!pendingFilePath) return
+
+    setCreating(true)
+    try {
+      const success = await createWorkspace(
+        pendingFilePath,
+        institutionName,
+        institutionCode,
+        username,
+        password
+      )
+      if (success) {
+        queryClient.clear()
+        setShowCreateModal(false)
+        setPendingFilePath(null)
+      } else {
+        alert('Kurum dosyası oluşturulamadı!')
+      }
+    } catch (err) {
+      console.error(err)
+      alert('Hata oluştu!')
+    } finally {
+      setCreating(false)
+    }
+  }
+
+  const handleOpenFile = async (): Promise<void> => {
+    try {
+      const res = await window.electron?.ipcRenderer.invoke('dialog:showOpenDialog')
+      if (!res.canceled && res.filePath) {
+        const success = await openWorkspace(res.filePath)
+        if (success) {
+          queryClient.clear()
+        } else {
+          alert('Kurum dosyası açılamadı!')
+        }
+      }
+    } catch (e) {
+      console.error(e)
+    }
+  }
+
+  const handleMinimize = (): void => window.electron?.ipcRenderer.send('window-minimize')
+  const handleMaximize = (): void => window.electron?.ipcRenderer.send('window-maximize')
+  const handleClose = (): void => window.electron?.ipcRenderer.send('window-close')
+
+  return (
+    <div
+      className="flex items-center justify-center h-screen w-full bg-slate-50 dark:bg-slate-950 p-6 relative transition-colors duration-300"
+      style={{ WebkitAppRegion: 'drag' } as React.CSSProperties}
+    >
+      {/* Draggable Header with Window Controls & Theme Switcher */}
+      <div
+        className="absolute top-0 left-0 w-full h-12 flex justify-between items-center px-4 bg-transparent z-50 select-none"
+        style={{ WebkitAppRegion: 'drag' } as React.CSSProperties}
+      >
+        <div className="flex items-center gap-2 text-slate-400 dark:text-slate-600 text-xs font-semibold">
+          <FolderOpen className="w-3.5 h-3.5" />
+          <span>DT Asistan Başlatıcı</span>
+        </div>
+
+        <div
+          className="flex items-center space-x-1"
+          style={{ WebkitAppRegion: 'no-drag' } as React.CSSProperties}
+        >
+          <button
+            onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+            className="p-1.5 text-slate-400 hover:text-slate-700 dark:text-slate-500 dark:hover:text-slate-300 transition-all rounded-lg hover:bg-slate-200/50 dark:hover:bg-slate-800/50 mr-2"
+            title="Tema Değiştir"
+          >
+            {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
+          </button>
+          <button
+            onClick={handleMinimize}
+            className="p-1.5 text-slate-400 hover:text-slate-700 dark:text-slate-500 dark:hover:text-slate-300 transition-all rounded-lg hover:bg-slate-200/50 dark:hover:bg-slate-800/50"
+            title="Simge Durumuna Küçült"
+          >
+            <Minus className="w-4 h-4" />
+          </button>
+          <button
+            onClick={handleMaximize}
+            className="p-1.5 text-slate-400 hover:text-slate-700 dark:text-slate-500 dark:hover:text-slate-300 transition-all rounded-lg hover:bg-slate-200/50 dark:hover:bg-slate-800/50"
+            title="Ekranı Kapla"
+          >
+            <Square className="w-3.5 h-3.5" />
+          </button>
+          <button
+            onClick={handleClose}
+            className="p-1.5 text-slate-400 hover:text-white hover:bg-red-600 rounded-lg transition-all"
+            title="Kapat"
+          >
+            <X className="w-4 h-4" />
+          </button>
+        </div>
+      </div>
+
+      <div
+        className="max-w-md w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl shadow-2xl overflow-hidden"
+        style={{ WebkitAppRegion: 'no-drag' } as React.CSSProperties}
+      >
+        <div className="p-8 text-center border-b border-slate-100 dark:border-slate-800">
+          <div className="w-16 h-16 bg-blue-100 dark:bg-blue-900/30 rounded-2xl flex items-center justify-center mx-auto mb-4 text-blue-600 dark:text-blue-400 animate-pulse">
+            <FolderOpen className="w-8 h-8" />
+          </div>
+          <h1 className="text-2xl font-bold text-slate-800 dark:text-white mb-2">
+            DT Asistan&apos;a Hoş Geldiniz
+          </h1>
+          <p className="text-slate-500 dark:text-slate-400 text-sm">
+            Çalışmaya başlamak için yeni bir kurum/çalışma alanı dosyası (.dtm) oluşturun veya
+            mevcut bir kurumu açın.
+          </p>
+        </div>
+
+        <div className="p-6 space-y-4">
+          <button
+            onClick={handleCreateNewFile}
+            className="w-full flex items-center gap-4 p-4 rounded-xl border border-blue-200 dark:border-blue-900/50 bg-blue-50/50 dark:bg-blue-900/10 hover:bg-blue-100/50 dark:hover:bg-blue-900/20 text-blue-700 dark:text-blue-300 transition-all group"
+          >
+            <div className="w-10 h-10 rounded-lg bg-blue-600 flex items-center justify-center text-white shrink-0 group-hover:scale-105 transition-transform shadow-md shadow-blue-600/20">
+              <PlusCircle className="w-5 h-5" />
+            </div>
+            <div className="text-left">
+              <h3 className="font-bold text-base">Yeni Kurum Oluştur</h3>
+              <p className="text-xs opacity-80 mt-0.5">Yeni yıl veya kurum için sıfırdan başla</p>
+            </div>
+          </button>
+
+          <button
+            onClick={handleOpenFile}
+            className="w-full flex items-center gap-4 p-4 rounded-xl border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-700 dark:text-slate-200 transition-all group"
+          >
+            <div className="w-10 h-10 rounded-lg bg-slate-200 dark:bg-slate-800 flex items-center justify-center text-slate-600 dark:text-slate-400 shrink-0 group-hover:scale-105 transition-transform">
+              <FolderOpen className="w-5 h-5" />
+            </div>
+            <div className="text-left">
+              <h3 className="font-bold text-base">Mevcut Kurumu Aç</h3>
+              <p className="text-xs opacity-80 mt-0.5">Önceden oluşturulmuş .dtm dosyasını yükle</p>
+            </div>
+          </button>
+        </div>
+      </div>
+
+      {/* CREATE WORKSPACE AUTH MODAL */}
+      {showCreateModal && (
+        <div
+          className="absolute inset-0 bg-slate-950/40 dark:bg-slate-950/80 backdrop-blur-md flex items-center justify-center p-4 z-50 animate-in fade-in duration-300"
+          style={{ WebkitAppRegion: 'no-drag' } as React.CSSProperties}
+        >
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 max-w-md w-full rounded-3xl p-6 shadow-2xl flex flex-col text-slate-800 dark:text-slate-100">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="p-2 bg-blue-100 dark:bg-blue-500/10 border border-blue-200 dark:border-blue-500/20 rounded-xl text-blue-600 dark:text-blue-400">
+                <Building className="w-5 h-5" />
+              </div>
+              <div>
+                <h3 className="text-lg font-bold text-slate-900 dark:text-white">
+                  Kurum Kayıt Bilgileri
+                </h3>
+                <p className="text-xs text-slate-550 dark:text-slate-400">
+                  Yeni veri dosyası için şifre ve kimlik ayarları
+                </p>
+              </div>
+            </div>
+
+            <form onSubmit={handleModalSubmit} className="space-y-4">
+              <div>
+                <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1 ml-1">
+                  Kurum Adı
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={institutionName}
+                  onChange={(e) => setInstitutionName(e.target.value)}
+                  className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 text-slate-850 dark:text-white"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1 ml-1">
+                  Kurum Kodu
+                </label>
+                <input
+                  type="text"
+                  required
+                  placeholder="Örn: 12345"
+                  value={institutionCode}
+                  onChange={(e) => setInstitutionCode(e.target.value)}
+                  className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 text-slate-850 dark:text-white placeholder-slate-400 dark:placeholder-slate-650"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1 ml-1">
+                  Yönetici Kullanıcı Adı
+                </label>
+                <div className="relative">
+                  <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 dark:text-slate-500" />
+                  <input
+                    type="text"
+                    required
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                    className="w-full pl-9 pr-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 text-slate-850 dark:text-white"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1 ml-1">
+                  Giriş Parolası
+                </label>
+                <div className="relative">
+                  <KeyRound className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 dark:text-slate-550" />
+                  <input
+                    type={showPassword ? 'text' : 'password'}
+                    required
+                    placeholder="Parolayı Belirleyin"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    className="w-full pl-9 pr-10 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 text-slate-850 dark:text-white placeholder-slate-400 dark:placeholder-slate-655"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-350 focus:outline-none"
+                    title={showPassword ? 'Şifreyi Gizle' : 'Şifreyi Göster'}
+                  >
+                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                </div>
+              </div>
+
+              <div className="flex gap-2 p-3 bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20 rounded-xl text-amber-700 dark:text-amber-500 text-[10px] leading-relaxed">
+                <ShieldAlert className="w-5 h-5 shrink-0" />
+                <span>
+                  Bu şifre ve kurum kodu veritabanına kaydedilir. İnternet olmasa dahi bu kurum
+                  dosyasına girmek için bu şifreyi kullanacaksınız. Lütfen unutmayın.
+                </span>
+              </div>
+
+              <div className="flex gap-3 mt-6 pt-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowCreateModal(false)
+                    setPendingFilePath(null)
+                  }}
+                  className="flex-1 py-2 border border-slate-205 hover:bg-slate-100 dark:border-slate-800 dark:hover:bg-slate-800 text-slate-500 dark:text-slate-400 rounded-xl text-sm font-semibold transition-colors"
+                >
+                  İptal
+                </button>
+                <button
+                  type="submit"
+                  disabled={creating}
+                  className="flex-1 py-2 bg-blue-600 hover:bg-blue-500 disabled:bg-blue-800 text-white rounded-xl text-sm font-semibold transition-colors"
+                >
+                  {creating ? 'Oluşturuluyor...' : 'Veri Dosyasını Aç'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
