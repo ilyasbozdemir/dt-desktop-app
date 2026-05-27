@@ -1,23 +1,20 @@
 import Database from 'better-sqlite3'
-import { migrate as migrateV1ToV2 } from './v1_to_v2'
-import { migrate as migrateV2ToV3 } from './v2_to_v3'
+import { migration as v1_to_v2 } from './v1_to_v2'
+import { migration as v2_to_v3 } from './v2_to_v3'
+import { migration as v3_to_v4 } from './v3_to_v4'
 
 export interface Migration {
-  version: number // Target schema version after applying this migration
-  migrate: (db: Database.Database) => void
+  from: number
+  to: number
+  up: (db: Database.Database) => void
 }
 
 /**
- * Migration registry.
- * Sequential execution order is guaranteed by version number sorting.
+ * Migration registry containing all registered steps.
+ * Automatically sorted sequentially by starting version.
  */
 export const migrations: Migration[] = [
-  {
-    version: 2,
-    migrate: migrateV1ToV2
-  },
-  {
-    version: 3,
-    migrate: migrateV2ToV3
-  }
-]
+  v1_to_v2,
+  v2_to_v3,
+  v3_to_v4
+].sort((a, b) => a.from - b.from)

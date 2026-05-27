@@ -1,16 +1,31 @@
 import Database from 'better-sqlite3'
-import { migrations } from './migrations/index'
+import { migrations, Migration } from './migrations/index'
 
-export const CURRENT_SCHEMA_VERSION = 3
+export const CURRENT_SCHEMA_VERSION = 4
 
 /**
  * Runs pending database migrations sequentially.
  * Wraps execution inside a database transaction to ensure atomicity.
  */
 export function runMigrations(db: Database.Database, fromVersion: number): void {
-  const pendingMigrations = migrations
-    .filter((m) => m.version > fromVersion)
-    .sort((a, b) => a.version - b.version)
+  if (fromVersion > CURRENT_SCHEMA_VERSION) {
+    throw new Error(
+      `Bu dosya daha yeni bir uygulama sürümü gerektirir. (Dosya Şema Sürümü: v${fromVersion}, Desteklenen Şema Sürümü: v${CURRENT_SCHEMA_VERSION})`
+    )
+  }
+
+  const pendingMigrations: Migration[] = []
+  let currentRunningVersion = fromVersion
+
+  // Trace the migration path sequentially using from -> to mappings
+  while (currentRunningVersion < CURRENT_SCHEMA_VERSION) {
+    const nextMigration = migrations.find((m) => m.from === currentRunningVersion)
+    if (!nextMigration) {
+      break
+    }
+    pendingMigrations.push(nextMigration)
+    currentRunningVersion = nextMigration.to
+  }
 
   if (pendingMigrations.length === 0) {
     console.log('Veritabanı şeması zaten güncel.')
@@ -25,12 +40,12 @@ export function runMigrations(db: Database.Database, fromVersion: number): void 
   // Run migrations within an atomic transaction
   const executeMigrationsTransaction = db.transaction(() => {
     for (const migration of pendingMigrations) {
-      console.log(`v${migration.version} şema sürümüne geçiş adımı çalıştırılıyor...`)
-      migration.migrate(db)
+      console.log(`v${migration.from} -> v${migration.to} şema geçiş adımı çalıştırılıyor...`)
+      migration.up(db)
       
       // Update schema version in the settings table
       db.prepare("INSERT OR REPLACE INTO settings (key, value) VALUES ('dbSchemaVersion', ?);").run(
-        migration.version.toString()
+        migration.to.toString()
       )
     }
   })

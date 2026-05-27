@@ -70,6 +70,12 @@ export class DtmWorkspace {
 
     const fromVersion = parseInt(meta.schema_version, 10) || 1
 
+    if (fromVersion > CURRENT_SCHEMA_VERSION) {
+      throw new Error(
+        `Bu dosya daha yeni bir uygulama sürümü gerektirir. (Dosya Şema Sürümü: v${meta.schema_version}, Desteklenen Şema Sürümü: v${CURRENT_SCHEMA_VERSION})`
+      )
+    }
+
     // Run migrations if database is older
     if (fromVersion < CURRENT_SCHEMA_VERSION) {
       // 1. Create backup before applying migrations

@@ -1,6 +1,17 @@
 import Database from 'better-sqlite3'
+import { Migration } from './index'
 
-export function migrate(_db: Database.Database): void {
-  console.log('Migrating database schema from v2 to v3 (baseline schema)...')
-  // Baseline schema v3 migration placeholder (currently no schema changes needed)
+export const migration: Migration = {
+  from: 2,
+  to: 3,
+  up: (db: Database.Database): void => {
+    console.log('TANIM_Kalem tablosu oluşturuluyor...')
+    db.exec(`
+      CREATE TABLE IF NOT EXISTS TANIM_Kalem (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        kod TEXT,
+        aciklama TEXT
+      );
+    `)
+  }
 }
