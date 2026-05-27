@@ -31,15 +31,16 @@ export function PageWrapper(): React.ReactNode {
     document.title = title
   }, [routerState.location.pathname])
 
-  const { activeFilePath, openWorkspace, isAuthenticated } = useWorkspaceStore()
+  const { activeFilePath, openWorkspace, isAuthenticated, loadActiveMeta } = useWorkspaceStore()
   const { loadSettings } = useSettingsStore()
   const queryClient = useQueryClient()
 
   useEffect(() => {
     if (activeFilePath && isAuthenticated) {
       loadSettings()
+      loadActiveMeta()
     }
-  }, [activeFilePath, isAuthenticated, loadSettings])
+  }, [activeFilePath, isAuthenticated, loadSettings, loadActiveMeta])
 
   useEffect(() => {
     // Initial fetch of DB name if any (in case backend already has an open DB on soft reload)

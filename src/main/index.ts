@@ -146,6 +146,16 @@ if (!gotTheLock) {
       }
     })
 
+    ipcMain.handle('workspace:get-meta', async () => {
+      try {
+        const meta = workspaceManager.getMeta()
+        return { success: true, meta }
+      } catch (error: any) {
+        console.error('Get meta error:', error)
+        return { success: false, error: error.message }
+      }
+    })
+
     // --- NATIVE DIALOG HANDLERS ---
     ipcMain.handle('dialog:showSaveDialog', async () => {
       const mainWindow = BrowserWindow.getAllWindows()[0]
@@ -494,6 +504,14 @@ if (!gotTheLock) {
 
     createWindow()
 
+    // Helper to send status to all open windows
+    const sendUpdaterStatus = (status: string, data: any = {}) => {
+      const windows = BrowserWindow.getAllWindows()
+      if (windows.length > 0) {
+        windows[0].webContents.send('updater:status', { status, ...data })
+      }
+    }
+
     // --- Auto Updater Logic ---
     // Uygulama açıldıktan saniyeler sonra güncellemeleri kontrol et (Geliştirme modunda atlar)
     if (!is.dev) {
@@ -502,24 +520,47 @@ if (!gotTheLock) {
 
     autoUpdater.on('checking-for-update', () => {
       console.log('Güncellemeler kontrol ediliyor...')
+      sendUpdaterStatus('checking')
     })
 
     autoUpdater.on('update-available', (info) => {
       console.log(`Yeni sürüm bulundu! Sürüm: ${info.version}`)
-      // İleride buraya: mainWindow.webContents.send('update-available') ekleyeceğiz.
+      sendUpdaterStatus('available', { version: info.version, info })
     })
 
-    autoUpdater.on('update-not-available', () => {
+    autoUpdater.on('update-not-available', (info) => {
       console.log('Güncelleme yok, en güncel sürümdesiniz.')
+      sendUpdaterStatus('not-available', { version: info?.version, info })
     })
 
     autoUpdater.on('update-downloaded', (info) => {
       console.log('Güncelleme başarıyla indirildi. Kurulum için hazır.', info.version)
-      // İleride buraya: "Kapatıp Kur" butonu için IPC gönderimi ekleyeceğiz.
-      // Şimdilik sadece log atıyoruz, ileride kullanıcı onay verince `autoUpdater.quitAndInstall()` çağrılacak.
+      sendUpdaterStatus('downloaded', { version: info.version, info })
     })
+
     autoUpdater.on('error', (err) => {
       console.error('Güncelleme sırasında hata oluştu:', err)
+      sendUpdaterStatus('error', { error: err.message })
+    })
+
+    ipcMain.handle('updater:check', async () => {
+      try {
+        const result = await autoUpdater.checkForUpdatesAndNotify()
+        return { success: true, result }
+      } catch (error: any) {
+        console.error('Manual update check error:', error)
+        return { success: false, error: error.message }
+      }
+    })
+
+    ipcMain.handle('updater:quit-and-install', () => {
+      try {
+        autoUpdater.quitAndInstall()
+        return { success: true }
+      } catch (error: any) {
+        console.error('Quit and install error:', error)
+        return { success: false, error: error.message }
+      }
     })
 
     app.on('activate', function () {

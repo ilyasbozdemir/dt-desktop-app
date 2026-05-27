@@ -1,11 +1,21 @@
 import { create } from 'zustand'
 
+export interface WorkspaceMeta {
+  dtm_version: string
+  app_version: string
+  created_at: string
+  institution: string
+  schema_version: string
+  updated_at?: string
+}
+
 interface WorkspaceState {
   activeFilePath: string | null
   fileName: string
   isAuthenticated: boolean
   activeDosyaId: number | null
   isCreatingDosya: boolean
+  activeMeta: WorkspaceMeta | null
   setIsCreatingDosya: (flag: boolean) => void
   setActiveFile: (path: string | null) => void
   setIsAuthenticated: (auth: boolean) => void
@@ -19,9 +29,10 @@ interface WorkspaceState {
     adminPassword?: string
   ) => Promise<boolean>
   closeWorkspace: () => Promise<void>
+  loadActiveMeta: () => Promise<void>
 }
 
-export const useWorkspaceStore = create<WorkspaceState>((set) => ({
+export const useWorkspaceStore = create<WorkspaceState>((set, get) => ({
   activeFilePath: sessionStorage.getItem('workspace_path') || null,
   fileName: sessionStorage.getItem('workspace_path')
     ? sessionStorage.getItem('workspace_path')!.split('\\').pop()?.split('/').pop() || 'Bilinmeyen Dosya'
@@ -31,6 +42,7 @@ export const useWorkspaceStore = create<WorkspaceState>((set) => ({
     ? parseInt(sessionStorage.getItem('workspace_dosya_id')!, 10)
     : null,
   isCreatingDosya: false,
+  activeMeta: null,
   setIsCreatingDosya: (flag) => set({ isCreatingDosya: flag }),
   setActiveFile: (path) => {
     if (path) {
@@ -76,6 +88,7 @@ export const useWorkspaceStore = create<WorkspaceState>((set) => ({
           activeFilePath: filePath,
           fileName: filePath.split('\\').pop()?.split('/').pop() || 'Bilinmeyen Dosya',
           isAuthenticated: keepAuth,
+          activeMeta: result.meta || null,
           activeDosyaId: keepAuth
             ? sessionStorage.getItem('workspace_dosya_id')
               ? parseInt(sessionStorage.getItem('workspace_dosya_id')!, 10)
@@ -114,6 +127,7 @@ export const useWorkspaceStore = create<WorkspaceState>((set) => ({
           activeFilePath: filePath,
           fileName: filePath.split('\\').pop()?.split('/').pop() || 'Bilinmeyen Dosya',
           isAuthenticated: true, // Auto-logged in on create
+          activeMeta: result.meta || null,
           activeDosyaId: null
         })
         return true
@@ -133,7 +147,19 @@ export const useWorkspaceStore = create<WorkspaceState>((set) => ({
       activeFilePath: null,
       fileName: 'Veri Dosyası Seçilmedi',
       isAuthenticated: false,
+      activeMeta: null,
       activeDosyaId: null
     })
+  },
+  loadActiveMeta: async () => {
+    if (!get().activeFilePath) return
+    try {
+      const result = await window.electron.ipcRenderer.invoke('workspace:get-meta')
+      if (result.success) {
+        set({ activeMeta: result.meta || null })
+      }
+    } catch (e) {
+      console.error(e)
+    }
   }
 }))

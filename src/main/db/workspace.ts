@@ -3,20 +3,33 @@ import Database from 'better-sqlite3'
 import { app } from 'electron'
 import fs from 'fs'
 import path from 'path'
-import { initializeDatabase, schema } from '../database/index'
+import { initializeDatabase, runMigrations, CURRENT_SCHEMA_VERSION } from '../database/index'
 
 export interface WorkspaceMeta {
-  version: string
-  schemaVersion: number
-  institutionName: string
-  createdAt: string
-  updatedAt: string
+  dtm_version: string      // format versiyonu (örn: "1.0")
+  app_version: string      // oluşturan/güncelleyen uygulama versiyonu (örn: "1.0.0-alpha.1")
+  created_at: string       // oluşturulma tarihi (YYYY-MM-DD)
+  institution: string      // kurum adı
+  schema_version: string   // veritabanı şema versiyonu (örn: "3")
+  updated_at?: string      // son düzenlenme zamanı (ISO string)
+}
+
+function normalizeMeta(raw: any): WorkspaceMeta {
+  return {
+    dtm_version: raw.dtm_version || '1.0',
+    app_version: raw.app_version || raw.version || '1.0.0',
+    created_at: raw.created_at || (raw.createdAt ? raw.createdAt.split('T')[0] : new Date().toISOString().split('T')[0]),
+    institution: raw.institution || raw.institutionName || 'Bilinmeyen Kurum',
+    schema_version: (raw.schema_version || raw.schemaVersion || '1').toString(),
+    updated_at: raw.updated_at || raw.updatedAt || new Date().toISOString()
+  }
 }
 
 export class DtmWorkspace {
   private tempDir: string
   private db: Database.Database | null = null
   private currentFilePath: string | null = null
+  private meta: WorkspaceMeta | null = null
 
   constructor() {
     // Generate a unique temp directory for this workspace session
@@ -34,18 +47,47 @@ export class DtmWorkspace {
     const zip = new AdmZip(filePath)
     zip.extractAllTo(this.tempDir, true)
 
-    // 2. Connect to the SQLite database
+    // 2. Read metadata
+    const metaPath = path.join(this.tempDir, 'meta.json')
+    let rawMeta: any = {}
+    if (fs.existsSync(metaPath)) {
+      const rawMetaContent = fs.readFileSync(metaPath, 'utf-8')
+      rawMeta = JSON.parse(rawMetaContent)
+    } else {
+      throw new Error('Geçersiz dosya: meta.json bulunamadı.')
+    }
+
+    const meta = normalizeMeta(rawMeta)
+
+    // Version checks
+    const SUPPORTED_DTM_VERSION = 1.0
+    if (parseFloat(meta.dtm_version) > SUPPORTED_DTM_VERSION) {
+      throw new Error(
+        `Bu dosya daha yeni bir uygulama sürümü gerektirir. (Gereken Format: ${meta.dtm_version}, Desteklenen En Yüksek Format: ${SUPPORTED_DTM_VERSION})`
+      )
+    }
+
+    // 3. Connect to the SQLite database
     const dbPath = path.join(this.tempDir, 'database.sqlite')
     this.db = new Database(dbPath)
 
-    // 3. Read metadata
-    const metaPath = path.join(this.tempDir, 'meta.json')
-    if (fs.existsSync(metaPath)) {
-      const rawMeta = fs.readFileSync(metaPath, 'utf-8')
-      return JSON.parse(rawMeta) as WorkspaceMeta
+    // 4. Run migrations if database is older
+    const fromVersion = parseInt(meta.schema_version, 10) || 1
+    if (fromVersion < CURRENT_SCHEMA_VERSION) {
+      runMigrations(this.db, fromVersion)
+      
+      // Update metadata to reflect new schema version and current app version
+      meta.schema_version = CURRENT_SCHEMA_VERSION.toString()
+      meta.app_version = app.getVersion()
+      meta.updated_at = new Date().toISOString()
+      fs.writeFileSync(metaPath, JSON.stringify(meta, null, 2))
+      
+      // Save changes back to zip archive immediately
+      this.saveWorkspace()
     }
 
-    throw new Error('Geçersiz dosya: meta.json bulunamadı.')
+    this.meta = meta
+    return meta
   }
 
   /**
@@ -59,16 +101,17 @@ export class DtmWorkspace {
     const dbPath = path.join(this.tempDir, 'database.sqlite')
     this.db = new Database(dbPath)
 
-    // Initialize Schema using our new centralized index.ts logic
+    // Initialize Schema using our centralized index.ts logic
     initializeDatabase(this.db, institutionName)
 
-    // 2. Create metadata
+    // 2. Create metadata using new schema
     const meta: WorkspaceMeta = {
-      version: schema.version,
-      schemaVersion: 1,
-      institutionName,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString()
+      dtm_version: '1.0',
+      app_version: app.getVersion(),
+      created_at: new Date().toISOString().split('T')[0],
+      institution: institutionName,
+      schema_version: CURRENT_SCHEMA_VERSION.toString(),
+      updated_at: new Date().toISOString()
     }
     const metaPath = path.join(this.tempDir, 'meta.json')
     fs.writeFileSync(metaPath, JSON.stringify(meta, null, 2))
@@ -79,6 +122,7 @@ export class DtmWorkspace {
     // 4. Save to the actual .dtm file
     this.saveWorkspace()
 
+    this.meta = meta
     return meta
   }
 
@@ -90,16 +134,14 @@ export class DtmWorkspace {
       throw new Error('Hiçbir veri dosyası açık değil.')
     }
 
-    // Close db before zipping, or wait, if we are saving while open we can force a checkpoint
-    // Actually, it's safer to just zip it. better-sqlite3 uses synchronous file writes.
-    // If WAL mode is used, we might need to checkpoint. For now, assume journal mode or force checkpoint.
     this.db.pragma('wal_checkpoint(TRUNCATE)')
 
-    // Update updated_at in meta
+    // Update updated_at and app_version in meta
     const metaPath = path.join(this.tempDir, 'meta.json')
     if (fs.existsSync(metaPath)) {
       const meta = JSON.parse(fs.readFileSync(metaPath, 'utf-8')) as WorkspaceMeta
-      meta.updatedAt = new Date().toISOString()
+      meta.updated_at = new Date().toISOString()
+      meta.app_version = app.getVersion()
       fs.writeFileSync(metaPath, JSON.stringify(meta, null, 2))
     }
 
@@ -117,6 +159,7 @@ export class DtmWorkspace {
       this.db = null
     }
     this.currentFilePath = null
+    this.meta = null
 
     if (fs.existsSync(this.tempDir)) {
       fs.rmSync(this.tempDir, { recursive: true, force: true })
@@ -126,6 +169,10 @@ export class DtmWorkspace {
   public getDb(): Database.Database {
     if (!this.db) throw new Error('Veritabanı bağlı değil.')
     return this.db
+  }
+
+  public getMeta(): WorkspaceMeta | null {
+    return this.meta
   }
 
   private ensureTempDir() {
@@ -162,5 +209,9 @@ export const workspaceManager = {
   getDb: () => {
     if (!activeWorkspace) throw new Error('Açık bir veri dosyası yok.')
     return activeWorkspace.getDb()
+  },
+  getMeta: () => {
+    if (!activeWorkspace) return null
+    return activeWorkspace.getMeta()
   }
 }

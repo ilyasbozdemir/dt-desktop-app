@@ -11,6 +11,8 @@ export const TablePrefixLogic = {
   LOG: 'SİSTEM LOGLARI VE KULLANICI HAREKETLERİ'
 }
 
+export const CURRENT_SCHEMA_VERSION = 3
+
 export const schema = {
   database: 'DOGRUDAN_TEMIN_DB',
   app_title: 'DT Asistan',
@@ -35,6 +37,32 @@ export const schema = {
   ]
 }
 
+export function runMigrations(db: Database.Database, fromVersion: number): void {
+  console.log(`Running migrations from schema version ${fromVersion} to ${CURRENT_SCHEMA_VERSION}...`)
+
+  if (fromVersion < 2) {
+    console.log('Migrating schema to version 2 (adding code columns to DATA_TeminDosyasi)...')
+    try {
+      db.exec('ALTER TABLE DATA_TeminDosyasi ADD COLUMN fonksiyonel_kod TEXT;')
+    } catch (e) {
+      // Column already exists, ignore
+    }
+    try {
+      db.exec('ALTER TABLE DATA_TeminDosyasi ADD COLUMN ekonomik_kod TEXT;')
+    } catch (e) {
+      // Column already exists, ignore
+    }
+  }
+
+  if (fromVersion < 3) {
+    console.log('Migrating schema to version 3...')
+    // Baseline version 3 changes if any
+  }
+
+  // Update schema version inside settings
+  db.exec(`INSERT OR REPLACE INTO settings (key, value) VALUES ('dbSchemaVersion', '${CURRENT_SCHEMA_VERSION}');`)
+}
+
 export function initializeDatabase(db: Database.Database, institutionName: string): void {
   // Temel ayarlar tablosu
   db.exec(`
@@ -44,22 +72,11 @@ export function initializeDatabase(db: Database.Database, institutionName: strin
     );
     INSERT OR REPLACE INTO settings (key, value) VALUES ('institutionName', '${institutionName.replace(/'/g, "''")}');
     INSERT OR REPLACE INTO settings (key, value) VALUES ('dbVersion', '${schema.version}');
+    INSERT OR REPLACE INTO settings (key, value) VALUES ('dbSchemaVersion', '${CURRENT_SCHEMA_VERSION}');
     INSERT OR REPLACE INTO settings (key, value) VALUES ('appTitle', '${schema.app_title}');
     INSERT OR REPLACE INTO settings (key, value) VALUES ('adminName', 'İlyas BOZDEMİR');
     INSERT OR REPLACE INTO settings (key, value) VALUES ('adminTitle', 'Sistem Yöneticisi');
   `)
-
-  // Migrations for existing databases
-  try {
-    db.exec('ALTER TABLE DATA_TeminDosyasi ADD COLUMN fonksiyonel_kod TEXT;')
-  } catch (e) {
-    // Column already exists, ignore
-  }
-  try {
-    db.exec('ALTER TABLE DATA_TeminDosyasi ADD COLUMN ekonomik_kod TEXT;')
-  } catch (e) {
-    // Column already exists, ignore
-  }
 
   // Tüm tabloları sırayla oluştur
   schema.tables.forEach((table: any) => {
