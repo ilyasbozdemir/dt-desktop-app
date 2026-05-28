@@ -179,16 +179,18 @@ if (!gotTheLock) {
         }
       })
 
-      const separator = data.path.includes('?') ? '&' : '?'
       const wpParam = data.workspacePath ? '&wp=' + encodeURIComponent(data.workspacePath) : ''
       if (is.dev && process.env['ELECTRON_RENDERER_URL']) {
+        // Dev: path goes into URL pathname, params into query string
         newWindow.loadURL(
-          process.env['ELECTRON_RENDERER_URL'] + '#' + data.path + separator + 'mode=window' + wpParam
+          process.env['ELECTRON_RENDERER_URL'] + data.path + '?mode=window' + wpParam
         )
       } else {
+        // Production: path goes into hash, params into search
         const indexHtml = join(__dirname, '../renderer/index.html')
         newWindow.loadFile(indexHtml, {
-          hash: data.path + separator + 'mode=window' + wpParam
+          hash: data.path,
+          search: 'mode=window' + wpParam
         })
       }
     })
