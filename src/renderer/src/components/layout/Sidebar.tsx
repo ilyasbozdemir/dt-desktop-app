@@ -50,6 +50,7 @@ const menuGroups = [
     title: 'Sistem',
     items: [
       { name: 'Raporlar', path: '/raporlar', icon: BarChart3 },
+      { name: 'Şablon Yönetimi', path: '/sablonlar', icon: FileText },
       { name: 'Mevzuat & Limitler', path: '/mevzuat', icon: Scale },
       { name: 'Ayarlar', path: '/ayarlar', icon: Settings }
     ]

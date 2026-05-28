@@ -13,6 +13,7 @@ import MalzemelerScreen from './screens/malzemeler/index.screen'
 import KurumScreen from './screens/kurum/index.screen'
 import ProfilScreen from './screens/profil/index.screen'
 import DosyaScreen from './screens/dosya/index.screen'
+import SablonlarScreen from './screens/sablonlar/index.screen'
 
 const rootRoute = createRootRoute({
   component: PageWrapper
@@ -40,6 +41,12 @@ const personelRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/personel',
   component: PersonelScreen
+})
+
+const sablonlarRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/sablonlar',
+  component: SablonlarScreen
 })
 
 // Placeholder routes
@@ -124,6 +131,7 @@ const routeTree = rootRoute.addChildren([
   dosyalarRoute,
   firmalarRoute,
   personelRoute,
+  sablonlarRoute,
   takipRoute,
   belgelerRoute,
   raporlarRoute,

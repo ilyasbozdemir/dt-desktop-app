@@ -8,6 +8,10 @@ import { DATA_TeminDosyasi } from './tables/DATA_TeminDosyasi'
 import { TANIM_Firma } from './tables/TANIM_Firma'
 import { TANIM_Ambar } from './tables/TANIM_Ambar'
 import { TANIM_AlimTuru } from './tables/TANIM_AlimTuru'
+import { TANIM_Sablon } from './tables/TANIM_Sablon'
+import { TANIM_Placeholder } from './tables/TANIM_Placeholder'
+import { TANIM_AlimTuru_Sablon } from './tables/TANIM_AlimTuru_Sablon'
+import { SABLON_Placeholder } from './tables/SABLON_Placeholder'
 import { CURRENT_SCHEMA_VERSION } from '../db/migrate'
 
 export const TablePrefixLogic = {
@@ -43,6 +47,10 @@ export const schema = {
     TANIM_Firma, // Kayıtlı firmalar havuzu
     TANIM_Ambar, // Ambar depoları
     TANIM_AlimTuru, // Alım Türleri
+    TANIM_Sablon, // Şablonlar
+    TANIM_Placeholder, // Dinamik alanlar
+    TANIM_AlimTuru_Sablon, // Alım türü ve şablon eşleşmeleri
+    SABLON_Placeholder, // Şablon içi alan eşleşmeleri
     // --- Operasyonel Veriler ---
     DATA_TeminDosyasi // Her bir temin kaydı
   ]
@@ -82,7 +90,8 @@ export function initializeDatabase(db: Database.Database, institutionName: strin
       })
       .join(', ')
 
-    db.exec('CREATE TABLE IF NOT EXISTS ' + table.name + ' (' + columnsSql + ');')
+    const constraintsSql = table.constraints ? ', ' + table.constraints.join(', ') : ''
+    db.exec('CREATE TABLE IF NOT EXISTS ' + table.name + ' (' + columnsSql + constraintsSql + ');')
 
     // Başlangıç verileri
     if (table.initialData && table.initialData.length > 0) {
