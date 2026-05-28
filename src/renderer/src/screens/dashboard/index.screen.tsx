@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import { useQuery } from '@tanstack/react-query'
 import {
   FileText,
   TrendingUp,
@@ -160,10 +161,36 @@ export default function DashboardScreen(): React.JSX.Element {
     }).format(value)
   }
 
-  const getAsamaDetails = (asama: 1 | 2 | 3 | 4 | 5) => {
-    switch (asama) {
+  const fetchAsamalar = async () => {
+    const res = await window.electron.ipcRenderer.invoke(
+      'db:query',
+      'SELECT * FROM TANIM_Asama WHERE aktif_mi = 1 ORDER BY asama_sira ASC'
+    )
+    if (!res.success) throw new Error(res.error)
+    return res.data
+  }
+
+  const { data: asamalar = [] } = useQuery({
+    queryKey: ['asamalar_dashboard'],
+    queryFn: fetchAsamalar
+  })
+
+  const getAsamaDetails = (asamaSira: number) => {
+    const asama = asamalar.find((a: any) => a.asama_sira === asamaSira)
+    if (asama) {
+      const colorMap: Record<string, string> = {
+        amber: 'bg-amber-50 text-amber-700 dark:bg-amber-950/20 dark:text-amber-450 border-amber-500/10',
+        blue: 'bg-blue-50 text-blue-700 dark:bg-blue-950/20 dark:text-blue-450 border-blue-500/10',
+        purple: 'bg-indigo-50 text-indigo-700 dark:bg-indigo-950/20 dark:text-indigo-450 border-indigo-500/10',
+        emerald: 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/20 dark:text-emerald-450 border-emerald-500/10'
+      }
+      return { name: asama.asama_adi, color: colorMap[asama.rozet_rengi] || colorMap['blue'] }
+    }
+    
+    // Fallback if db not loaded
+    switch (asamaSira) {
       case 1:
-        return { name: 'Hazırlık Aşaması', color: 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300' }
+        return { name: 'Hazırlık Aşaması', color: 'bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-300 border-slate-500/10' }
       case 2:
         return { name: 'Piyasa Araştırması', color: 'bg-amber-50 text-amber-700 dark:bg-amber-950/20 dark:text-amber-450 border-amber-500/10' }
       case 3:
@@ -172,6 +199,8 @@ export default function DashboardScreen(): React.JSX.Element {
         return { name: 'Karar & Onay', color: 'bg-indigo-50 text-indigo-700 dark:bg-indigo-950/20 dark:text-indigo-450 border-indigo-500/10' }
       case 5:
         return { name: 'Fatura / Ödeme', color: 'bg-emerald-50 text-emerald-700 dark:bg-emerald-950/20 dark:text-emerald-450 border-emerald-500/10' }
+      default:
+        return { name: 'Belirsiz Aşama', color: 'bg-slate-50 text-slate-700 dark:bg-slate-900 dark:text-slate-400' }
     }
   }
 

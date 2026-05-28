@@ -201,12 +201,22 @@ interface Asama {
   rozet_rengi: string
 }
 
+const defaultAsamalar: Asama[] = [
+  { id: 1, asama_sira: 1, asama_adi: 'İhtiyaç Tespiti & Başlangıç', aciklama: 'İlgili birim tarafından ihtiyacın belirlendiği ve harcama talimatının hazırlandığı ilk aşamadır.', rozet_rengi: 'amber' },
+  { id: 2, asama_sira: 2, asama_adi: 'Piyasa Fiyat Araştırması', aciklama: 'Firmalardan tekliflerin toplandığı, yaklaşık maliyetin belirlendiği ve alım yapılacak firmanın seçildiği aşamadır.', rozet_rengi: 'blue' },
+  { id: 3, asama_sira: 3, asama_adi: 'Sipariş & Sözleşme', aciklama: 'Harcama yetkilisinden nihai onayın alındığı ve firmaya siparişin geçildiği (gerekiyorsa sözleşmenin imzalandığı) aşamadır.', rozet_rengi: 'purple' },
+  { id: 4, asama_sira: 4, asama_adi: 'Kabul & Ödeme İşlemleri', aciklama: 'Mal veya hizmetin teslim alındığı, kabul komisyonunca onaylandığı ve ödeme evraklarının (ÖEB) Mali Hizmetlere sevk edildiği son aşamadır.', rozet_rengi: 'emerald' }
+];
+
 const fetchAsamalar = async (): Promise<Asama[]> => {
   const res = await window.electron.ipcRenderer.invoke(
     'db:query',
     'SELECT * FROM TANIM_Asama WHERE aktif_mi = 1 ORDER BY asama_sira ASC'
   )
   if (!res.success) throw new Error(res.error)
+  if (!res.data || res.data.length === 0) {
+    return defaultAsamalar;
+  }
   return res.data
 }
 
@@ -219,6 +229,14 @@ export function MevzuatScreen(): React.JSX.Element {
   const [isConfirmed, setIsConfirmed] = useState(false)
   const [butceSearch, setButceSearch] = useState('')
   const [copiedText, setCopiedText] = useState('')
+
+  // Dinamik Alım Türü Rehberi State
+  const [alimTurleri, setAlimTurleri] = useState([
+    { id: '1', ad: 'Mal Alımı', ikon: 'Building2', belgeler: ['Onay Belgesi', 'Piyasa Fiyat Araştırması Tutanağı', 'Muayene ve Kabul Komisyonu Tutanağı', 'Fatura / e-Arşiv Fatura', 'Taşınır İşlem Fişi (TİF)'], sablonId: '' },
+    { id: '2', ad: 'Hizmet Alımı', ikon: 'Briefcase', belgeler: ['Onay Belgesi', 'Piyasa Fiyat Araştırması Tutanağı', 'Hizmet İşleri Kabul Tutanağı', 'Fatura / e-Arşiv Fatura'], sablonId: '' },
+    { id: '3', ad: 'Yapım İşi', ikon: 'HardHat', belgeler: ['Yaklaşık Maliyet Hesap Cetveli', 'Onay Belgesi', 'Piyasa Fiyat Araştırması Tutanağı', 'Yapım İşleri Kabul Tutanağı', 'Sözleşme (İdare Gerekli Görürse)'], sablonId: '' }
+  ])
+  const [yeniAlimTuru, setYeniAlimTuru] = useState('')
 
   // Mali & Kurumsal Kodlar States
   const [kurumsalKod1, setKurumsalKod1] = useState('')
@@ -1021,106 +1039,80 @@ export function MevzuatScreen(): React.JSX.Element {
 
         {activeTab === 'rehber' && (
           <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
-            <h2 className="text-xl font-bold text-slate-800 dark:text-slate-200 mb-2">
-              Alım Türlerine Göre Belge Rehberi
-            </h2>
-            <p className="text-sm text-slate-500 dark:text-slate-400 mb-6">
-              Doğrudan temin ile yapılacak alımlarda, alımın türüne göre dosyada bulunması gereken
-              asgari belgeler.
-            </p>
+            <div className="flex items-center justify-between mb-2">
+              <div>
+                <h2 className="text-xl font-bold text-slate-800 dark:text-slate-200">
+                  Alım Türlerine Göre Belge Rehberi
+                </h2>
+                <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
+                  Doğrudan temin ile yapılacak alımlarda, alımın türüne göre dosyada bulunması gereken asgari belgeler. İlerleyen aşamalarda bu türleri dinamik şablon ID\'leri ile bağlayabilirsiniz.
+                </p>
+              </div>
+              <div className="flex items-center gap-2 shrink-0">
+                <Input 
+                  value={yeniAlimTuru} 
+                  onChange={(e) => setYeniAlimTuru(e.target.value)} 
+                  placeholder="Yeni Tür Adı..." 
+                  className="bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-sm h-9" 
+                />
+                <Button 
+                  onClick={() => {
+                    if(yeniAlimTuru.trim()) {
+                      setAlimTurleri([...alimTurleri, { id: Date.now().toString(), ad: yeniAlimTuru.trim(), ikon: 'FileText', belgeler: ['Onay Belgesi', 'Piyasa Fiyat Araştırması Tutanağı'], sablonId: '' }]);
+                      setYeniAlimTuru('');
+                    }
+                  }}
+                  className="bg-blue-600 hover:bg-blue-700 text-white h-9 px-3"
+                >
+                  <Plus className="w-4 h-4 mr-1" /> Ekle
+                </Button>
+              </div>
+            </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {/* Mal Alımı */}
-              <div className="bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 hover:border-blue-300 dark:hover:border-blue-700 transition-colors">
-                <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900/30 rounded-xl flex items-center justify-center text-blue-600 dark:text-blue-400 mb-4">
-                  <Building2 className="w-6 h-6" />
+              {alimTurleri.map((tur) => (
+                <div key={tur.id} className="bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 hover:border-blue-300 dark:hover:border-blue-700 transition-colors relative group">
+                  <button 
+                    onClick={() => setAlimTurleri(alimTurleri.filter(t => t.id !== tur.id))}
+                    className="absolute top-3 right-3 text-slate-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity"
+                    title="Bu türü sil"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                  <div className="w-12 h-12 bg-blue-100 dark:bg-blue-900/30 rounded-xl flex items-center justify-center text-blue-600 dark:text-blue-400 mb-4">
+                    {tur.ikon === 'Building2' && <Building2 className="w-6 h-6" />}
+                    {tur.ikon === 'Briefcase' && <Briefcase className="w-6 h-6" />}
+                    {tur.ikon === 'HardHat' && <HardHat className="w-6 h-6" />}
+                    {tur.ikon === 'FileText' && <FileText className="w-6 h-6" />}
+                  </div>
+                  <h3 className="text-lg font-bold text-slate-800 dark:text-white mb-3">{tur.ad}</h3>
+                  <div className="mb-4">
+                    <label className="text-[10px] font-semibold text-slate-500 dark:text-slate-400 block mb-1">Şablon ID (Bağlantı)</label>
+                    <Input 
+                      value={tur.sablonId} 
+                      onChange={(e) => {
+                        const newTurleri = [...alimTurleri];
+                        const index = newTurleri.findIndex(t => t.id === tur.id);
+                        if(index > -1) { newTurleri[index].sablonId = e.target.value; setAlimTurleri(newTurleri); }
+                      }}
+                      placeholder="Şablon ID..." 
+                      className="h-7 text-xs bg-white dark:bg-slate-950" 
+                    />
+                  </div>
+                  <ul className="space-y-2.5 text-sm text-slate-600 dark:text-slate-300">
+                    {tur.belgeler.map((belge, idx) => (
+                      <li key={idx} className="flex items-start gap-2">
+                        <CheckCircle2 className="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" />
+                        <span>{belge}</span>
+                      </li>
+                    ))}
+                    <li className="flex items-start gap-2 mt-2 pt-2 border-t border-slate-200 dark:border-slate-800">
+                      <Plus className="w-4 h-4 text-slate-400 mt-0.5 shrink-0" />
+                      <span className="text-slate-400 italic text-xs cursor-pointer hover:text-blue-500">Yeni İşlem Sırası Ekle...</span>
+                    </li>
+                  </ul>
                 </div>
-                <h3 className="text-lg font-bold text-slate-800 dark:text-white mb-3">Mal Alımı</h3>
-                <ul className="space-y-2.5 text-sm text-slate-600 dark:text-slate-300">
-                  <li className="flex items-start gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" />
-                    <span>Onay Belgesi</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" />
-                    <span>Piyasa Fiyat Araştırması Tutanağı</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" />
-                    <span>Muayene ve Kabul Komisyonu Tutanağı</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" />
-                    <span>Fatura / e-Arşiv Fatura</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" />
-                    <span>Taşınır İşlem Fişi (TİF)</span>
-                  </li>
-                </ul>
-              </div>
-
-              {/* Hizmet Alımı */}
-              <div className="bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 hover:border-purple-300 dark:hover:border-purple-700 transition-colors">
-                <div className="w-12 h-12 bg-purple-100 dark:bg-purple-900/30 rounded-xl flex items-center justify-center text-purple-600 dark:text-purple-400 mb-4">
-                  <Briefcase className="w-6 h-6" />
-                </div>
-                <h3 className="text-lg font-bold text-slate-800 dark:text-white mb-3">
-                  Hizmet Alımı
-                </h3>
-                <ul className="space-y-2.5 text-sm text-slate-600 dark:text-slate-300">
-                  <li className="flex items-start gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" />
-                    <span>Onay Belgesi</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" />
-                    <span>Piyasa Fiyat Araştırması Tutanağı</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" />
-                    <span>Hizmet İşleri Kabul Tutanağı</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" />
-                    <span>Fatura / e-Arşiv Fatura</span>
-                  </li>
-                  <li className="flex items-start gap-2 text-slate-400">
-                    <Info className="w-4 h-4 mt-0.5 shrink-0" />
-                    <span className="italic">Gerekirse hakediş raporu</span>
-                  </li>
-                </ul>
-              </div>
-
-              {/* Yapım İşi */}
-              <div className="bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 hover:border-orange-300 dark:hover:border-orange-700 transition-colors">
-                <div className="w-12 h-12 bg-orange-100 dark:bg-orange-900/30 rounded-xl flex items-center justify-center text-orange-600 dark:text-orange-400 mb-4">
-                  <HardHat className="w-6 h-6" />
-                </div>
-                <h3 className="text-lg font-bold text-slate-800 dark:text-white mb-3">Yapım İşi</h3>
-                <ul className="space-y-2.5 text-sm text-slate-600 dark:text-slate-300">
-                  <li className="flex items-start gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" />
-                    <span>Yaklaşık Maliyet Hesap Cetveli</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" />
-                    <span>Onay Belgesi</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" />
-                    <span>Piyasa Fiyat Araştırması Tutanağı</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" />
-                    <span>Yapım İşleri Kabul Tutanağı</span>
-                  </li>
-                  <li className="flex items-start gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" />
-                    <span>Sözleşme (İdare Gerekli Görürse)</span>
-                  </li>
-                </ul>
-              </div>
+              ))}
             </div>
           </div>
         )}
