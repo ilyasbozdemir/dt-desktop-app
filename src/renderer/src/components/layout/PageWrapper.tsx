@@ -3,8 +3,10 @@ import { Outlet, useRouterState } from '@tanstack/react-router'
 import { Sidebar } from './Sidebar'
 import { Header } from './Header'
 import { Footer } from './Footer'
+import { TabsBar } from './TabsBar'
 import { useWorkspaceStore } from '../../store/workspaceStore'
 import { useSettingsStore } from '../../store/settingsStore'
+import { useTabStore } from '../../store/tabStore'
 import LauncherScreen from '../../screens/launcher/index.screen'
 import LockScreen from './LockScreen'
 import { useQueryClient } from '@tanstack/react-query'
@@ -33,6 +35,7 @@ export function PageWrapper(): React.ReactNode {
 
   const { activeFilePath, openWorkspace, isAuthenticated, loadActiveMeta } = useWorkspaceStore()
   const { loadSettings } = useSettingsStore()
+  const { addTab, clearTabs } = useTabStore()
   const queryClient = useQueryClient()
 
   useEffect(() => {
@@ -41,6 +44,20 @@ export function PageWrapper(): React.ReactNode {
       loadActiveMeta()
     }
   }, [activeFilePath, isAuthenticated, loadSettings, loadActiveMeta])
+
+  // Sync route with tab store
+  useEffect(() => {
+    if (activeFilePath && isAuthenticated) {
+      addTab(routerState.location.href)
+    }
+  }, [routerState.location.href, activeFilePath, isAuthenticated, addTab])
+
+  // Reset tabs when workspace/auth is closed
+  useEffect(() => {
+    if (!activeFilePath || !isAuthenticated) {
+      clearTabs()
+    }
+  }, [activeFilePath, isAuthenticated, clearTabs])
 
   useEffect(() => {
     // Initial fetch of DB name if any (in case backend already has an open DB on soft reload)
@@ -142,6 +159,7 @@ export function PageWrapper(): React.ReactNode {
       <Sidebar />
       <div className="flex flex-col flex-1 min-w-0">
         <Header />
+        <TabsBar />
         <main className="flex-1 overflow-auto p-6">
           <Outlet />
         </main>

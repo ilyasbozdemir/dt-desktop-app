@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { useDosyalarHooks, TeminDosyasi } from './dosyalar.hooks'
+import { useTabStore } from '../../store/tabStore'
+import { useRouterState } from '@tanstack/react-router'
 import {
   Search,
   Plus,
@@ -25,6 +27,8 @@ import { FONKSIYONEL_KODLAR, EKONOMIK_KODLAR } from '../../constants/butce-kodla
 export default function DosyalarScreen(): React.ReactNode {
   const { dosyalar, isLoadingDosyalar, addDosya, updateDosya, deleteDosya } = useDosyalarHooks()
   const { activeDosyaId, setActiveDosyaId, isCreatingDosya, setIsCreatingDosya } = useWorkspaceStore()
+  const { updateTabLabel } = useTabStore()
+  const routerState = useRouterState()
   
   const [searchQuery, setSearchQuery] = useState('')
   const [isCreating, setIsCreating] = useState(false)
@@ -41,6 +45,16 @@ export default function DosyalarScreen(): React.ReactNode {
   const [formEkonomikKod, setFormEkonomikKod] = useState('')
 
   const selectedDosya = dosyalar.find((d) => d.id === activeDosyaId)
+
+  // Dynamically update the tab label with the active file's topic
+  useEffect(() => {
+    const currentHref = routerState.location.href
+    if (selectedDosya) {
+      updateTabLabel(currentHref, `DT: ${selectedDosya.konu}`)
+    } else {
+      updateTabLabel(currentHref, 'Doğrudan Temin')
+    }
+  }, [selectedDosya, routerState.location.href, updateTabLabel])
 
   // Listen to global create trigger (e.g. from header selector)
   useEffect(() => {
