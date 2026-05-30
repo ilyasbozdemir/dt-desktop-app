@@ -33,6 +33,7 @@ export function getTabLabel(fullPath: string): string {
   if (path.startsWith('/belgeler')) return 'Belgeler & Formlar'
   if (path.startsWith('/raporlar')) return 'Raporlar'
   if (path.startsWith('/tema')) return 'Tema Ayarları'
+  if (path.startsWith('/sablonlar')) return 'Şablon Yönetimi'
   return 'Yeni Sekme'
 }
 
