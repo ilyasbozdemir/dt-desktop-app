@@ -16,6 +16,7 @@ import KurumScreen from './screens/kurum/index.screen'
 import ProfilScreen from './screens/profil/index.screen'
 import DosyaScreen from './screens/dosya/index.screen'
 import SablonlarScreen from './screens/sablonlar/index.screen'
+import RaporlarScreen from './screens/raporlar/index.screen'
 
 const rootRoute = createRootRoute({
   component: PageWrapper
@@ -71,7 +72,7 @@ const belgelerRoute = createRoute({
 const raporlarRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/raporlar',
-  component: () => <div className="p-4 text-slate-500">Raporlar ekranı yapım aşamasında...</div>
+  component: RaporlarScreen
 })
 
 const mevzuatRoute = createRoute({
