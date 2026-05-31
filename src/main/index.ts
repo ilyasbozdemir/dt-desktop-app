@@ -2,6 +2,9 @@ import { app, shell, BrowserWindow, ipcMain, dialog } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import { autoUpdater } from 'electron-updater'
+import isDev from 'electron-is-dev'
+import fs from 'fs'
+import yaml from 'js-yaml'
 import icon from '../../resources/icon.png?asset'
 import { workspaceManager } from './db/workspace'
 import { CURRENT_SCHEMA_VERSION } from './db/migrate'
@@ -925,8 +928,46 @@ if (!gotTheLock) {
     }
 
     // --- Auto Updater Logic ---
-    // Uygulama açıldıktan saniyeler sonra güncellemeleri kontrol et (Geliştirme modunda atlar)
-    if (!is.dev) {
+    // Uygulama açıldıktan saniyeler sonra güncellemeleri kontrol et
+    if (isDev) {
+      setTimeout(async () => {
+        try {
+          const db = workspaceManager.getDb()
+          const testModeRow = db.prepare("SELECT value FROM settings WHERE key = 'devUpdateTestMode'").get() as { value: string } | undefined
+          const devVersionRow = db.prepare("SELECT value FROM settings WHERE key = 'devUpdateVersion'").get() as { value: string } | undefined
+          
+          if (testModeRow?.value === 'true') {
+            autoUpdater.forceDevUpdateConfig = true
+
+            if (devVersionRow?.value) {
+              autoUpdater.currentVersion = devVersionRow.value
+            } else {
+              // Read dev-app-update.yml to get owner and repo
+              const ymlPath = join(__dirname, '../../dev-app-update.yml')
+              if (fs.existsSync(ymlPath)) {
+                const config = yaml.load(fs.readFileSync(ymlPath, 'utf8')) as any
+                if (config && config.owner && config.repo) {
+                  const res = await fetch(`https://api.github.com/repos/${config.owner}/${config.repo}/releases`)
+                  const releases = await res.json()
+                  if (Array.isArray(releases)) {
+                    console.log('GitHub Releases List:')
+                    releases.forEach((r, i) => console.log(`[${i}] ${r.tag_name}`))
+                    if (releases.length > 0) {
+                      const targetVersion = releases[releases.length - 1].tag_name.replace('v', '')
+                      autoUpdater.currentVersion = targetVersion
+                    }
+                  }
+                }
+              }
+            }
+            
+            autoUpdater.checkForUpdatesAndNotify()
+          }
+        } catch (e) {
+          console.error('Dev update check failed:', e)
+        }
+      }, 5000)
+    } else {
       autoUpdater.checkForUpdatesAndNotify()
     }
 

@@ -1,10 +1,20 @@
 import React from 'react'
-import { Bell, Moon, Sun, Minus, Square, X } from 'lucide-react'
+import { Bell, Moon, Sun, Minus, Square, X, DownloadCloud } from 'lucide-react'
 import { useTheme } from '../providers/ThemeProvider'
 import { TeminSelector } from './TeminSelector'
 
 export function Header(): React.JSX.Element {
   const { theme, setTheme } = useTheme()
+  const [updateStatus, setUpdateStatus] = React.useState<{status: string, version?: string} | null>(null)
+
+  React.useEffect(() => {
+    const removeListener = window.electron?.ipcRenderer.on('updater:status', (_event, data) => {
+      setUpdateStatus(data as any)
+    })
+    return () => {
+      if (removeListener) removeListener()
+    }
+  }, [])
 
   const handleMinimize = () => window.electron?.ipcRenderer.send('window-minimize')
   const handleMaximize = () => window.electron?.ipcRenderer.send('window-maximize')
@@ -33,6 +43,16 @@ export function Header(): React.JSX.Element {
         >
           {theme === 'dark' ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
         </button>
+
+        {updateStatus && (updateStatus.status === 'available' || updateStatus.status === 'downloaded') && (
+          <button
+            className="relative p-2 text-blue-500 hover:text-blue-600 transition-all rounded-xl hover:bg-blue-50 dark:hover:bg-blue-900/30"
+            title={`Yeni sürüm mevcut: ${updateStatus.version}`}
+          >
+            <DownloadCloud className="w-4 h-4" />
+            <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-blue-500 rounded-full border-2 border-white dark:border-slate-900 shadow-sm"></span>
+          </button>
+        )}
 
         <button
           className="relative p-2 text-slate-500 hover:text-slate-800 dark:text-slate-400 dark:hover:text-slate-200 transition-all rounded-xl hover:bg-slate-200/50 dark:hover:bg-slate-800/50 mr-2"

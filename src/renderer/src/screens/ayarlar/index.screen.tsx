@@ -9,12 +9,13 @@ import {
   Upload,
   Download,
   Settings,
-  Palette
+  Palette,
+  Code
 } from 'lucide-react'
 import TemaScreen from './TemaScreen'
 import { useLocation } from '@tanstack/react-router'
 
-type TabType = 'smtp' | 'tema'  
+type TabType = 'smtp' | 'tema' | 'developer'
 
 
 export default function AyarlarScreen(): React.ReactNode {
@@ -25,7 +26,7 @@ export default function AyarlarScreen(): React.ReactNode {
   const [activeTab, setActiveTab] = useState<TabType>(() => {
     const params = new URLSearchParams(location.search)
     const tabParam = params.get('tab') as TabType
-    if (tabParam === 'smtp' || tabParam === 'tema') {
+    if (tabParam === 'smtp' || tabParam === 'tema' || tabParam === 'developer') {
       return tabParam
     }
     return 'smtp'
@@ -34,7 +35,7 @@ export default function AyarlarScreen(): React.ReactNode {
   useEffect(() => {
     const params = new URLSearchParams(location.search)
     const tabParam = params.get('tab') as TabType
-    if (tabParam === 'smtp' || tabParam === 'tema') {
+    if (tabParam === 'smtp' || tabParam === 'tema' || tabParam === 'developer') {
       setActiveTab(tabParam)
     }
   }, [location.search])
@@ -48,6 +49,10 @@ export default function AyarlarScreen(): React.ReactNode {
   const [smtpPass, setSmtpPass] = useState('')
   const [smtpSecure, setSmtpSecure] = useState(false)
 
+  // Tab 6: Geliştirici Ayarları
+  const [devUpdateTestMode, setDevUpdateTestMode] = useState(false)
+  const [devUpdateVersion, setDevUpdateVersion] = useState('')
+
   useEffect(() => {
     if (settings) {
       setTimeout(() => {
@@ -56,20 +61,28 @@ export default function AyarlarScreen(): React.ReactNode {
         setSmtpUser(settings.smtp_user || '')
         setSmtpPass(settings.smtp_pass || '')
         setSmtpSecure(settings.smtp_secure === 'true')
+        
+        setDevUpdateTestMode(settings.devUpdateTestMode === 'true')
+        setDevUpdateVersion(settings.devUpdateVersion || '')
       }, 0)
     }
   }, [settings])
 
   const handleSaveTab = async (tab: TabType): Promise<void> => {
-    if (tab !== 'smtp') return
+    if (tab !== 'smtp' && tab !== 'developer') return
     setSaving(true)
     try {
-      const dataToSave: Record<string, string> = {
-        smtp_host: smtpHost,
-        smtp_port: smtpPort,
-        smtp_user: smtpUser,
-        smtp_pass: smtpPass,
-        smtp_secure: smtpSecure ? 'true' : 'false'
+      const dataToSave: Record<string, string> = {}
+      
+      if (tab === 'smtp') {
+        dataToSave.smtp_host = smtpHost
+        dataToSave.smtp_port = smtpPort
+        dataToSave.smtp_user = smtpUser
+        dataToSave.smtp_pass = smtpPass
+        dataToSave.smtp_secure = smtpSecure ? 'true' : 'false'
+      } else if (tab === 'developer') {
+        dataToSave.devUpdateTestMode = devUpdateTestMode ? 'true' : 'false'
+        dataToSave.devUpdateVersion = devUpdateVersion
       }
 
       await saveSettings(dataToSave)
@@ -147,6 +160,20 @@ export default function AyarlarScreen(): React.ReactNode {
           >
             <Palette className="w-4 h-4 shrink-0" />
             <span>Renk & Tema</span>
+          </button>
+
+          <div className="h-px bg-slate-100 dark:bg-slate-800 my-2" />
+
+          <button
+            onClick={() => setActiveTab('developer')}
+            className={`flex items-center gap-3 w-full text-left py-2.5 px-4 text-xs font-bold rounded-xl transition-all ${
+              activeTab === 'developer'
+                ? 'bg-blue-600 text-white shadow-md shadow-blue-500/20'
+                : 'text-slate-650 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-100'
+            }`}
+          >
+            <Code className="w-4 h-4 shrink-0" />
+            <span>Geliştirici & Test</span>
           </button>
         </div>
 
@@ -252,6 +279,54 @@ export default function AyarlarScreen(): React.ReactNode {
                           SSL/TLS Bağlantısı (Güvenli)
                         </label>
                       </div>
+                    </div>
+                  </div>
+                )}
+
+                {/* TAB 6: GELİŞTİRİCİ AYARLARI */}
+                {activeTab === 'developer' && (
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-2">
+                      <div>
+                        <h2 className="text-lg font-bold text-slate-850 dark:text-slate-100">
+                          Geliştirici ve Test Ayarları
+                        </h2>
+                        <p className="text-xs text-slate-500">
+                          Geliştirme modunda otomatik güncellemeleri test etmek için kullanılır.
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+                      <div className="md:col-span-2 flex items-center gap-2">
+                        <input
+                          type="checkbox"
+                          id="devUpdateTestMode"
+                          checked={devUpdateTestMode}
+                          onChange={(e) => setDevUpdateTestMode(e.target.checked)}
+                          className="rounded border-slate-300 dark:border-slate-700 bg-slate-55 dark:bg-slate-950 text-blue-600 focus:ring-blue-500"
+                        />
+                        <label
+                          htmlFor="devUpdateTestMode"
+                          className="text-xs font-semibold text-slate-600 dark:text-slate-400 cursor-pointer"
+                        >
+                          Geliştirici Modunda (Dev Mode) Güncelleme Testini Etkinleştir
+                        </label>
+                      </div>
+
+                      {devUpdateTestMode && (
+                        <div className="md:col-span-1">
+                          <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1">
+                            Şu Anki Versiyonu Şöyle Göster (currentVersion mock)
+                          </label>
+                          <Input
+                            placeholder="Örn: 0.0.1 veya 1.0.0-alpha.3"
+                            value={devUpdateVersion}
+                            onChange={(e) => setDevUpdateVersion(e.target.value)}
+                            className="bg-slate-55 dark:bg-slate-950 border-slate-200 dark:border-slate-800"
+                          />
+                        </div>
+                      )}
                     </div>
                   </div>
                 )}
