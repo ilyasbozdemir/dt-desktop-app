@@ -1160,7 +1160,6 @@ if (!gotTheLock) {
                   const res = await fetch(`https://api.github.com/repos/${config.owner}/${config.repo}/releases`)
                   const releases = await res.json()
                   if (Array.isArray(releases)) {
-                    console.log('GitHub Releases List:')
                     releases.forEach((r, i) => console.log(`[${i}] ${r.tag_name}`))
                     if (releases.length > 0) {
                       const targetVersion = releases[releases.length - 1].tag_name.replace('v', '')
