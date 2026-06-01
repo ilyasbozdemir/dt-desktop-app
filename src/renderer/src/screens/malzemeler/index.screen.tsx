@@ -90,8 +90,8 @@ export default function MalzemelerScreen(): React.JSX.Element {
 
   return (
     <div className="p-8 max-w-7xl mx-auto flex flex-col gap-6 w-full animate-in fade-in slide-in-from-bottom-4 duration-500 overflow-y-auto max-h-full">
-      <div className="flex justify-between items-end border-b border-slate-200 dark:border-slate-800 pb-4">
-        <div>
+      <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-6 border-b border-slate-200 dark:border-slate-800 pb-4">
+        <div className="flex-1 min-w-0">
           <h1 className="text-3xl font-bold tracking-tight flex items-center gap-3 text-slate-850 dark:text-slate-100">
             <PackageSearch className="w-8 h-8 text-blue-605" />
             Malzeme & Hizmet Tanımları
@@ -108,12 +108,12 @@ export default function MalzemelerScreen(): React.JSX.Element {
             </p>
           </div>
         </div>
-        <div className="flex items-center gap-6">
+        <div className="flex flex-wrap items-center gap-4 sm:gap-6 shrink-0">
           <div className="text-right border-r border-slate-200 dark:border-slate-800 pr-6 hidden sm:block">
             <div className="text-2xl font-bold text-slate-800 dark:text-slate-100">{kalemList.length}</div>
             <div className="text-[10px] text-slate-400 uppercase tracking-wider font-bold">Kayıtlı Kalem</div>
           </div>
-          <div className="flex gap-3">
+          <div className="flex flex-wrap gap-2">
             <Link to="/tasinirkod">
               <Button
                 variant="outline"
@@ -181,14 +181,14 @@ export default function MalzemelerScreen(): React.JSX.Element {
 
       <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm flex flex-col flex-1 overflow-hidden">
         {/* TABS & SEARCH */}
-        <div className="flex items-center justify-between p-4 border-b border-slate-200 dark:border-slate-800">
-          <div className="flex bg-slate-100 dark:bg-slate-800/50 p-1 rounded-lg">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 p-4 border-b border-slate-200 dark:border-slate-800">
+          <div className="flex bg-slate-100 dark:bg-slate-800/50 p-1 rounded-lg overflow-x-auto max-w-full">
             {['Tümü', 'Mal Alımı', 'Hizmet Alımı', 'Yapım İşi'].map(tab => (
               <button
                 key={tab}
                 onClick={() => setActiveTab(tab)}
                 className={cn(
-                  "px-4 py-1.5 text-xs font-semibold rounded-md transition-all",
+                  "px-4 py-1.5 text-xs font-semibold rounded-md transition-all whitespace-nowrap",
                   activeTab === tab 
                     ? "bg-white dark:bg-slate-700 text-blue-600 dark:text-blue-400 shadow-sm"
                     : "text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200"
@@ -199,7 +199,7 @@ export default function MalzemelerScreen(): React.JSX.Element {
             ))}
           </div>
           
-          <div className="relative w-72">
+          <div className="relative w-full sm:w-72">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
             <input
               type="text"

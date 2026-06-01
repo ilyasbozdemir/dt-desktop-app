@@ -527,7 +527,7 @@ export default function DosyalarScreen(): React.ReactNode {
           /* SEÇİLİ DOSYA DETAY GÖRÜNÜMÜ (READ-ONLY) */
           <div className="flex-1 overflow-y-auto custom-scrollbar p-8 flex flex-col justify-between">
             <div className="space-y-6">
-              <div className="flex items-start justify-between pb-6 border-b border-slate-100 dark:border-slate-800">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-6 border-b border-slate-100 dark:border-slate-800">
                 <div>
                   <div className="flex items-center gap-3 mb-2.5">
                     <span className="px-2.5 py-1 rounded-lg bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400 text-xs font-bold tracking-wide uppercase border border-blue-100/30 dark:border-blue-900/20">

@@ -20,13 +20,13 @@ export function InnerMenu({ items, activeId, onChange, className }: InnerMenuPro
   return (
     <div
       className={cn(
-        'bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-4 shadow-sm flex flex-col gap-1.5',
+        'bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-3 shadow-sm flex flex-row overflow-x-auto lg:flex-col gap-1.5 custom-scrollbar',
         className
       )}
     >
       {items.map((item, idx) => {
         if (item.isDivider) {
-          return <div key={`div-${idx}`} className="h-px bg-slate-100 dark:bg-slate-800 my-1" />
+          return <div key={`div-${idx}`} className="hidden lg:block h-px bg-slate-100 dark:bg-slate-800 my-1" />
         }
 
         const isActive = activeId === item.id
@@ -35,7 +35,7 @@ export function InnerMenu({ items, activeId, onChange, className }: InnerMenuPro
             key={item.id}
             onClick={() => onChange(item.id)}
             className={cn(
-              'flex items-center gap-3 w-full text-left py-2.5 px-4 rounded-xl transition-all',
+              'flex items-center gap-3 shrink-0 py-2 px-3 lg:py-2.5 lg:px-4 rounded-xl transition-all w-auto lg:w-full text-left',
               isActive
                 ? 'bg-primary text-primary-foreground shadow-md shadow-primary/20'
                 : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 hover:text-slate-900 dark:hover:text-slate-100'
@@ -45,7 +45,7 @@ export function InnerMenu({ items, activeId, onChange, className }: InnerMenuPro
               {item.icon}
             </span>
             <div className="flex flex-col">
-              <span className="text-xs font-bold leading-tight">{item.label}</span>
+              <span className="text-xs font-bold leading-tight whitespace-nowrap">{item.label}</span>
               {item.description && (
                 <span className="text-[10px] text-slate-400 dark:text-slate-500 mt-0.5 leading-tight">
                   {item.description}

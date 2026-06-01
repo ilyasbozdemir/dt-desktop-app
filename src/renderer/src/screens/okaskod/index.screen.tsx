@@ -145,9 +145,9 @@ export default function OkasKodScreen(): React.JSX.Element {
     <div className="flex flex-col h-full bg-slate-50 dark:bg-slate-900 overflow-hidden">
       {/* Header */}
       <div className="flex-shrink-0 border-b border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800">
-        <div className="flex items-center justify-between px-6 py-4">
+        <div className="flex flex-col md:flex-row md:items-center justify-between px-6 py-4 gap-4">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-lg bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center">
+            <div className="w-9 h-9 rounded-lg bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center shrink-0">
               <Tag className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
             </div>
             <div>
@@ -155,30 +155,30 @@ export default function OkasKodScreen(): React.JSX.Element {
               <p className="text-xs text-slate-500 dark:text-slate-400">Ortak Kamu Alımları Sözlüğü kodları</p>
             </div>
           </div>
-          <div className="flex items-center gap-3">
-            <div className="flex flex-col items-end">
+          <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6 w-full md:w-auto">
+            <div className="text-left sm:text-right sm:border-r border-slate-200 dark:border-slate-700 sm:pr-6">
               <div className="text-2xl font-bold text-slate-800 dark:text-slate-100">{okasKodList.length}</div>
               <div className="text-[10px] text-slate-400 uppercase tracking-wider font-bold">Kayıtlı Kod</div>
             </div>
-            <div className="flex gap-2">
+            <div className="flex flex-wrap gap-2">
               <Button
                 onClick={handleExportTemplate}
                 disabled={isExportingTemplate}
                 variant="outline"
-                className="gap-2 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 flex items-center px-4 py-2 text-sm"
+                className="gap-2 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 flex items-center px-3 py-1.5 sm:px-4 sm:py-2 text-sm flex-1 sm:flex-initial justify-center"
               >
                 <Download className="w-4 h-4" /> Şablon İndir
               </Button>
               <Button
                 onClick={handleImportExcel}
                 disabled={isImporting}
-                className="gap-2 bg-indigo-600 hover:bg-indigo-700 shadow-md flex items-center px-4 py-2 text-sm"
+                className="gap-2 bg-indigo-600 hover:bg-indigo-700 shadow-md flex items-center px-3 py-1.5 sm:px-4 sm:py-2 text-sm flex-1 sm:flex-initial justify-center"
               >
                 <FileUp className="w-4 h-4" /> {isImporting ? 'Aktarılıyor...' : "Excel'den İçe Aktar"}
               </Button>
               <Button
                 onClick={handleOpenModal}
-                className="gap-2 bg-blue-600 hover:bg-blue-700 shadow-md flex items-center px-4 py-2 text-sm"
+                className="gap-2 bg-blue-600 hover:bg-blue-700 shadow-md flex items-center px-3 py-1.5 sm:px-4 sm:py-2 text-sm w-full sm:w-auto justify-center"
               >
                 <Plus className="w-4 h-4" /> Yeni Kod Ekle
               </Button>
@@ -219,9 +219,9 @@ export default function OkasKodScreen(): React.JSX.Element {
       </div>
 
       {/* Arama & Tablo */}
-      <div className="flex-1 overflow-hidden flex flex-col p-6 gap-4">
-        <div className="flex items-center gap-3">
-          <div className="relative flex-1 max-w-sm">
+      <div className="flex-1 overflow-hidden flex flex-col p-4 sm:p-6 gap-4">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="relative w-full sm:max-w-sm">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
             <Input
               placeholder="Kod veya açıklama ile ara..."
@@ -245,7 +245,7 @@ export default function OkasKodScreen(): React.JSX.Element {
               </div>
             </div>
           ) : (
-            <table className="w-full text-sm">
+            <table className="w-full min-w-[800px] text-sm">
               <thead className="sticky top-0 z-10">
                 <tr className="bg-slate-50 dark:bg-slate-800/90 text-slate-500 dark:text-slate-400 text-xs uppercase tracking-wide border-b border-slate-200 dark:border-slate-700">
                   <th className="px-4 py-3 text-left">OKAS Kodu</th>

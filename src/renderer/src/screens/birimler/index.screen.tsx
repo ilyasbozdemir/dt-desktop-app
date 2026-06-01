@@ -67,9 +67,9 @@ export default function BirimlerScreen(): React.ReactNode {
 
   return (
     <div className="p-8 max-w-5xl mx-auto flex flex-col h-full space-y-6 animate-in fade-in slide-in-from-bottom-4 duration-500 overflow-y-auto max-h-full">
-      <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 dark:border-slate-800 pb-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight text-slate-850 dark:text-slate-100 flex items-center gap-3">
+          <h1 className="text-3xl font-bold tracking-tight text-slate-855 dark:text-slate-100 flex items-center gap-3">
             <LayoutGrid className="w-8 h-8 text-blue-600" />
             Birim &amp; Müdürlük Yönetimi
           </h1>
@@ -79,7 +79,7 @@ export default function BirimlerScreen(): React.ReactNode {
         </div>
         <Button 
           onClick={() => setIsModalOpen(true)}
-          className="bg-blue-600 hover:bg-blue-700 shadow-md flex items-center gap-2 px-4 py-2 text-sm"
+          className="bg-blue-600 hover:bg-blue-700 shadow-md flex items-center gap-2 px-4 py-2 text-sm shrink-0"
         >
           <Plus className="w-4 h-4" />
           Yeni Birim Ekle

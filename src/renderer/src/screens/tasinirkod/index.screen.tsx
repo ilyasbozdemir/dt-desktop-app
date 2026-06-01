@@ -106,10 +106,10 @@ export default function TasinirKodScreen(): React.JSX.Element {
   }
 
   return (
-    <div className="p-8 max-w-7xl mx-auto flex flex-col gap-6 w-full animate-in fade-in slide-in-from-bottom-4 duration-500 overflow-y-auto max-h-full">
-      <div className="flex justify-between items-end border-b border-slate-200 dark:border-slate-800 pb-4">
+    <div className="p-4 sm:p-8 max-w-7xl mx-auto flex flex-col gap-6 w-full animate-in fade-in slide-in-from-bottom-4 duration-500 overflow-y-auto max-h-full">
+      <div className="flex flex-col lg:flex-row lg:items-end justify-between gap-4 border-b border-slate-200 dark:border-slate-800 pb-4">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight flex items-center gap-3 text-slate-850 dark:text-slate-100">
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight flex items-center gap-3 text-slate-850 dark:text-slate-100">
             <FolderTree className="w-8 h-8 text-emerald-600" />
             Taşınır Kod Yönetimi
           </h1>
@@ -117,30 +117,30 @@ export default function TasinirKodScreen(): React.JSX.Element {
             Muhasebat Genel Müdürlüğü standartlarına uygun taşınır kod ağacını (150.xx.xx) yönetin.
           </p>
         </div>
-        <div className="flex items-center gap-6">
-          <div className="text-right border-r border-slate-200 dark:border-slate-800 pr-6 hidden sm:block">
+        <div className="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6 w-full lg:w-auto">
+          <div className="text-left sm:text-right sm:border-r border-slate-200 dark:border-slate-800 sm:pr-6">
             <div className="text-2xl font-bold text-slate-800 dark:text-slate-100">{tasinirKodList.length}</div>
             <div className="text-[10px] text-slate-400 uppercase tracking-wider font-bold">Kayıtlı Kod</div>
           </div>
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2">
             <Button
               onClick={handleExportTemplate}
               disabled={isExportingTemplate}
               variant="outline"
-              className="gap-2 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 flex items-center px-4 py-2 text-sm"
+              className="gap-2 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 flex items-center px-3 py-1.5 sm:px-4 sm:py-2 text-sm flex-1 sm:flex-initial justify-center"
             >
               <Download className="w-4 h-4" /> Şablon İndir
             </Button>
             <Button
               onClick={handleImportExcel}
               disabled={isImporting}
-              className="gap-2 bg-emerald-600 hover:bg-emerald-700 shadow-md flex items-center px-4 py-2 text-sm"
+              className="gap-2 bg-emerald-600 hover:bg-emerald-700 shadow-md flex items-center px-3 py-1.5 sm:px-4 sm:py-2 text-sm flex-1 sm:flex-initial justify-center"
             >
               <FileUp className="w-4 h-4" /> {isImporting ? 'Aktarılıyor...' : "Excel'den İçe Aktar"}
             </Button>
             <Button
               onClick={handleOpenModal}
-              className="gap-2 bg-emerald-600 hover:bg-emerald-700 shadow-md flex items-center px-4 py-2 text-sm"
+              className="gap-2 bg-emerald-600 hover:bg-emerald-700 shadow-md flex items-center px-3 py-1.5 sm:px-4 sm:py-2 text-sm w-full sm:w-auto justify-center"
             >
               <Plus className="w-4 h-4" /> Yeni Kod Ekle
             </Button>
@@ -170,8 +170,8 @@ export default function TasinirKodScreen(): React.JSX.Element {
       </div>
 
       <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm flex flex-col flex-1 overflow-hidden">
-        <div className="flex items-center justify-between p-4 border-b border-slate-200 dark:border-slate-800">
-          <div className="relative w-72">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between p-4 gap-4 border-b border-slate-200 dark:border-slate-800">
+          <div className="relative w-full sm:w-72">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
             <input
               type="text"
@@ -184,7 +184,7 @@ export default function TasinirKodScreen(): React.JSX.Element {
         </div>
 
         <div className="flex-1 overflow-auto p-0">
-          <table className="w-full text-left text-sm text-slate-600 dark:text-slate-400">
+          <table className="w-full min-w-[800px] text-left text-sm text-slate-600 dark:text-slate-400">
             <thead className="text-xs uppercase bg-slate-50 dark:bg-slate-950/50 text-slate-500 border-b border-slate-200 dark:border-slate-800 sticky top-0">
               <tr>
                 <th className="px-4 py-3 font-semibold">Hesap Kodu</th>

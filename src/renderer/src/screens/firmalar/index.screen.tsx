@@ -80,7 +80,7 @@ export default function FirmalarScreen(): React.JSX.Element {
   return (
     <div className="p-8 max-w-7xl mx-auto flex flex-col gap-6 w-full animate-in fade-in slide-in-from-bottom-4 duration-500 overflow-y-auto max-h-full">
       {/* BAŞLIK */}
-      <div className="flex justify-between items-end border-b border-slate-200 dark:border-slate-800 pb-4">
+      <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 border-b border-slate-200 dark:border-slate-800 pb-4">
         <div>
           <h1 className="text-3xl font-bold tracking-tight flex items-center gap-3 text-slate-850 dark:text-slate-100">
             <Building2 className="w-8 h-8 text-blue-600" />
@@ -90,7 +90,7 @@ export default function FirmalarScreen(): React.JSX.Element {
             Doğrudan temin süreçlerinde kullanılacak firma ve tedarikçi havuzunu yönetin.
           </p>
         </div>
-        <div className="flex items-center gap-6">
+        <div className="flex items-center gap-4 sm:gap-6 shrink-0">
           <div className="text-right border-r border-slate-200 dark:border-slate-800 pr-6 hidden sm:block">
             <div className="text-2xl font-bold text-slate-800 dark:text-slate-100">{firmalar.length}</div>
             <div className="text-[10px] text-slate-400 uppercase tracking-wider font-bold">Kayıtlı Firma</div>
@@ -105,9 +105,9 @@ export default function FirmalarScreen(): React.JSX.Element {
       </div>
 
       <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-sm">
-        <div className="flex items-center justify-between mb-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
           <h3 className="text-sm font-bold text-slate-850 dark:text-slate-200">Kayıtlı Firmalar</h3>
-          <div className="relative w-72">
+          <div className="relative w-full sm:w-72">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
             <Input
               value={searchQuery}

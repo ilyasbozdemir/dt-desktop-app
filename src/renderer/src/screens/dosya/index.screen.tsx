@@ -246,17 +246,10 @@ export default function DosyaScreen(): React.JSX.Element {
           institution: activeMeta.institution,
           schema_version: activeMeta.schema_version,
 
-          updated_at: activeMeta.updated_at
-        },
-        null,
-        2
-      )
-    : '{}'
-
-  return (
-    <div className="p-8 max-w-6xl mx-auto flex flex-col gap-6 w-full animate-in fade-in slide-in-from-bottom-4 duration-500 overflow-y-auto max-h-full">
+          up  return (
+    <div className="p-4 sm:p-8 max-w-6xl mx-auto flex flex-col gap-6 w-full animate-in fade-in slide-in-from-bottom-4 duration-500 overflow-y-auto max-h-full">
       {/* Üst Başlık Bölümü */}
-      <div className="flex justify-between items-center border-b border-slate-200 dark:border-slate-800 pb-4">
+      <div className="flex flex-col md:flex-row md:items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-4 gap-4">
         <div className="flex items-center gap-3">
           <Link
             to="/"
@@ -266,12 +259,16 @@ export default function DosyaScreen(): React.JSX.Element {
             <ArrowLeft className="w-5 h-5" />
           </Link>
           <div>
-            <h1 className="text-2xl font-bold tracking-tight text-slate-850 dark:text-slate-100 flex items-center gap-2">
+            <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-855 dark:text-slate-100 flex items-center gap-2">
               <FileArchive className="w-7 h-7 text-amber-500" />
               Aktif Çalışma Dosyası (.dtm)
             </h1>
             <p className="text-slate-500 dark:text-slate-400 mt-1 text-xs">
               Uygulamanın veri alışverişi yaptığı sıkıştırılmış veritabanı arşiv paketinin detayları.
+            </p>
+          </div>
+        </div>
+      </div>�tırılmış veritabanı arşiv paketinin detayları.
             </p>
           </div>
         </div>
