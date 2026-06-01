@@ -18,7 +18,8 @@ import {
   FileCode,
   X,
   Plus,
-  ListPlus
+  ListPlus,
+  Coins
 } from 'lucide-react'
 import { useQuery } from '@tanstack/react-query'
 import { cn } from '../../utils/cn'
@@ -223,7 +224,7 @@ const fetchAsamalar = async (): Promise<Asama[]> => {
 
 export function MevzuatScreen(): React.JSX.Element {
   const [activeTab, setActiveTab] = useState<
-    'limitler' | 'oranlar' | 'mali' | 'butcekodlari' | 'asamalar' | 'bentler' | 'rehber'
+    'limitler' | 'oranlar' | 'mali' | 'butcekodlari' | 'asamalar' | 'bentler' | 'rehber' | 'fiyatfarki'
   >('limitler')
   const [subTab, setSubTab] = useState<'madde22' | 'madde3'>('madde22')
   const [isSaving, setIsSaving] = useState(false)
@@ -389,6 +390,7 @@ export function MevzuatScreen(): React.JSX.Element {
   const menuItems: InnerMenuItem[] = [
     { id: 'limitler', label: '4734 Sayılı Kanun Limitleri', icon: <Scale className="w-4 h-4 shrink-0" /> },
     { id: 'oranlar', label: 'Vergi & Kesinti Oranları', icon: <Calculator className="w-4 h-4 shrink-0" /> },
+    { id: 'fiyatfarki', label: 'Fiyat Farkı Kararnameleri', icon: <Coins className="w-4 h-4 shrink-0" /> },
     { id: 'mali', label: 'Mali & Kurumsal Kodlar', icon: <FileCode className="w-4 h-4 shrink-0" /> },
     { id: 'rehber', label: 'Alım Türü Rehberi', icon: <FileText className="w-4 h-4 shrink-0" /> },
     { id: 'asamalar', label: 'İşlem Aşamaları (Status)', icon: <Info className="w-4 h-4 shrink-0" /> },
@@ -815,6 +817,101 @@ export function MevzuatScreen(): React.JSX.Element {
                 </div>
               </>
             )}
+          </div>
+        )}
+
+        {activeTab === 'fiyatfarki' && (
+          <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-300">
+            <div className="flex items-start gap-4 p-4 bg-blue-50/50 dark:bg-blue-900/10 text-blue-800 dark:text-blue-300 rounded-xl border border-blue-100 dark:border-blue-800/30">
+              <Coins className="w-5 h-5 shrink-0 mt-0.5 text-blue-500" />
+              <div className="text-sm">
+                <p className="font-semibold mb-1">Fiyat Farkı Kararnameleri ve Mevzuat Yapısı</p>
+                <p className="leading-relaxed text-xs">
+                  4734 Sayılı Kamu İhale Kanunu kapsamında gerçekleştirilen alımlarda, piyasa koşullarındaki fiyat değişimlerinin (enflasyon, işçilik vb.) sözleşme bedeline yansıtılması bu esaslara göre yapılır. Doğrudan temin (Madde 22) alımlarında fiyat farkı verilmesi zorunlu olmamakla birlikte, idarenin uygun görmesi ve sözleşme tasarısında açıkça belirtilmesi halinde kararnamelere göre ödeme yapılabilir.
+                </p>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {/* Option 1: Fiyat Farkı Ödenmeyecek */}
+              <div className="bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 hover:border-slate-300 dark:hover:border-slate-700 transition-colors relative flex flex-col justify-between">
+                <div>
+                  <div className="w-10 h-10 bg-slate-100 dark:bg-slate-800 rounded-xl flex items-center justify-center text-slate-500 mb-3 border border-slate-200 dark:border-slate-700 font-bold text-sm">
+                    FF0
+                  </div>
+                  <h3 className="text-sm font-bold text-slate-800 dark:text-white mb-2">Fiyat Farkı Ödenmeyecek</h3>
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed">
+                    Süreçte herhangi bir fiyat farkı hesaplaması yapılmaz. İhale veya teklif tarihindeki birim fiyatlar sözleşme/alım sonuna kadar sabit kalır. Doğrudan temin alımlarının büyük kısmında bu seçenek tercih edilir.
+                  </p>
+                </div>
+                <div className="mt-4 pt-3 border-t border-slate-200 dark:border-slate-800 text-[10px] text-slate-400 dark:text-slate-500 font-medium">
+                  Varsayılan Uygulama Modu
+                </div>
+              </div>
+
+              {/* Option 2: Mal Alımı Kararnamesi */}
+              <div className="bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 hover:border-blue-300 dark:hover:border-blue-700 transition-colors relative flex flex-col justify-between">
+                <div>
+                  <div className="w-10 h-10 bg-emerald-50 dark:bg-emerald-950/30 rounded-xl flex items-center justify-center text-emerald-600 dark:text-emerald-400 mb-3 border border-emerald-200/50 dark:border-emerald-800/30 font-bold text-sm">
+                    FF1
+                  </div>
+                  <h3 className="text-sm font-bold text-slate-800 dark:text-white mb-2">Mal Alımı Fiyat Farkı</h3>
+                  <p className="text-[11px] text-slate-550 dark:text-slate-400 leading-relaxed font-medium">
+                    <strong>31.08.2013 Tarih ve 2013/5216 Sayılı</strong> Mal Alımı İhalelerinde Fiyat Farkı Hesaplanmasına İlişkin Esaslar uygulanır.
+                  </p>
+                  <p className="text-[10px] text-slate-500 mt-2 leading-relaxed">
+                    Malın teslim süresi içinde teslim edilememesi durumunda gecikilen süreler için fiyat farkı hesabı, endekslerin değişim oranlarına göre (TÜİK ÜFE) hesaplanır.
+                  </p>
+                </div>
+                <div className="mt-4 pt-3 border-t border-slate-200 dark:border-slate-800 text-[10px] text-emerald-600 dark:text-emerald-400 font-semibold">
+                  Karar No: 2013/5216
+                </div>
+              </div>
+
+              {/* Option 3: Hizmet Alımı Kararnamesi */}
+              <div className="bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 hover:border-blue-300 dark:hover:border-blue-700 transition-colors relative flex flex-col justify-between">
+                <div>
+                  <div className="w-10 h-10 bg-blue-50 dark:bg-blue-955/30 rounded-xl flex items-center justify-center text-blue-600 dark:text-blue-400 mb-3 border border-blue-200/50 dark:border-blue-800/30 font-bold text-sm">
+                    FF2
+                  </div>
+                  <h3 className="text-sm font-bold text-slate-800 dark:text-white mb-2">Hizmet Alımı Fiyat Farkı</h3>
+                  <p className="text-[11px] text-slate-550 dark:text-slate-400 leading-relaxed font-medium">
+                    <strong>31.08.2013 Tarih ve 2013/5215 Sayılı</strong> Hizmet Alımlarında Fiyat Farkı Hesaplanmasına İlişkin Esaslar uygulanır.
+                  </p>
+                  <p className="text-[10px] text-slate-500 mt-2 leading-relaxed">
+                    Personel çalıştırılmasına dayalı hizmet alımlarında asgari ücret artışları, akaryakıt endeksi değişimleri ve diğer girdi kalemlerindeki (ÜFE) değişimler formüle edilerek hesaplanır.
+                  </p>
+                </div>
+                <div className="mt-4 pt-3 border-t border-slate-200 dark:border-slate-800 text-[10px] text-blue-600 dark:text-blue-400 font-semibold">
+                  Karar No: 2013/5215
+                </div>
+              </div>
+            </div>
+
+            <div className="bg-slate-50/50 dark:bg-slate-900/30 border border-slate-200 dark:border-slate-800 p-5 rounded-2xl">
+              <h3 className="text-xs font-bold text-slate-800 dark:text-slate-200 mb-3 uppercase tracking-wider">Fiyat Farkı Formül Yapısı (K.İ.K Standartı)</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 items-center">
+                <div className="space-y-3">
+                  <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+                    Fiyat farkı hesabı, sözleşme bedeli veya hakediş tutarı üzerinden aşağıdaki KİK formülüyle hesaplanır:
+                  </p>
+                  <div className="bg-slate-950 text-slate-200 font-mono text-xs p-3.5 rounded-xl border border-slate-800 text-center shadow-inner">
+                    F = An x (Pn - 1)
+                  </div>
+                  <ul className="text-[11px] text-slate-500 dark:text-slate-450 space-y-1 leading-relaxed">
+                    <li><strong>F:</strong> Ödenecek/kesilecek fiyat farkı tutarı (TL)</li>
+                    <li><strong>An:</strong> Fiyat farkı uygulanacak hakediş tutarı</li>
+                    <li><strong>Pn:</strong> Fiyat farkı katsayısı</li>
+                  </ul>
+                </div>
+                <div className="p-4 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl space-y-2">
+                  <h4 className="text-[11px] font-bold text-slate-700 dark:text-slate-350">Mevzuat Uygulama Kriterleri</h4>
+                  <p className="text-[10px] text-slate-500 dark:text-slate-450 leading-relaxed">
+                    Doğrudan teminlerde fiyat farkı verilmek isteniyorsa, yaklaşık maliyetin limitlerin altında kalması formülü değiştirmez. Ancak ödeme aşamalarında aksaklık yaşanmaması için ihale onay belgesi düzenlenirken ve yaklaşık maliyet onaylanırken fiyat farkı maddesinin seçilmiş olması ve firmaya iletilen sipariş mektubunda/sözleşmede bu kararnamenin adının geçmesi şarttır.
+                  </p>
+                </div>
+              </div>
+            </div>
           </div>
         )}
 
