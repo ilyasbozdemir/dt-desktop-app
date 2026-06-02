@@ -56,6 +56,26 @@ export function useDeleteOlcuBirimi() {
 
   return useMutation({
     mutationFn: async (id: number) => {
+      // First get the name of the unit
+      const birimRes = await window.electron.ipcRenderer.invoke(
+        'db:query',
+        'SELECT ad FROM TANIM_OlcuBirimi WHERE id = ?',
+        [id]
+      )
+      
+      if (birimRes.success && birimRes.data && birimRes.data.length > 0) {
+        const ad = birimRes.data[0].ad
+        // Check if used in TANIM_Kalem
+        const checkRes = await window.electron.ipcRenderer.invoke(
+          'db:query',
+          'SELECT COUNT(*) as count FROM TANIM_Kalem WHERE birim = ?',
+          [ad]
+        )
+        if (checkRes.success && checkRes.data && checkRes.data[0].count > 0) {
+          throw new Error('Bu ölçü birimi ' + checkRes.data[0].count + ' adet malzemede kullanıldığı için silinemez! Bunun yerine "Pasif" duruma getirebilirsiniz.')
+        }
+      }
+
       const res = await window.electron.ipcRenderer.invoke(
         'db:run',
         'DELETE FROM TANIM_OlcuBirimi WHERE id = ?',

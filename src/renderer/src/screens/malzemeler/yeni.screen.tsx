@@ -16,7 +16,7 @@ export default function YeniMalzemeScreen(): React.JSX.Element {
     kdv_orani: 20,
     aktif_mi: 1,
     personel_asgari_fark_oran: 0,
-    barkod_id: `UID-${Math.random().toString(36).substring(2, 11).toUpperCase()}`
+    barkod_id: Math.floor(1000000000000 + Math.random() * 9000000000000).toString()
   }))
 
   // Mock OKAS and Tasinir selection state

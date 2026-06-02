@@ -18,6 +18,8 @@ import DosyaScreen from './screens/dosya/index.screen'
 import SablonlarScreen from './screens/sablonlar/index.screen'
 import RaporlarScreen from './screens/raporlar/index.screen'
 import OkasKodScreen from './screens/okaskod/index.screen'
+import OlcuBirimleriScreen from './screens/olcubirimleri/index.screen'
+import YeniMalzemeScreen from './screens/malzemeler/yeni.screen'
 
 const rootRoute = createRootRoute({
   component: PageWrapper
@@ -151,13 +153,13 @@ const dosyaRoute = createRoute({
 const olcubirimleriRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/olcubirimleri',
-  component: () => import('./screens/olcubirimleri/index.screen').then(m => <m.default />)
+  component: OlcuBirimleriScreen
 })
 
 const yeniMalzemeRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/malzemeler/yeni',
-  component: () => import('./screens/malzemeler/yeni.screen').then(m => <m.default />)
+  component: YeniMalzemeScreen
 })
 
 const routeTree = rootRoute.addChildren([

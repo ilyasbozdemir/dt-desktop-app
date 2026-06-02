@@ -22,6 +22,10 @@ export default function MalzemelerScreen(): React.JSX.Element {
   }
 
   const handleImport = async () => {
+    if (!window.confirm('ÖNERİ: Ürünlerin ID ve Barkod çakışması yaşamaması için, manuel malzeme girişlerinden ÖNCE Excel aktarımını yapmanız tavsiye edilir.\n\nExcel\'deki "Barkod_ID" mevcut ise mevcut kayıtlar güncellenir, yoksa yeni olarak eklenir.\n\nAktarıma devam edilsin mi?')) {
+      return
+    }
+
     try {
       const res = await window.electron.ipcRenderer.invoke('db:import-kalem-excel')
       if (res.success) {
@@ -66,34 +70,40 @@ export default function MalzemelerScreen(): React.JSX.Element {
 
   return (
     <div className="p-8 max-w-7xl mx-auto flex flex-col gap-6 w-full animate-in fade-in slide-in-from-bottom-4 duration-500 overflow-y-auto max-h-full">
-      <div className="flex flex-col xl:flex-row xl:items-end justify-between gap-6 border-b border-slate-200 dark:border-slate-800 pb-4">
-        <div className="flex-1 min-w-0 max-w-3xl">
+      <div className="flex flex-col gap-6 border-b border-slate-200 dark:border-slate-800 pb-6">
+        <div className="w-full">
           <h1 className="text-3xl font-bold tracking-tight flex items-center gap-3 text-slate-850 dark:text-slate-100">
             <PackageSearch className="w-8 h-8 text-blue-605" />
             Malzeme & Hizmet Tanımları
           </h1>
-          <p className="text-slate-500 dark:text-slate-400 mt-2 text-sm">
+          <p className="text-slate-500 dark:text-slate-400 mt-2 text-sm max-w-4xl">
             Yaklaşık maliyet hesaplarında ve teklif mektuplarında kullanılacak malzeme, hizmet ve yapım kalemlerini yönetin.
           </p>
-          <div className="mt-4 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-900/50 rounded-lg text-xs text-blue-700 dark:text-blue-300 flex flex-col gap-1.5">
-            <p>
-              💡 <strong>İpucu:</strong> Güncel Taşınır Kodları listesine ulaşmak için <a href="https://muhasebat.hmb.gov.tr/tasinir-kod-listesi" target="_blank" rel="noreferrer" className="underline font-semibold hover:text-blue-800 dark:hover:text-blue-200">Muhasebat Genel Müdürlüğü</a> sayfasını ziyaret edebilirsiniz.
-            </p>
-            <p>
-              📣 Uygulama altyapımız bu kodları tamamen desteklemektedir. Hazır malzeme listesi ve kodlarının varsayılan olarak eklenmesi için <a href="https://github.com/ilyasbozdemir/dt-desktop-app" target="_blank" rel="noreferrer" className="underline font-semibold hover:text-blue-800 dark:hover:text-blue-200">GitHub sayfamızdan Issue açarak</a> bize veritabanı taleplerinizi iletebilirsiniz.
-            </p>
+          <div className="mt-4 p-3 bg-blue-50 dark:bg-blue-900/20 border border-blue-100 dark:border-blue-900/50 rounded-lg text-xs text-blue-700 dark:text-blue-300 flex flex-col sm:flex-row gap-4 items-start sm:items-center">
+            <div className="flex-1">
+              <p className="mb-1">
+                💡 <strong>İpucu:</strong> Güncel Taşınır Kodları listesine ulaşmak için <a href="https://muhasebat.hmb.gov.tr/tasinir-kod-listesi" target="_blank" rel="noreferrer" className="underline font-semibold hover:text-blue-800 dark:hover:text-blue-200">Muhasebat Genel Müdürlüğü</a> sayfasını ziyaret edebilirsiniz.
+              </p>
+              <p>
+                📣 Uygulama altyapımız bu kodları tamamen desteklemektedir. Hazır malzeme listesi ve kodlarının varsayılan olarak eklenmesi için <a href="https://github.com/ilyasbozdemir/dt-desktop-app" target="_blank" rel="noreferrer" className="underline font-semibold hover:text-blue-800 dark:hover:text-blue-200">GitHub sayfamızdan Issue açarak</a> bize veritabanı taleplerinizi iletebilirsiniz.
+              </p>
+            </div>
           </div>
         </div>
-        <div className="flex flex-wrap items-center gap-4 sm:gap-6 w-full xl:w-auto xl:justify-end">
-          <div className="text-right border-r border-slate-200 dark:border-slate-800 pr-6 hidden sm:block">
-            <div className="text-2xl font-bold text-slate-800 dark:text-slate-100">{kalemList.length}</div>
-            <div className="text-[10px] text-slate-400 uppercase tracking-wider font-bold">Kayıtlı Kalem</div>
+
+        <div className="flex flex-col sm:flex-row flex-wrap items-start sm:items-center justify-between gap-4 w-full bg-slate-50 dark:bg-slate-900/50 p-4 rounded-xl border border-slate-100 dark:border-slate-800">
+          <div className="flex items-center gap-4 border-b sm:border-b-0 sm:border-r border-slate-200 dark:border-slate-800 pb-4 sm:pb-0 pr-0 sm:pr-6 w-full sm:w-auto">
+            <div>
+              <div className="text-3xl font-bold text-slate-800 dark:text-slate-100 leading-none">{kalemList.length}</div>
+              <div className="text-[10px] text-slate-400 uppercase tracking-wider font-bold mt-1">Kayıtlı Kalem</div>
+            </div>
           </div>
-          <div className="flex flex-wrap gap-2 flex-1 sm:flex-initial">
+          
+          <div className="flex flex-wrap items-center gap-2 flex-1 justify-end w-full sm:w-auto">
             <Button
               variant="outline"
               onClick={handleExportTemplate}
-              className="gap-2 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-50 flex items-center px-4 py-2 text-sm flex-1 sm:flex-initial justify-center"
+              className="gap-2 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-50 flex items-center px-4 py-2 text-sm justify-center"
               title="Örnek şablonu indir"
             >
               <Download className="w-4 h-4 text-blue-600 shrink-0" /> <span className="whitespace-nowrap">Şablon İndir</span>
@@ -101,32 +111,32 @@ export default function MalzemelerScreen(): React.JSX.Element {
             <Button
               variant="outline"
               onClick={handleImport}
-              className="gap-2 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-50 flex items-center px-4 py-2 text-sm flex-1 sm:flex-initial justify-center"
+              className="gap-2 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-50 flex items-center px-4 py-2 text-sm justify-center"
               title="Excel'den toplu kalem yükle"
             >
               <Upload className="w-4 h-4 text-orange-600 shrink-0" /> <span className="whitespace-nowrap">Excel İçe Aktar</span>
             </Button>
-            <Link to="/tasinirkod" className="flex-1 sm:flex-initial">
+            <Link to="/tasinirkod" className="shrink-0">
               <Button
                 variant="outline"
                 className="w-full gap-2 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-50 flex items-center px-4 py-2 text-sm justify-center"
               >
-                <FolderTree className="w-4 h-4 text-emerald-600 shrink-0" /> <span className="whitespace-nowrap">Taşınır Kod Yönetimi</span>
+                <FolderTree className="w-4 h-4 text-emerald-600 shrink-0" /> <span className="whitespace-nowrap">Taşınır Kodları</span>
               </Button>
             </Link>
-            <Link to="/okaskod" className="flex-1 sm:flex-initial">
+            <Link to="/okaskod" className="shrink-0">
               <Button
                 variant="outline"
                 className="w-full gap-2 border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-50 flex items-center px-4 py-2 text-sm justify-center"
               >
-                <Tag className="w-4 h-4 text-indigo-600 shrink-0" /> <span className="whitespace-nowrap">OKAS Kod Yönetimi</span>
+                <Tag className="w-4 h-4 text-indigo-600 shrink-0" /> <span className="whitespace-nowrap">OKAS Kodları</span>
               </Button>
             </Link>
-            <Link to="/malzemeler/yeni" className="flex-1 sm:flex-initial">
+            <Link to="/malzemeler/yeni" className="shrink-0">
               <Button
-                className="w-full gap-2 bg-blue-600 hover:bg-blue-700 shadow-md flex items-center px-4 py-2 text-sm justify-center text-white"
+                className="w-full gap-2 bg-blue-600 hover:bg-blue-700 shadow-md flex items-center px-5 py-2 text-sm justify-center text-white"
               >
-                <Plus className="w-4 h-4 shrink-0" /> <span className="whitespace-nowrap">Mal/Hizmet/Yapım İşi Ekle</span>
+                <Plus className="w-4 h-4 shrink-0" /> <span className="whitespace-nowrap font-semibold">Mal/Hizmet/Yapım İşi Ekle</span>
               </Button>
             </Link>
           </div>
