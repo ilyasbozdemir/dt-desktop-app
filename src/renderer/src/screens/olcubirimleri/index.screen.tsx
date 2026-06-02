@@ -45,31 +45,30 @@ export default function OlcuBirimleriScreen(): React.JSX.Element {
   }
 
   return (
-    <div className="flex-1 flex flex-col min-h-0 relative">
+    <div className="p-8 max-w-5xl mx-auto flex flex-col gap-6 w-full h-full animate-in fade-in slide-in-from-bottom-4 duration-500 overflow-hidden">
       {/* Header */}
-      <div className="flex-none p-4 md:p-6 pb-4">
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div>
-            <h1 className="text-2xl md:text-3xl font-bold text-slate-800 dark:text-white tracking-tight">
-              Ölçü Birimleri
-            </h1>
-            <p className="text-sm md:text-base text-slate-500 dark:text-slate-400 mt-1">
-              Malzeme ve hizmetler için sistemde kayıtlı ölçü birimleri. Toplam {birimler.length} kayıt.
-            </p>
-          </div>
-          <button
-            onClick={handleAddNew}
-            className="flex items-center justify-center gap-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition-colors shadow-sm w-full sm:w-auto"
-          >
-            <Plus size={20} />
-            <span className="font-medium">Yeni Birim Ekle</span>
-          </button>
+      <div className="flex-none flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 dark:border-slate-800 pb-4">
+        <div>
+          <h1 className="text-3xl font-bold tracking-tight text-slate-850 dark:text-slate-100 flex items-center gap-3">
+            <Plus className="text-blue-600 w-8 h-8" />
+            Ölçü Birimleri
+          </h1>
+          <p className="text-slate-500 dark:text-slate-400 mt-2 text-sm">
+            Malzeme ve hizmetler için sistemde kayıtlı ölçü birimleri. Toplam {birimler.length} kayıt.
+          </p>
         </div>
+        <button
+          onClick={handleAddNew}
+          className="flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors shadow-md w-full sm:w-auto"
+        >
+          <Plus size={20} />
+          <span className="font-medium">Yeni Birim Ekle</span>
+        </button>
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 overflow-auto px-4 md:px-6 pb-6">
-        <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 flex flex-col h-full min-h-[400px]">
+      <div className="flex-1 w-full min-h-0 pb-6">
+        <div className="bg-white dark:bg-slate-900 rounded-xl shadow-sm border border-slate-200 dark:border-slate-800 flex flex-col h-full">
           {/* Toolbar */}
           <div className="flex-none p-4 border-b border-slate-200 dark:border-slate-800">
             <div className="relative">
@@ -78,7 +77,7 @@ export default function OlcuBirimleriScreen(): React.JSX.Element {
               </div>
               <input
                 type="text"
-                className="w-full pl-10 pr-4 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/50"
+                className="w-full pl-10 pr-4 py-2 bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50"
                 placeholder="Ölçü birimi ara..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
@@ -126,7 +125,7 @@ export default function OlcuBirimleriScreen(): React.JSX.Element {
                         <div className="flex items-center justify-end gap-2">
                           <button
                             onClick={() => handleEdit(birim)}
-                            className="p-1.5 text-slate-400 hover:text-primary hover:bg-primary/10 rounded transition-colors"
+                            className="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-500/10 rounded transition-colors"
                             title="Düzenle"
                           >
                             <Edit2 size={16} />
@@ -178,7 +177,7 @@ export default function OlcuBirimleriScreen(): React.JSX.Element {
                     type="text"
                     value={editingBirim.ad || ''}
                     onChange={(e) => setEditingBirim({ ...editingBirim, ad: e.target.value })}
-                    className="w-full px-3 py-2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary/50"
+                    className="w-full px-3 py-2 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-700 rounded-lg text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500/50"
                     placeholder="Örn: Adet, Kutu, Saat..."
                     autoFocus
                   />
@@ -190,7 +189,7 @@ export default function OlcuBirimleriScreen(): React.JSX.Element {
                     id="aktif_mi"
                     checked={editingBirim.aktif_mi === 1}
                     onChange={(e) => setEditingBirim({ ...editingBirim, aktif_mi: e.target.checked ? 1 : 0 })}
-                    className="w-4 h-4 text-primary bg-slate-100 border-slate-300 rounded focus:ring-primary"
+                    className="w-4 h-4 text-blue-600 bg-slate-100 border-slate-300 rounded focus:ring-blue-600"
                   />
                   <label htmlFor="aktif_mi" className="text-sm font-medium text-slate-700 dark:text-slate-300">
                     Aktif (Sistemde Kullanılabilir)
@@ -212,7 +211,7 @@ export default function OlcuBirimleriScreen(): React.JSX.Element {
               <button
                 onClick={handleSave}
                 disabled={saveMutation.isPending}
-                className="px-4 py-2 text-sm font-medium text-white bg-primary rounded-lg hover:bg-primary/90 transition-colors shadow-sm disabled:opacity-50 flex items-center gap-2"
+                className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors shadow-sm disabled:opacity-50 flex items-center gap-2"
               >
                 {saveMutation.isPending ? 'Kaydediliyor...' : 'Kaydet'}
               </button>
