@@ -12,14 +12,15 @@ export interface Birim {
   ilgili_personel_id: number | null
   aktif_mi: number
   created_at: string
+  personel_sayisi?: number
 }
 
-export type BirimInput = Omit<Birim, 'id' | 'aktif_mi' | 'created_at'>
+export type BirimInput = Omit<Birim, 'id' | 'aktif_mi' | 'created_at' | 'personel_sayisi'>
 
 const fetchBirimler = async (): Promise<Birim[]> => {
   const res = await window.electron.ipcRenderer.invoke(
     'db:query',
-    'SELECT * FROM TANIM_Birim ORDER BY birim_adi ASC'
+    'SELECT b.*, (SELECT COUNT(*) FROM TANIM_Personel p WHERE p.birim = b.birim_adi) as personel_sayisi FROM TANIM_Birim b ORDER BY birim_adi ASC'
   )
   if (!res.success) throw new Error(res.error)
   return res.data
@@ -88,6 +89,17 @@ export function useBirimlerHooks() {
 
   const deleteBirimMutation = useMutation({
     mutationFn: async (id: number) => {
+      const getRes = await window.electron.ipcRenderer.invoke('db:query', 'SELECT birim_adi FROM TANIM_Birim WHERE id = ?', [id])
+      if (getRes.data && getRes.data.length > 0) {
+        const checkRes = await window.electron.ipcRenderer.invoke(
+          'db:query', 
+          'SELECT COUNT(*) as count FROM TANIM_Personel WHERE birim = ?', 
+          [getRes.data[0].birim_adi]
+        )
+        if (checkRes.data && checkRes.data[0].count > 0) {
+          throw new Error(`Bu birime bağlı ${checkRes.data[0].count} personel var. Önce personellerin birimini değiştirin.`)
+        }
+      }
       const res = await window.electron.ipcRenderer.invoke(
         'db:run',
         'DELETE FROM TANIM_Birim WHERE id = ?',

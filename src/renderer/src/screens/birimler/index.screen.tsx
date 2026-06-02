@@ -121,6 +121,11 @@ export default function BirimlerScreen(): React.ReactNode {
                         {birim.kurumsal_kod}
                       </span>
                     )}
+                    {birim.personel_sayisi ? (
+                      <span className="text-[10px] font-medium bg-emerald-100 dark:bg-emerald-900/30 text-emerald-700 dark:text-emerald-400 px-1.5 py-0.5 rounded ml-auto">
+                        {birim.personel_sayisi} Personel
+                      </span>
+                    ) : null}
                   </div>
                   
                   <div className="space-y-1.5 mt-auto pt-3 border-t border-slate-200/60 dark:border-slate-800/60">

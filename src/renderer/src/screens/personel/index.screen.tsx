@@ -1,13 +1,15 @@
 import React, { useState } from 'react'
 import { usePersonelHooks, Personel } from './personel.hooks'
+import { useBirimlerHooks } from '../birimler/birimler.hooks'
 import { Button } from '../../components/ui/Button'
 import { Input } from '../../components/ui/Input'
 import { Modal } from '../../components/ui/Modal'
 import { Plus, Edit, Trash2, Users, CheckCircle, Shield } from 'lucide-react'
 
 export default function PersonelScreen(): React.ReactNode {
-  const { personelList, isLoading, addPersonel, updatePersonel, deletePersonel } =
+  const { personelList, isLoading: isPersonelLoading, addPersonel, updatePersonel, deletePersonel } =
     usePersonelHooks()
+  const { birimler } = useBirimlerHooks()
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [editingPersonel, setEditingPersonel] = useState<Personel | null>(null)
 
@@ -95,7 +97,7 @@ export default function PersonelScreen(): React.ReactNode {
 
       <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-sm">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-          {isLoading ? (
+          {isPersonelLoading ? (
             <div className="col-span-full p-8 text-center text-slate-450 dark:text-slate-500 animate-pulse italic">Yükleniyor...</div>
           ) : personelList.length === 0 ? (
             <div className="col-span-full p-16 flex flex-col items-center justify-center text-slate-450 bg-slate-50 dark:bg-slate-950 rounded-xl">
@@ -200,12 +202,16 @@ export default function PersonelScreen(): React.ReactNode {
 
             <div>
               <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5">Birim / Müdürlük</label>
-              <Input
-                placeholder="Örn: Fen İşleri"
+              <select
                 value={formData.birim || ''}
                 onChange={(e) => setFormData({ ...formData, birim: e.target.value })}
-                className="bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-xs py-1.5 h-9"
-              />
+                className="w-full flex h-9 rounded-md border bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 px-3 py-1.5 text-xs shadow-sm transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-blue-500 disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                <option value="">-- Birim Seçin --</option>
+                {birimler.map((b) => (
+                  <option key={b.id} value={b.birim_adi}>{b.birim_adi}</option>
+                ))}
+              </select>
             </div>
 
             <div className="grid grid-cols-2 gap-3">
