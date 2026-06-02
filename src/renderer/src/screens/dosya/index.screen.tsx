@@ -246,7 +246,9 @@ export default function DosyaScreen(): React.JSX.Element {
           institution: activeMeta.institution,
           schema_version: activeMeta.schema_version,
 
-          up  return (
+          }, null, 2) : "";
+
+  return (
     <div className="p-4 sm:p-8 max-w-6xl mx-auto flex flex-col gap-6 w-full animate-in fade-in slide-in-from-bottom-4 duration-500 overflow-y-auto max-h-full">
       {/* Üst Başlık Bölümü */}
       <div className="flex flex-col md:flex-row md:items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-4 gap-4">
@@ -265,10 +267,6 @@ export default function DosyaScreen(): React.JSX.Element {
             </h1>
             <p className="text-slate-500 dark:text-slate-400 mt-1 text-xs">
               Uygulamanın veri alışverişi yaptığı sıkıştırılmış veritabanı arşiv paketinin detayları.
-            </p>
-          </div>
-        </div>
-      </div>�tırılmış veritabanı arşiv paketinin detayları.
             </p>
           </div>
         </div>
@@ -753,3 +751,5 @@ export default function DosyaScreen(): React.JSX.Element {
     </div>
   )
 }
+
+
