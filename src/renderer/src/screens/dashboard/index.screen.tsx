@@ -508,24 +508,24 @@ export default function DashboardScreen(): React.JSX.Element {
         </div>
 
         {/* DUYURULAR / BİLDİRİMLER PANOSU */}
-        <div className="lg:col-span-4 flex flex-col gap-4">
-          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-sm flex-1 flex flex-col">
-            <div className="flex items-center gap-2 mb-6 pb-4 border-b border-slate-100 dark:border-slate-800">
+        <div className="lg:col-span-4 flex flex-col gap-4 h-full max-h-[480px]">
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-sm flex-1 flex flex-col min-h-0">
+            <div className="flex items-center gap-2 mb-6 pb-4 border-b border-slate-100 dark:border-slate-800 shrink-0">
               <Megaphone className="w-5 h-5 text-amber-500" />
               <h3 className="text-sm font-bold text-slate-800 dark:text-slate-200">Duyurular ve Güncellemeler</h3>
             </div>
             
-            <div className="flex-1 overflow-y-auto pr-2 space-y-4">
+            <div className="flex-1 overflow-y-auto pr-2 space-y-5 min-h-0 custom-scrollbar">
               
               {/* Duyuru 1 */}
               <div className="flex gap-3">
                 <div className="mt-1 w-2 h-2 bg-blue-500 rounded-full shrink-0 shadow-sm shadow-blue-500/50"></div>
                 <div>
-                  <h4 className="text-xs font-bold text-slate-800 dark:text-slate-200">Yeni Versiyon Yayınlandı! (v1.0.0-alpha.3)</h4>
+                  <h4 className="text-xs font-bold text-slate-800 dark:text-slate-200">Yeni Altyapı ve Ekranlar (v1.0.0-alpha.5)</h4>
                   <p className="text-[11px] text-slate-500 mt-1 leading-relaxed">
-                    Sistem teması baştan tasarlandı ve yeni birim özellikleri eklendi. Geri bildirimleriniz için teşekkür ederiz.
+                    Kurum bilgileri, personel ve birim yönetimi ekranları modernleştirildi. Mali ve Muhasebe kod listeleri entegre edildi.
                   </p>
-                  <span className="text-[9px] text-slate-400 font-medium mt-1 block">28 Mayıs 2026</span>
+                  <span className="text-[9px] text-slate-400 font-medium mt-1 block">02 Haziran 2026</span>
                 </div>
               </div>
 
@@ -533,23 +533,35 @@ export default function DashboardScreen(): React.JSX.Element {
               <div className="flex gap-3">
                 <div className="mt-1 w-2 h-2 bg-emerald-500 rounded-full shrink-0 shadow-sm shadow-emerald-500/50"></div>
                 <div>
-                  <h4 className="text-xs font-bold text-slate-800 dark:text-slate-200">KİK 2026 Limitleri Güncellendi</h4>
+                  <h4 className="text-xs font-bold text-slate-800 dark:text-slate-200">Kayıt Ekranları Geliştirildi</h4>
                   <p className="text-[11px] text-slate-500 mt-1 leading-relaxed">
-                    22/d Doğrudan Temin limitleri 2026 yılı için güncellenmiştir. Limit kontrolünü Mevzuat ekranından takip edebilirsiniz.
+                    Malzeme/Hizmet ekleme, OKAS ve Taşınır kod seçimleri ile Ölçü Birimleri sayfasındaki listeleme deneyimi iyileştirildi.
                   </p>
-                  <span className="text-[9px] text-slate-400 font-medium mt-1 block">15 Ocak 2026</span>
+                  <span className="text-[9px] text-slate-400 font-medium mt-1 block">01 Haziran 2026</span>
                 </div>
               </div>
 
               {/* Duyuru 3 */}
               <div className="flex gap-3">
+                <div className="mt-1 w-2 h-2 bg-purple-500 rounded-full shrink-0 shadow-sm shadow-purple-500/50"></div>
+                <div>
+                  <h4 className="text-xs font-bold text-slate-800 dark:text-slate-200">Doğrudan Temin Altyapısı</h4>
+                  <p className="text-[11px] text-slate-500 mt-1 leading-relaxed">
+                    Doğrudan temin İhale Dosyası modülü için ön hazırlıklar tamamlandı. Gerekli veritabanı tabloları eklendi.
+                  </p>
+                  <span className="text-[9px] text-slate-400 font-medium mt-1 block">30 Mayıs 2026</span>
+                </div>
+              </div>
+
+              {/* Duyuru 4 */}
+              <div className="flex gap-3">
                 <div className="mt-1 w-2 h-2 bg-indigo-500 rounded-full shrink-0 shadow-sm shadow-indigo-500/50"></div>
                 <div>
-                  <h4 className="text-xs font-bold text-slate-800 dark:text-slate-200">EBYS Entegrasyonu Hazırlıkları</h4>
+                  <h4 className="text-xs font-bold text-slate-800 dark:text-slate-200">KİK 2026 Limitleri Güncellendi</h4>
                   <p className="text-[11px] text-slate-500 mt-1 leading-relaxed">
-                    Kurum EBYS sistemine tam entegrasyon için altyapı çalışmaları başlatıldı. İlerleyen güncellemelerde duyurulacaktır.
+                    22/d Doğrudan Temin limitleri güncellenmiştir. Kontrolünü Mevzuat ekranından takip edebilirsiniz.
                   </p>
-                  <span className="text-[9px] text-slate-400 font-medium mt-1 block">10 Mayıs 2026</span>
+                  <span className="text-[9px] text-slate-400 font-medium mt-1 block">15 Ocak 2026</span>
                 </div>
               </div>
 

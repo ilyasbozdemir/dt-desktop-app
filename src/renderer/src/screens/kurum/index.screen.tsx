@@ -2,8 +2,8 @@ import React, { useState, useEffect } from 'react'
 import { useAyarlarHooks } from '../ayarlar/ayarlar.hooks'
 import { Button } from '../../components/ui/Button'
 import { Input } from '../../components/ui/Input'
-import { useSettingsStore } from '../../store/settingsStore'
-import { Building2, Save, Upload, MapPin, ImageIcon, Info, X } from 'lucide-react'
+import { Building2, Save, Upload, MapPin, ImageIcon, Info, X, ExternalLink } from 'lucide-react'
+import { Link } from '@tanstack/react-router'
 import { FINANSMAN_KODLARI } from '../../constants/butce-kodlari'
 import { InnerMenu, InnerMenuItem } from '../../components/ui/InnerMenu'
 
@@ -338,10 +338,19 @@ export default function KurumScreen(): React.JSX.Element {
 
                       {/* MÜHASEBE VE BÜTÇE KODLARI */}
                       <div className="md:col-span-2 mt-4 pt-6 border-t border-slate-100 dark:border-slate-800">
-                        <h3 className="text-sm font-bold text-slate-850 dark:text-slate-100 mb-4 flex items-center gap-2">
-                          <Building2 className="w-4 h-4 text-blue-500" />
-                          Mali ve Muhasebe Birim Bilgileri
-                        </h3>
+                        <div className="flex items-center justify-between mb-4">
+                          <h3 className="text-sm font-bold text-slate-850 dark:text-slate-100 flex items-center gap-2">
+                            <Building2 className="w-4 h-4 text-blue-500" />
+                            Mali ve Muhasebe Birim Bilgileri
+                          </h3>
+                          <Link
+                            to="/mevzuat"
+                            className="text-[11px] font-semibold flex items-center gap-1.5 text-blue-600 dark:text-blue-400 hover:text-blue-700 dark:hover:text-blue-300 bg-blue-50 dark:bg-blue-900/30 px-2 py-1.5 rounded-lg border border-blue-100 dark:border-blue-800/50 transition-colors"
+                          >
+                            <ExternalLink className="w-3.5 h-3.5" />
+                            Kod Listelerini Yönet
+                          </Link>
+                        </div>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                           
                           {/* Kurumsal Kod */}
