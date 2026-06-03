@@ -262,6 +262,13 @@ export default function YeniDosyaScreen(): React.JSX.Element {
       ).slice(0, 5)
     : []
 
+  const exactMatchCount = formData.konu
+    ? dosyalar.filter(d => 
+        normalizeTr(d.konu) === normalizeTr(formData.konu || '') && 
+        (!isEdit || d.id !== editId)
+      ).length
+    : 0
+
   return (
     <div className="flex flex-col h-full bg-slate-50 dark:bg-slate-900 overflow-hidden">
       {/* HEADER */}
@@ -439,6 +446,11 @@ export default function YeniDosyaScreen(): React.JSX.Element {
                         placeholder="Alımın konusunu resmi dilde açıklayıcı şekilde girin (Örn: Fen İşleri Kırtasiye Malzemesi Alımı)"
                         className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-xs focus:outline-none focus:ring-1 focus:ring-blue-500 text-slate-800 dark:text-slate-200 font-semibold"
                       />
+                      {exactMatchCount > 0 && (
+                        <p className="text-[10px] text-amber-600 dark:text-amber-400 font-bold mt-1.5 flex items-center gap-1 animate-in fade-in duration-200">
+                          ⚠️ Bu isimde daha önce {exactMatchCount} adet dosya açılmış. Kaydedildiğinde otomatik olarak &quot;({exactMatchCount + 1})&quot; son eki eklenecektir.
+                        </p>
+                      )}
                       {showKonuSuggestions && matchedSuggestions.length > 0 && (
                         <div className="absolute left-0 right-0 mt-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-xl z-50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-150">
                           <div className="px-3 py-1.5 bg-slate-50 dark:bg-slate-950/50 text-[10px] font-bold text-slate-400 border-b border-slate-100 dark:border-slate-800">
