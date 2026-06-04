@@ -10,7 +10,6 @@ import {
   Copy,
   Search,
   Sparkles,
-  Loader2,
   ChevronRight
 } from 'lucide-react'
 import { Link, useNavigate, useRouterState } from '@tanstack/react-router'
@@ -185,8 +184,6 @@ export default function YeniDosyaScreen(): React.JSX.Element {
     }))
   }
 
-  // AI Description Generator (single field)
-  const [isAiGeneratingDesc, setIsAiGeneratingDesc] = useState(false)
 
   // AI Form Fill Modal
   const [showAIModal, setShowAIModal] = useState(false)
@@ -593,11 +590,10 @@ export default function YeniDosyaScreen(): React.JSX.Element {
                           <button
                             type="button"
                             onClick={handleAiDescGenerate}
-                            disabled={isAiGeneratingDesc}
                             title="İşin adına göre yapay zeka ile profesyonel açıklama metni oluştur"
-                            className="text-[10px] text-purple-600 hover:text-purple-700 font-bold flex items-center gap-1 cursor-pointer bg-purple-50 dark:bg-purple-900/20 px-2 py-1 rounded disabled:opacity-50"
+                            className="text-[10px] text-purple-600 hover:text-purple-700 font-bold flex items-center gap-1 cursor-pointer bg-purple-50 dark:bg-purple-900/20 px-2 py-1 rounded"
                           >
-                            {isAiGeneratingDesc ? <Loader2 size={11} className="animate-spin" /> : <Sparkles size={11} />}
+                            <Sparkles size={11} />
                             AI ile Üret
                           </button>
                           <button

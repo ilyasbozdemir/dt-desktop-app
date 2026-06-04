@@ -22,7 +22,7 @@ export function AITextGeneratorModal({
   initialPrompt = '',
   systemInstruction = '',
   onApply
-}: AITextGeneratorModalProps) {
+}: AITextGeneratorModalProps): React.JSX.Element | null {
   const [prompt, setPrompt] = useState('')
   const [loading, setLoading] = useState(false)
   const [result, setResult] = useState('')
@@ -43,7 +43,7 @@ export function AITextGeneratorModal({
     }
   }, [isOpen, initialSubject, initialPrompt, fieldName])
 
-  const handleGenerate = async () => {
+  const handleGenerate = async (): Promise<void> => {
     if (!prompt.trim()) {
       setError('Lütfen yapay zekaya ne yapacağını söyleyen bir talimat girin.')
       return
@@ -69,7 +69,7 @@ export function AITextGeneratorModal({
     }
   }
 
-  const handleApply = () => {
+  const handleApply = (): void => {
     onApply(result)
     onClose()
   }

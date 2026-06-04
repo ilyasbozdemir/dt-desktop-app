@@ -17,6 +17,11 @@ import { TANIM_TasinirKod } from './tables/TANIM_TasinirKod'
 import { TANIM_OkasKod } from './tables/TANIM_OkasKod'
 import { TANIM_KodSozlugu } from './tables/TANIM_KodSozlugu'
 import { TANIM_OlcuBirimi } from './tables/TANIM_OlcuBirimi'
+import { DATA_TeminKalem } from './tables/DATA_TeminKalem'
+import { DATA_TeminFirma } from './tables/DATA_TeminFirma'
+import { DATA_TeminKalemTeklif } from './tables/DATA_TeminKalemTeklif'
+import { DATA_TeminKomisyon } from './tables/DATA_TeminKomisyon'
+import { DATA_TeminBelge } from './tables/DATA_TeminBelge'
 import { CURRENT_SCHEMA_VERSION } from './migrate'
 
 export const TablePrefixLogic = {
@@ -57,7 +62,12 @@ export const schema = {
     SABLON_Placeholder, // Şablon içi alan eşleşmeleri
     TANIM_KodSozlugu, // Kurumsal ve Mali Kod Sözlüğü
     // --- Operasyonel Veriler ---
-    DATA_TeminDosyasi // Her bir temin kaydı
+    DATA_TeminDosyasi, // Her bir temin kaydı
+    DATA_TeminKalem,
+    DATA_TeminFirma,
+    DATA_TeminKalemTeklif,
+    DATA_TeminKomisyon,
+    DATA_TeminBelge
   ]
 }
 

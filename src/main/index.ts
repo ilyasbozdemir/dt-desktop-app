@@ -786,6 +786,15 @@ if (!gotTheLock) {
       }
     })
 
+    // --- AI Handlers ---
+    ipcMain.handle('ai:generate', async (_, options: AIGenerateOptions) => {
+      return await generateContent(options)
+    })
+
+    ipcMain.handle('ai:test', async (_, provider: string, apiKey: string) => {
+      return await testConnection({ provider, apiKey })
+    })
+
     ipcMain.handle('db:import-dte', async (_, customFilePath?: string) => {
       try {
         let filePath = customFilePath
@@ -799,15 +808,6 @@ if (!gotTheLock) {
           if (canceled || !filePaths || filePaths.length === 0) {
             return { success: false, error: 'İptal edildi' }
           }
-
-    // --- AI Handlers ---
-    ipcMain.handle('ai:generate', async (_, options: AIGenerateOptions) => {
-      return await generateContent(options)
-    })
-
-    ipcMain.handle('ai:test', async (_, provider: string, apiKey: string) => {
-      return await testConnection({ provider, apiKey })
-    })
           filePath = filePaths[0]
         }
         
