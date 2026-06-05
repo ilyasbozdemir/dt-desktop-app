@@ -324,7 +324,7 @@ export function useActiveDosyaSummary(activeDosyaId: number | null, institutionN
 }
 
 export interface Announcement {
-  id: number
+  id: number | string
   title: string
   content: string
   date: string
@@ -338,20 +338,53 @@ export function useAnnouncements() {
   const loadAnnouncements = useCallback(async () => {
     setIsLoading(true)
     try {
-      // Fetch from GitHub raw URL
-      const response = await fetch('https://raw.githubusercontent.com/ilyas-bozdemir/dt-desktop-app/main/docs/announcements.json')
-      if (!response.ok) {
-        throw new Error('Server returned non-200 response')
+      let remoteData: Announcement[] = []
+      try {
+        // Fetch from GitHub raw URL
+        const response = await fetch('https://raw.githubusercontent.com/ilyas-bozdemir/dt-desktop-app/main/docs/announcements.json')
+        if (response.ok) {
+          const data = await response.json()
+          if (Array.isArray(data)) {
+            remoteData = data
+          }
+        } else {
+          throw new Error('Server returned non-200 response')
+        }
+      } catch (error) {
+        console.warn('Failed to fetch remote announcements, using local fallback:', error)
+        remoteData = fallbackAnnouncements as Announcement[]
       }
-      const data = await response.json()
-      if (Array.isArray(data)) {
-        setAnnouncements(data)
-      } else {
-        throw new Error('Announcements data is not an array')
+
+      // Fetch from local LOG_SystemLog
+      let localLogs: Announcement[] = []
+      try {
+        const logRes = await window.electron.ipcRenderer.invoke(
+          'db:query', 
+          'SELECT id, title, message, type, created_at FROM LOG_SystemLog ORDER BY created_at DESC LIMIT 50'
+        )
+        if (logRes.success && logRes.data) {
+          localLogs = logRes.data.map((row: any) => ({
+            id: `syslog_${row.id}`,
+            title: row.title,
+            content: row.message,
+            date: new Date(row.created_at).toLocaleDateString('tr-TR', { day: '2-digit', month: 'short', year: 'numeric' }),
+            _rawDate: new Date(row.created_at).getTime(),
+            type: row.type as 'info' | 'success' | 'warning' | 'error'
+          }))
+        }
+      } catch (logErr) {
+        console.warn('Failed to fetch system logs:', logErr)
       }
-    } catch (error) {
-      console.warn('Failed to fetch remote announcements, using local fallback:', error)
-      setAnnouncements(fallbackAnnouncements as Announcement[])
+
+      // Merge and sort
+      const merged = [...remoteData, ...localLogs].sort((a: any, b: any) => {
+        // Sort by _rawDate for local logs if available, else parse date string or put remote items logically
+        const timeA = a._rawDate || new Date(a.date.split('.').reverse().join('-')).getTime() || 0
+        const timeB = b._rawDate || new Date(b.date.split('.').reverse().join('-')).getTime() || 0
+        return timeB - timeA
+      })
+
+      setAnnouncements(merged as Announcement[])
     } finally {
       setIsLoading(false)
     }

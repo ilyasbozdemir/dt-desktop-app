@@ -629,7 +629,7 @@ export default function DashboardScreen(): React.JSX.Element {
           <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-6 shadow-sm flex flex-col max-h-[360px] overflow-hidden">
             <div className="flex items-center gap-2 mb-4 pb-3 border-b border-slate-100 dark:border-slate-800 shrink-0">
               <Megaphone className="w-5 h-5 text-amber-500" />
-              <h3 className="text-sm font-bold text-slate-800 dark:text-slate-200">Duyurular ve Güncellemeler</h3>
+              <h3 className="text-sm font-bold text-slate-800 dark:text-slate-200">Duyurular ve İşlem Logları</h3>
             </div>
             
             <div className="flex-1 overflow-y-auto pr-1 space-y-4 min-h-0 custom-scrollbar">

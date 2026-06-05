@@ -18,6 +18,7 @@ import { useTabStore } from '../../store/tabStore'
 import { cn } from '../../utils/cn'
 import { AIFormFillModal, AIFilledValues } from '../../components/ui/AIFormFillModal'
 import { AITextGeneratorModal } from '../../components/ui/AITextGeneratorModal'
+import { logActivity } from '../../utils/logger'
 
 interface DBBirim {
   id: number
@@ -344,9 +345,11 @@ export default function YeniDosyaScreen(): React.JSX.Element {
     try {
       if (isEdit) {
         await updateDosya({ ...payload, id: editId! })
+        await logActivity('Dosya Güncellendi', `${payload.konu || 'İsimsiz'} isimli dosya güncellendi.`, 'info')
         alert('İhale dosyası başarıyla güncellendi.')
       } else {
         await addDosya(payload)
+        await logActivity('Yeni Dosya Eklendi', `${payload.konu || 'İsimsiz'} konusuyla yeni bir temin dosyası oluşturuldu.`, 'success')
         alert('Yeni ihale dosyası başarıyla eklendi.')
       }
       navigate({ to: '/dosyalar' })
