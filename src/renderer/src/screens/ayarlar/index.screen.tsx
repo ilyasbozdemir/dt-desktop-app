@@ -192,8 +192,8 @@ export default function AyarlarScreen(): React.ReactNode {
     { id: 'tema', label: 'Renk & Tema', icon: <Palette className="w-4 h-4 shrink-0" /> },
     { id: 'div2', label: '', icon: null, isDivider: true },
     { id: 'ai', label: 'Yapay Zeka', icon: <Bot className="w-4 h-4 shrink-0" /> },
-    { id: 'developer', label: 'Geliştirici & Test', icon: <Code className="w-4 h-4 shrink-0" /> }
-  ]
+    ...(import.meta.env.DEV ? [{ id: 'developer', label: 'Geliştirici & Test', icon: <Code className="w-4 h-4 shrink-0" /> }] : [])
+  ] as InnerMenuItem[]
 
   return (
     <div className="p-8 max-w-6xl mx-auto flex flex-col gap-6 w-full animate-in fade-in slide-in-from-bottom-4 duration-500 overflow-y-auto max-h-full">

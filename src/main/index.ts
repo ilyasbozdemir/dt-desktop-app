@@ -1430,9 +1430,11 @@ if (!gotTheLock) {
         }
       }, 5000)
     } else {
-      autoUpdater.checkForUpdatesAndNotify().catch(e => {
-        console.error('Update check error:', e.message)
-      })
+      setTimeout(() => {
+        autoUpdater.checkForUpdatesAndNotify().catch(e => {
+          console.error('Update check error:', e.message)
+        })
+      }, 5000)
     }
 
     autoUpdater.on('checking-for-update', () => {

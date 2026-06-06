@@ -50,7 +50,7 @@ export function Header(): React.JSX.Element {
             style={{ WebkitAppRegion: 'no-drag' } as React.CSSProperties}
             onClick={() => {
               if (updateStatus.status === 'downloaded') {
-                window.electron?.ipcRenderer.send('install-update')
+                window.electron?.ipcRenderer.invoke('updater:quit-and-install')
               } else {
                 alert('Güncelleme arka planda indiriliyor, lütfen bekleyin...')
               }
