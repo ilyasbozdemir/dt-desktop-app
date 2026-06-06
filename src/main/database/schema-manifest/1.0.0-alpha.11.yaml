@@ -1,0 +1,6 @@
+version: "16"
+description: "Komisyon türleri ve komisyon üye eşleşmeleri için yeni dinamik yapı"
+tables:
+  - TANIM_KomisyonTuru
+  - TANIM_Komisyon
+  - TANIM_KomisyonUye

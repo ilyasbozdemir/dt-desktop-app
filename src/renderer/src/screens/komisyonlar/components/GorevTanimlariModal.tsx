@@ -4,15 +4,19 @@ import {
   ClipboardCheck,
   Search,
   Plus,
-  Filter,
-  CheckCircle2,
   Trash2,
-  Edit
+  Edit,
+  X
 } from 'lucide-react'
-import { Button } from '../../components/ui/Button'
-import { Input } from '../../components/ui/Input'
+import { Button } from '../../../components/ui/Button'
+import { Input } from '../../../components/ui/Input'
 
-export default function KomisyonGorevleriScreen(): React.JSX.Element {
+interface GorevTanimlariModalProps {
+  isOpen: boolean
+  onClose: () => void
+}
+
+export function GorevTanimlariModal({ isOpen, onClose }: GorevTanimlariModalProps): React.JSX.Element | null {
   const [searchTerm, setSearchTerm] = useState('')
 
   const { data: gorevler = [], isLoading } = useQuery({
@@ -24,36 +28,42 @@ export default function KomisyonGorevleriScreen(): React.JSX.Element {
       )
       if (!res.success) throw new Error(res.error)
       return res.data
-    }
+    },
+    enabled: isOpen // Only fetch when modal is open
   })
 
-  const filteredGorevler = gorevler.filter(g => 
+  const filteredGorevler = gorevler.filter((g: any) => 
     g.ad.toLowerCase().includes(searchTerm.toLowerCase()) || 
     (g.aciklama && g.aciklama.toLowerCase().includes(searchTerm.toLowerCase()))
   )
 
+  if (!isOpen) return null
+
   return (
-    <div className="flex flex-col h-full space-y-6">
-      <div className="flex flex-col md:flex-row md:items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-4 gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-slate-800 dark:text-white flex items-center gap-2">
-            <ClipboardCheck className="w-6 h-6 text-indigo-500" />
-            Komisyon Görev Tanımları
-          </h1>
-          <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-            Komisyonlarda personellere atanabilecek "Başkan, Üye, Uzman Üye" gibi unvan ve görevleri yönetin.
-          </p>
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm">
+      <div className="bg-white dark:bg-slate-900 rounded-2xl shadow-xl w-full max-w-4xl max-h-[90vh] flex flex-col overflow-hidden border border-slate-200 dark:border-slate-800">
+        
+        {/* Header */}
+        <div className="flex items-center justify-between p-6 border-b border-slate-200 dark:border-slate-800 shrink-0">
+          <div>
+            <h2 className="text-xl font-bold text-slate-800 dark:text-white flex items-center gap-2">
+              <ClipboardCheck className="w-6 h-6 text-indigo-500" />
+              Komisyon Görev Tanımları
+            </h2>
+            <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
+              Komisyonlarda personellere atanabilecek unvan ve görevleri yönetin.
+            </p>
+          </div>
+          <button 
+            onClick={onClose}
+            className="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+          >
+            <X className="w-5 h-5" />
+          </button>
         </div>
 
-        <div className="flex items-center gap-3">
-          <Button className="gap-2 bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm shadow-indigo-500/20 rounded-xl px-4 py-2 text-sm font-semibold transition-all">
-            <Plus className="w-4 h-4" /> Yeni Görev Ekle
-          </Button>
-        </div>
-      </div>
-
-      <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-sm min-h-[450px] flex flex-col overflow-hidden relative">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+        {/* Toolbar */}
+        <div className="p-6 pb-0 shrink-0 flex flex-col md:flex-row gap-4 justify-between">
           <div className="relative flex-1 max-w-md">
             <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
             <Input
@@ -64,13 +74,14 @@ export default function KomisyonGorevleriScreen(): React.JSX.Element {
               className="pl-9 pr-4 py-2 w-full bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 rounded-xl text-sm"
             />
           </div>
-          <Button variant="outline" className="gap-2 rounded-xl text-slate-600 dark:text-slate-300">
-            <Filter className="w-4 h-4" /> Filtrele
+          <Button className="gap-2 bg-indigo-600 hover:bg-indigo-700 text-white shadow-sm shadow-indigo-500/20 rounded-xl px-4 py-2 text-sm font-semibold transition-all">
+            <Plus className="w-4 h-4" /> Yeni Görev Ekle
           </Button>
         </div>
 
-        <div className="flex-1 overflow-y-auto custom-scrollbar">
-          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+        {/* Content */}
+        <div className="p-6 overflow-y-auto custom-scrollbar flex-1">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {isLoading ? (
               <div className="col-span-full py-12 text-center text-slate-500">Yükleniyor...</div>
             ) : filteredGorevler.length === 0 ? (
@@ -101,6 +112,7 @@ export default function KomisyonGorevleriScreen(): React.JSX.Element {
             )))}
           </div>
         </div>
+
       </div>
     </div>
   )
