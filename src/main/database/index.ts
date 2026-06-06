@@ -42,7 +42,7 @@ export const schema = {
     web: 'https://ilyasbozdemir.dev',
     github: 'https://github.com/ilyasbozdemir'
   },
-  version: '1.0.0-alpha.7',
+  version: '1.0.0-alpha.13',
   /**
    * Tablo tanımları — sıra önemlidir (FK bağımlılıkları).
    * Tüm tanım (TANIM_*) tabloları DATA_* tablolarından önce oluşturulmalı.
