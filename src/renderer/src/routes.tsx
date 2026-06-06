@@ -22,6 +22,7 @@ import OlcuBirimleriScreen from './screens/olcubirimleri/index.screen'
 import YeniMalzemeScreen from './screens/malzemeler/yeni.screen'
 import YeniDosyaScreen from './screens/dosyalar/yeni.screen'
 import KomisyonlarScreen from './screens/komisyonlar/index.screen'
+import KomisyonGorevleriScreen from './screens/komisyon-gorevleri/index.screen'
 
 const rootRoute = createRootRoute({
   component: PageWrapper
@@ -67,6 +68,12 @@ const komisyonlarRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/komisyonlar',
   component: KomisyonlarScreen
+})
+
+const komisyonGorevleriRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/komisyon-gorevleri',
+  component: KomisyonGorevleriScreen
 })
 
 import { TakipScreen } from './screens/system/TakipScreen'
@@ -293,6 +300,8 @@ const routeTree = rootRoute.addChildren([
   firmalarRoute,
   personelRoute,
   sablonlarRoute,
+  komisyonlarRoute,
+  komisyonGorevleriRoute,
   takipRoute,
   raporlarRoute,
   komisyonlarRoute,

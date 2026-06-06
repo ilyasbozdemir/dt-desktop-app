@@ -128,6 +128,39 @@ if (!gotTheLock) {
       autoUpdater.quitAndInstall(false, true)
     })
 
+    // --- EBYS Network (Socket) Handlers ---
+    const { startServer, stopServer, getSocketServer } = require('./server')
+    const { connectToServer, disconnectFromServer, emitEvent } = require('./client')
+
+    ipcMain.handle('network:start-server', (_, port: number) => {
+      return startServer(port)
+    })
+
+    ipcMain.handle('network:stop-server', () => {
+      stopServer()
+      return { success: true }
+    })
+
+    ipcMain.handle('network:connect-client', (_, url: string) => {
+      return connectToServer(url)
+    })
+
+    ipcMain.handle('network:disconnect-client', () => {
+      disconnectFromServer()
+      return { success: true }
+    })
+
+    ipcMain.on('network:emit', (_, eventName: string, data: any) => {
+      // Eğer istemciysek sunucuya gönder
+      emitEvent(eventName, data)
+      
+      // Eğer aynı zamanda sunucuysak, kendi istemcilerimize de dağıt
+      const io = getSocketServer()
+      if (io) {
+         io.emit(eventName, data)
+      }
+    })
+
     // --- Workspace & SQLite Handlers ---
     const broadcastDbChange = () => {
       BrowserWindow.getAllWindows().forEach((win) => {

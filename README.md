@@ -17,15 +17,9 @@ yapılan alımları yönetmek için geliştirilmiş masaüstü uygulama.**
 
 ## Hakkında
 
-Doğrudan Temin Programı, internet bağlantısı gerektirmeyen, tamamen **çevrimdışı
-(offline)** çalışan bir masaüstü uygulamasıdır. Verileriniz yalnızca kendi
-bilgisayarınızda saklanır; herhangi bir sunucuya veya bulut sistemine
-gönderilmez.
+Doğrudan Temin Programı, varsayılan olarak internet bağlantısı gerektirmeyen, tamamen **çevrimdışı (offline)** çalışan bir masaüstü uygulamasıdır. Ancak yeni nesil **Ağ Senkronizasyonu (EBYS Mimarisi)** sayesinde kurumunuzdaki diğer birimlerle (Satın Alma, Muhasebe vb.) yerel ağ (LAN) üzerinden anında eşzamanlı veri paylaşımı yapabilirsiniz.
 
-Uygulama, tüm verilerini `.dtm` uzantılı dosyalarda saklar. Bu dosya formatı,
-tıpkı `.docx`, `.xlsx` veya `.pptx` gibi uygulamaya özgü bir yapıya sahiptir;
-içinde SQLite veritabanı ve ilgili meta veriler yer alır. Dosyalarınızı
-yedekleyebilir, taşıyabilir ve paylaşabilirsiniz.
+Uygulama, tüm verilerini `.dtm` uzantılı dosyalarda saklar. Bu dosya formatı, tıpkı `.docx`, `.xlsx` veya `.pptx` gibi uygulamaya özgü bir yapıya sahiptir; içinde SQLite veritabanı ve ilgili meta veriler yer alır. Dosyalarınızı yedekleyebilir, taşıyabilir, paylaşabilir veya yerel ağdaki bir Host üzerinden tüm birimlerle canlı olarak çalışabilirsiniz.
 
 ---
 
@@ -36,22 +30,12 @@ yedekleyebilir, taşıyabilir ve paylaşabilirsiniz.
 - **Tek girdi, sonsuz kullanım** — Temin sürecinde kullanılan belgeleri
   kurumunuza özgü bir kez düzenleyin, her zaman kullanın. Sık kullanılan benzer
   alımlarınız için Tip Onay Belgesi oluşturun.
-- **Sınırsız Esneklik** — En düşük fiyatlı firmadan mı, tüm kalemleri aynı
-  firmadan mı, yoksa her kalem için istediğiniz firmadan mı alım
-  gerçekleştireceksiniz? Kaç firmadan teklif alacaksanız sayısını siz
-  belirleyin. Seçim tamamen size ait!
-- **Yaklaşık Maliyet Kolaylığı** — Yaklaşık maliyeti ister programla detaylı
-  hesaplayın, isterseniz doğrudan elinizdeki veriyi girin.
-- **EKAP’a Girişe Hazır** — Doğrudan Temin Kayıt Formu için zaman harcamaya
-  gerek kalmadı, sistem her şeyi EKAP formatına uygun hazırlar.
-- **Dinamik şablon yönetimi** — Belgelerinizi uygulama içinden düzenleyebilir,
-  anlık önizleyebilir ve `.xlsx` ya da `.docx` formatında dışa aktarabilirsiniz.
-- **DYS uyumlu çıktı** — Tüm belgeler `.UDF` formatında da dışa aktarılabilir;
-  Doküman Yönetim Sistemi entegrasyonu ek adım gerektirmez.
-- **Adım adım rehberli iş akışı** — Her süreç aşaması yönlendirmeli ekranlarla
-  ilerler; eksik ya da hatalı bilgi girilmesi sistem tarafından engellenir.
-- **Tamamen çevrimdışı** — İnternet bağlantısı gerekmez, verileriniz yalnızca
-  sizin bilgisayarınızda durur.
+- **Sınırsız Esneklik** — En düşük fiyatlı firmadan mı, tüm kalemleri aynı firmadan mı, yoksa her kalem için istediğiniz firmadan mı alım gerçekleştireceksiniz?
+- **Yaklaşık Maliyet Kolaylığı** — Yaklaşık maliyeti ister programla detaylı hesaplayın, isterseniz doğrudan elinizdeki veriyi girin.
+- **EBYS ve Çoklu Birim Mimarisi** — Yerleşik Socket.io altyapısı ile uygulamanızı bir Ana Sunucu (Host) haline getirip, kurumdaki diğer istemcilerin (Client) size bağlanmasını sağlayın. Dosya durum güncellemelerini anında tüm birimlerde görün.
+- **Birim Yetkilendirme** — Birimlere (Örn: Fen İşleri, Destek Hizmetleri) özel yetkilendirme sistemi sayesinde evraklarda güvenli Okuma/Yazma (RBAC) kontrolü yapın.
+- **Dinamik şablon yönetimi** — Belgelerinizi uygulama içinden düzenleyebilir, anlık önizleyebilir ve `.xlsx` ya da `.docx` formatında dışa aktarabilirsiniz.
+- **Tamamen çevrimdışı veya Yerel Ağ** — İnternet bağlantısı gerekmez. Verileriniz buluta gitmez, yalnızca sizin bilgisayarınızda veya kurumunuzun yerel ağında (LAN) durur.
 
 ---
 
@@ -145,14 +129,10 @@ pnpm run build:mac
 - [Electron.js](https://www.electronjs.org/) — Masaüstü uygulama çatısı
 - [Radix UI](https://www.radix-ui.com/) — Erişilebilirlik odaklı, headless
   bileşen kütüphanesi
-- [Tailwind CSS](https://tailwindcss.com/) — `rem` tabanlı, responsive
-  utility-first stil sistemi
-- [SQLite](https://www.sqlite.org/) /
-  [better-sqlite3](https://github.com/WiseLibs/better-sqlite3) — Yerel
-  veritabanı
-- [Express.js](https://expressjs.com/) — Dahili API katmanı
-- [node-windows](https://github.com/coreybutler/node-windows) — Windows servis
-  entegrasyonu
+- [Tailwind CSS](https://tailwindcss.com/) — `rem` tabanlı, responsive utility-first stil sistemi
+- [SQLite](https://www.sqlite.org/) / [better-sqlite3](https://github.com/WiseLibs/better-sqlite3) — Yerel veritabanı
+- [Socket.io](https://socket.io/) — Çoklu birimler arası yerel ağda (LAN) gerçek zamanlı WebSockets senkronizasyonu
+- [node-windows](https://github.com/coreybutler/node-windows) — Windows servis entegrasyonu
 
 ---
 
