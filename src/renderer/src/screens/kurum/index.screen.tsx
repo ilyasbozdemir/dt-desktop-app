@@ -564,19 +564,27 @@ export default function KurumScreen(): React.JSX.Element {
                             />
                           </label>
 
-                          {/* Önerilen boyut etiketi */}
-                          <div className="flex items-center justify-between">
-                            <span className="text-[9px] text-slate-400 dark:text-slate-600 font-mono">Önerilen: 256×256 px</span>
-                            {institutionLogo && (
-                              <button
-                                type="button"
-                                onClick={() => setInstitutionLogo('')}
-                                className="flex items-center gap-1 py-1 px-2 border border-red-200 dark:border-red-900/40 hover:bg-red-50 dark:hover:bg-red-950/20 text-red-600 dark:text-red-400 rounded-lg text-[10px] font-bold transition-all"
-                              >
-                                <X className="w-3 h-3" />
-                                Kaldır
-                              </button>
-                            )}
+                          {/* Önerilen boyut ve URL Girişi */}
+                          <div className="flex flex-col gap-3">
+                            <Input
+                              value={institutionLogo?.startsWith('http') ? institutionLogo : ''}
+                              onChange={(e) => setInstitutionLogo(e.target.value)}
+                              placeholder="Veya web URL'si yapıştırın (https://...)"
+                              className="text-xs bg-slate-55 dark:bg-slate-955 border-slate-200 dark:border-slate-800"
+                            />
+                            <div className="flex items-center justify-between">
+                              <span className="text-[9px] text-slate-400 dark:text-slate-600 font-mono">Önerilen: 256×256 px</span>
+                              {institutionLogo && (
+                                <button
+                                  type="button"
+                                  onClick={() => setInstitutionLogo('')}
+                                  className="flex items-center gap-1 py-1 px-2 border border-red-200 dark:border-red-900/40 hover:bg-red-50 dark:hover:bg-red-950/20 text-red-600 dark:text-red-400 rounded-lg text-[10px] font-bold transition-all"
+                                >
+                                  <X className="w-3 h-3" />
+                                  Kaldır
+                                </button>
+                              )}
+                            </div>
                           </div>
                         </div>
 
@@ -636,18 +644,26 @@ export default function KurumScreen(): React.JSX.Element {
                             />
                           </label>
 
-                          <div className="flex items-center justify-between">
-                            <span className="text-[9px] text-slate-400 dark:text-slate-600 font-mono">Önerilen: 300×150 px</span>
-                            {logoLeft && (
-                              <button
-                                type="button"
-                                onClick={() => setLogoLeft('')}
-                                className="flex items-center gap-1 py-1 px-2 border border-red-200 dark:border-red-900/40 hover:bg-red-50 dark:hover:bg-red-950/20 text-red-600 dark:text-red-400 rounded-lg text-[10px] font-bold transition-all"
-                              >
-                                <X className="w-3 h-3" />
-                                Kaldır
-                              </button>
-                            )}
+                          <div className="flex flex-col gap-3">
+                            <Input
+                              value={logoLeft?.startsWith('http') ? logoLeft : ''}
+                              onChange={(e) => setLogoLeft(e.target.value)}
+                              placeholder="Veya web URL'si yapıştırın (https://...)"
+                              className="text-xs bg-slate-55 dark:bg-slate-955 border-slate-200 dark:border-slate-800"
+                            />
+                            <div className="flex items-center justify-between">
+                              <span className="text-[9px] text-slate-400 dark:text-slate-600 font-mono">Önerilen: 300×150 px</span>
+                              {logoLeft && (
+                                <button
+                                  type="button"
+                                  onClick={() => setLogoLeft('')}
+                                  className="flex items-center gap-1 py-1 px-2 border border-red-200 dark:border-red-900/40 hover:bg-red-50 dark:hover:bg-red-950/20 text-red-600 dark:text-red-400 rounded-lg text-[10px] font-bold transition-all"
+                                >
+                                  <X className="w-3 h-3" />
+                                  Kaldır
+                                </button>
+                              )}
+                            </div>
                           </div>
                         </div>
 
@@ -707,18 +723,26 @@ export default function KurumScreen(): React.JSX.Element {
                             />
                           </label>
 
-                          <div className="flex items-center justify-between">
-                            <span className="text-[9px] text-slate-400 dark:text-slate-600 font-mono">Önerilen: 300×150 px</span>
-                            {logoRight && (
-                              <button
-                                type="button"
-                                onClick={() => setLogoRight('')}
-                                className="flex items-center gap-1 py-1 px-2 border border-red-200 dark:border-red-900/40 hover:bg-red-50 dark:hover:bg-red-950/20 text-red-600 dark:text-red-400 rounded-lg text-[10px] font-bold transition-all"
-                              >
-                                <X className="w-3 h-3" />
-                                Kaldır
-                              </button>
-                            )}
+                          <div className="flex flex-col gap-3">
+                            <Input
+                              value={logoRight?.startsWith('http') ? logoRight : ''}
+                              onChange={(e) => setLogoRight(e.target.value)}
+                              placeholder="Veya web URL'si yapıştırın (https://...)"
+                              className="text-xs bg-slate-55 dark:bg-slate-955 border-slate-200 dark:border-slate-800"
+                            />
+                            <div className="flex items-center justify-between">
+                              <span className="text-[9px] text-slate-400 dark:text-slate-600 font-mono">Önerilen: 300×150 px</span>
+                              {logoRight && (
+                                <button
+                                  type="button"
+                                  onClick={() => setLogoRight('')}
+                                  className="flex items-center gap-1 py-1 px-2 border border-red-200 dark:border-red-900/40 hover:bg-red-50 dark:hover:bg-red-950/20 text-red-600 dark:text-red-400 rounded-lg text-[10px] font-bold transition-all"
+                                >
+                                  <X className="w-3 h-3" />
+                                  Kaldır
+                                </button>
+                              )}
+                            </div>
                           </div>
                         </div>
                       </div>
