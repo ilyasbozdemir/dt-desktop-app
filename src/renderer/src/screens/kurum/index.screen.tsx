@@ -20,7 +20,7 @@ export default function KurumScreen(): React.JSX.Element {
   // Tab 1: İdari Bilgiler
   const [institutionCode, setInstitutionCode] = useState('')
   const [kurumAdi, setKurumAdi] = useState('')
-  const [institutionLetterhead, setInstitutionLetterhead] = useState('')
+  const [institutionLetterhead, setInstitutionLetterhead] = useState<string[]>([''])
   const [recipientTitle, setRecipientTitle] = useState('')
   const [parentInstitution, setParentInstitution] = useState('')
   const [logoLeft, setLogoLeft] = useState('')
@@ -86,7 +86,20 @@ export default function KurumScreen(): React.JSX.Element {
       setTimeout(() => {
         setInstitutionCode(settings.institutionCode || '')
         setKurumAdi(settings.institutionName || '')
-        setInstitutionLetterhead(settings.institutionLetterhead || '')
+        let parsedLetterhead = ['']
+        if (settings.institutionLetterhead) {
+          try {
+            const parsed = JSON.parse(settings.institutionLetterhead)
+            if (Array.isArray(parsed) && parsed.length > 0) {
+              parsedLetterhead = parsed
+            } else {
+              parsedLetterhead = [settings.institutionLetterhead]
+            }
+          } catch {
+            parsedLetterhead = [settings.institutionLetterhead]
+          }
+        }
+        setInstitutionLetterhead(parsedLetterhead)
         setRecipientTitle(settings.recipientTitle || '')
         setParentInstitution(settings.parentInstitution || '')
         setLogoLeft(settings.logoLeft || '')
@@ -123,7 +136,7 @@ export default function KurumScreen(): React.JSX.Element {
       if (tab === 'idari') {
         dataToSave.institutionCode = institutionCode
         dataToSave.institutionName = kurumAdi
-        dataToSave.institutionLetterhead = institutionLetterhead
+        dataToSave.institutionLetterhead = JSON.stringify(institutionLetterhead.filter(Boolean))
         dataToSave.recipientTitle = recipientTitle
         dataToSave.parentInstitution = parentInstitution
         dataToSave.logoLeft = logoLeft
@@ -232,14 +245,44 @@ export default function KurumScreen(): React.JSX.Element {
                       </div>
                       <div className="md:col-span-2">
                         <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1">
-                          Kurum Anteti
+                          Kurum Anteti (Satır Satır)
                         </label>
-                        <Input
-                          value={institutionLetterhead}
-                          onChange={(e) => setInstitutionLetterhead(e.target.value)}
-                          placeholder="Resmi Belge Başlığı Örn: T.C. GÜNEY YURT BELEDİYE BAŞKANLIĞI"
-                          className="bg-slate-55 dark:bg-slate-955 border-slate-200 dark:border-slate-800 text-xs"
-                        />
+                        <div className="space-y-2">
+                          {institutionLetterhead.map((line, idx) => (
+                            <div key={idx} className="flex items-center gap-2">
+                              <Input
+                                value={line}
+                                onChange={(e) => {
+                                  const newArr = [...institutionLetterhead];
+                                  newArr[idx] = e.target.value;
+                                  setInstitutionLetterhead(newArr);
+                                }}
+                                placeholder={`Antet ${idx + 1}. Satır (Örn: ${idx === 0 ? 'T.C.' : idx === 1 ? 'GÜNEY YURT BELEDİYE BAŞKANLIĞI' : 'Destek Hizmetleri'})`}
+                                className="bg-slate-55 dark:bg-slate-955 border-slate-200 dark:border-slate-800 text-xs flex-1"
+                              />
+                              {institutionLetterhead.length > 1 && (
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    const newArr = institutionLetterhead.filter((_, i) => i !== idx);
+                                    setInstitutionLetterhead(newArr);
+                                  }}
+                                  className="p-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-950/30 rounded-xl transition-colors shrink-0"
+                                  title="Satırı Sil"
+                                >
+                                  <X className="w-4 h-4" />
+                                </button>
+                              )}
+                            </div>
+                          ))}
+                          <button
+                            type="button"
+                            onClick={() => setInstitutionLetterhead([...institutionLetterhead, ''])}
+                            className="mt-2 text-[10px] font-bold text-blue-600 dark:text-blue-400 hover:text-blue-700 bg-blue-50 dark:bg-blue-900/20 px-3 py-1.5 rounded-lg border border-blue-100 dark:border-blue-800/40"
+                          >
+                            + Yeni Satır Ekle
+                          </button>
+                        </div>
                       </div>
                       <div>
                         <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1">
