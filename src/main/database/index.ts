@@ -20,6 +20,7 @@ import { TANIM_OlcuBirimi } from './tables/TANIM_OlcuBirimi'
 import { TANIM_KomisyonGorevi } from './tables/TANIM_KomisyonGorevi'
 import { TANIM_Komisyon } from './tables/TANIM_Komisyon'
 import { TANIM_KomisyonUye } from './tables/TANIM_KomisyonUye'
+import { TANIM_Komisyon_Sablon } from './tables/TANIM_Komisyon_Sablon'
 import { DATA_TeminKalem } from './tables/DATA_TeminKalem'
 import { DATA_TeminFirma } from './tables/DATA_TeminFirma'
 import { DATA_TeminKalemTeklif } from './tables/DATA_TeminKalemTeklif'
@@ -68,6 +69,7 @@ export const schema = {
     TANIM_KomisyonGorevi, // Komisyon Görev Tanımları
     TANIM_Komisyon, // Tanımlı Komisyonlar
     TANIM_KomisyonUye, // Tanımlı Komisyonların Üyeleri
+    TANIM_Komisyon_Sablon, // Komisyonlara Atanmış Belgeler/Şablonlar
     // --- Operasyonel Veriler ---
     DATA_TeminDosyasi, // Her bir temin kaydı
     DATA_TeminKalem,

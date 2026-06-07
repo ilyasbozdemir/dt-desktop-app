@@ -17,6 +17,9 @@ export function KomisyonOlusturModal({ isOpen, onClose, komisyonId }: KomisyonOl
   
   // Üyeler state: { personelId: number, gorevId: number, asilMi: boolean }
   const [uyeler, setUyeler] = useState<any[]>([])
+  
+  // Şablonlar state
+  const [seciliSablonlar, setSeciliSablonlar] = useState<number[]>([])
 
 
 
@@ -26,6 +29,20 @@ export function KomisyonOlusturModal({ isOpen, onClose, komisyonId }: KomisyonOl
       const res = await window.electron.ipcRenderer.invoke(
         'db:query',
         'SELECT * FROM TANIM_KomisyonGorevi WHERE aktif_mi = 1 ORDER BY id ASC'
+      )
+      if (!res.success) throw new Error(res.error)
+      return res.data
+    },
+    enabled: isOpen
+  })
+
+  // Şablon seçenekleri
+  const { data: tumSablonlar = [] } = useQuery({
+    queryKey: ['komisyon_sablon_secenekleri'],
+    queryFn: async () => {
+      const res = await window.electron.ipcRenderer.invoke(
+        'db:query',
+        'SELECT * FROM TANIM_Sablon WHERE aktif_mi = 1 ORDER BY ad ASC'
       )
       if (!res.success) throw new Error(res.error)
       return res.data
@@ -60,6 +77,17 @@ export function KomisyonOlusturModal({ isOpen, onClose, komisyonId }: KomisyonOl
           asilMi: m.asil_mi
         })))
       }
+
+      // Mevcut şablonları çek
+      const sablonRes = await window.electron.ipcRenderer.invoke(
+        'db:query',
+        'SELECT * FROM TANIM_Komisyon_Sablon WHERE komisyon_id = ?',
+        [komisyonId]
+      )
+      if (sablonRes.success && sablonRes.data) {
+        setSeciliSablonlar(sablonRes.data.map((s: any) => s.sablon_id))
+      }
+
       return res.data[0]
     },
     enabled: !!komisyonId && isOpen
@@ -75,6 +103,12 @@ export function KomisyonOlusturModal({ isOpen, onClose, komisyonId }: KomisyonOl
 
   const handleUyeChange = (id: number, field: string, value: any) => {
     setUyeler(uyeler.map(u => u.id === id ? { ...u, [field]: value } : u))
+  }
+
+  const handleSablonToggle = (sablonId: number) => {
+    setSeciliSablonlar(prev => 
+      prev.includes(sablonId) ? prev.filter(id => id !== sablonId) : [...prev, sablonId]
+    )
   }
 
   const saveMutation = useMutation({
@@ -93,6 +127,10 @@ export function KomisyonOlusturModal({ isOpen, onClose, komisyonId }: KomisyonOl
           {
             sql: 'DELETE FROM TANIM_KomisyonUye WHERE komisyon_id = ?',
             params: [komisyonId]
+          },
+          {
+            sql: 'DELETE FROM TANIM_Komisyon_Sablon WHERE komisyon_id = ?',
+            params: [komisyonId]
           }
         ])
         if (!updateRes.success) throw new Error(updateRes.error)
@@ -106,6 +144,17 @@ export function KomisyonOlusturModal({ isOpen, onClose, komisyonId }: KomisyonOl
           const uyeRes = await window.electron.ipcRenderer.invoke('db:transaction', uyeQueries)
           if (!uyeRes.success) throw new Error(uyeRes.error)
         }
+
+        const sablonQueries = seciliSablonlar.map(sId => ({
+          sql: 'INSERT INTO TANIM_Komisyon_Sablon (komisyon_id, sablon_id) VALUES (?, ?)',
+          params: [komisyonId, sId]
+        }))
+
+        if (sablonQueries.length > 0) {
+          const sablonRes = await window.electron.ipcRenderer.invoke('db:transaction', sablonQueries)
+          if (!sablonRes.success) throw new Error(sablonRes.error)
+        }
+
         return komisyonId
 
       } else {
@@ -129,6 +178,16 @@ export function KomisyonOlusturModal({ isOpen, onClose, komisyonId }: KomisyonOl
           if (!uyeRes.success) throw new Error(uyeRes.error)
         }
 
+        const sablonQueries = seciliSablonlar.map(sId => ({
+          sql: 'INSERT INTO TANIM_Komisyon_Sablon (komisyon_id, sablon_id) VALUES (?, ?)',
+          params: [newKomisyonId, sId]
+        }))
+
+        if (sablonQueries.length > 0) {
+          const sablonRes = await window.electron.ipcRenderer.invoke('db:transaction', sablonQueries)
+          if (!sablonRes.success) throw new Error(sablonRes.error)
+        }
+
         return newKomisyonId
       }
     },
@@ -137,6 +196,7 @@ export function KomisyonOlusturModal({ isOpen, onClose, komisyonId }: KomisyonOl
       onClose()
       setAd('')
       setUyeler([])
+      setSeciliSablonlar([])
     }
   })
 
@@ -222,6 +282,45 @@ export function KomisyonOlusturModal({ isOpen, onClose, komisyonId }: KomisyonOl
                 ))
               )}
             </div>
+        </div>
+
+        {/* Şablonlar */}
+        <div className="pt-4 border-t border-slate-200 dark:border-slate-800">
+          <div className="mb-4">
+            <h3 className="text-base font-bold text-slate-800 dark:text-slate-200">Belge ve Şablonlar</h3>
+            <p className="text-xs text-slate-500 dark:text-slate-400">Bu komisyonun üretebileceği belgeleri (ör: Onay/Olur, Karar Tutanağı) seçin.</p>
+          </div>
+          
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-h-48 overflow-y-auto custom-scrollbar pr-2">
+            {tumSablonlar.map((sablon: any) => (
+              <label 
+                key={sablon.id} 
+                className={`flex items-start gap-3 p-3 border rounded-xl cursor-pointer transition-colors ${
+                  seciliSablonlar.includes(sablon.id)
+                    ? 'border-blue-500 bg-blue-50/50 dark:bg-blue-900/20 dark:border-blue-500/50'
+                    : 'border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50'
+                }`}
+              >
+                <div className="pt-0.5">
+                  <input
+                    type="checkbox"
+                    className="w-4 h-4 rounded text-blue-600 focus:ring-blue-500 border-slate-300"
+                    checked={seciliSablonlar.includes(sablon.id)}
+                    onChange={() => handleSablonToggle(sablon.id)}
+                  />
+                </div>
+                <div>
+                  <div className="text-sm font-semibold text-slate-800 dark:text-slate-200">{sablon.ad}</div>
+                  <div className="text-xs text-slate-500 line-clamp-1">{sablon.aciklama || 'Şablon'}</div>
+                </div>
+              </label>
+            ))}
+            {tumSablonlar.length === 0 && (
+              <div className="col-span-full text-sm text-slate-500 text-center py-4 bg-slate-50 dark:bg-slate-900/50 rounded-lg">
+                Sistemde tanımlı şablon bulunamadı.
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Footer */}

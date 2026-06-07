@@ -7,7 +7,8 @@ import {
   Filter,
   ShieldCheck,
   CheckCircle2,
-  FileSearch
+  FileSearch,
+  Printer
 } from 'lucide-react'
 import { Button } from '../../components/ui/Button'
 import { Input } from '../../components/ui/Input'
@@ -43,9 +44,18 @@ export default function KomisyonlarScreen(): React.JSX.Element {
          JOIN TANIM_KomisyonGorevi g ON u.gorev_id = g.id`
       )
       
+      const sablonlarRes = await window.electron.ipcRenderer.invoke(
+        'db:query',
+        `SELECT ks.komisyon_id, s.id as sablon_id, s.ad, s.aciklama 
+         FROM TANIM_Komisyon_Sablon ks
+         JOIN TANIM_Sablon s ON ks.sablon_id = s.id
+         WHERE s.aktif_mi = 1`
+      )
+      
       const komisyonlarData = res.data.map((k: any) => ({
         ...k,
-        uyeler: membersRes.success ? membersRes.data.filter((m: any) => m.komisyon_id === k.id) : []
+        uyeler: membersRes.success ? membersRes.data.filter((m: any) => m.komisyon_id === k.id) : [],
+        sablonlar: sablonlarRes.success ? sablonlarRes.data.filter((s: any) => s.komisyon_id === k.id) : []
       }))
 
       return komisyonlarData
@@ -244,6 +254,28 @@ export default function KomisyonlarScreen(): React.JSX.Element {
                           Sil
                         </Button>
                       </div>
+                      
+                      {komisyon.sablonlar && komisyon.sablonlar.length > 0 && (
+                        <div className="mt-4 pt-4 border-t border-slate-100 dark:border-slate-800">
+                          <p className="text-xs font-semibold text-slate-500 dark:text-slate-400 mb-2">Çıktılar / Belgeler</p>
+                          <div className="flex flex-wrap gap-2">
+                            {komisyon.sablonlar.map((sablon: any) => (
+                              <Button
+                                key={sablon.sablon_id}
+                                variant="outline"
+                                className="text-xs py-1 px-3 h-auto rounded-lg text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800"
+                                onClick={() => {
+                                  // Gelecekte belge oluşturma modülüne yönlendirme
+                                  alert(`Şablon üretiliyor: ${sablon.ad}\n(Bu özellik yapım aşamasındadır)`)
+                                }}
+                              >
+                                <Printer className="w-3 h-3 mr-1.5" />
+                                {sablon.ad}
+                              </Button>
+                            ))}
+                          </div>
+                        </div>
+                      )}
                     </div>
                   ))}
                 </div>
