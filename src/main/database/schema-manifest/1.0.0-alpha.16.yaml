@@ -1,0 +1,10 @@
+version: '1.0.0-alpha.16'
+timestamp: 2026-06-07T08:40:00Z
+description: 'TANIM_Sablon tablosuna versiyonlama icin parent_id ve versiyon kolonlari eklendi'
+changes:
+  - type: sql
+    up: |
+      ALTER TABLE TANIM_Sablon ADD COLUMN parent_id INTEGER REFERENCES TANIM_Sablon(id) ON DELETE SET NULL;
+      ALTER TABLE TANIM_Sablon ADD COLUMN versiyon INTEGER DEFAULT 1;
+    down: |
+      -- SQLite doesn't support dropping columns easily, but we can skip down migration since we don't usually rollback in this context.
