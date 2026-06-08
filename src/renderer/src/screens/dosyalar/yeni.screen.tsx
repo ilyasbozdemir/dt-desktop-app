@@ -159,6 +159,42 @@ export default function YeniDosyaScreen(): React.JSX.Element {
     loadData()
   }, [isEdit, editId])
 
+  // Otomatik Temin Numarası (TN2026-0001) Oluşturma
+  useEffect(() => {
+    if (!isEdit && !formData.temin_no && !loadingDb) {
+      const year = new Date().getFullYear()
+      const yearStr = year.toString()
+      
+      const yearDosyalar = dosyalar.filter(d => 
+        d.temin_no && (d.temin_no.startsWith(`TN${yearStr}-`) || d.temin_no.startsWith(`${yearStr}/DT-`))
+      )
+      
+      let maxSeq = 0
+      yearDosyalar.forEach(d => {
+        const no = d.temin_no!
+        let seqStr = ''
+        if (no.startsWith(`TN${yearStr}-`)) {
+          seqStr = no.split('-')[1]
+        } else if (no.startsWith(`${yearStr}/DT-`)) {
+          seqStr = no.split('-')[1]
+        }
+        
+        if (seqStr) {
+          const seq = parseInt(seqStr, 10)
+          if (!isNaN(seq) && seq > maxSeq) {
+            maxSeq = seq
+          }
+        }
+      })
+      
+      const nextSeq = String(maxSeq + 1).padStart(4, '0')
+      setFormData(prev => ({
+        ...prev,
+        temin_no: `TN${yearStr}-${nextSeq}`
+      }))
+    }
+  }, [isEdit, formData.temin_no, loadingDb, dosyalar])
+
   // Active Tab (Stepper)
   const [activeTab, setActiveTab] = useState<'genel' | 'ihtiyac' | 'teknik'>('genel')
 
