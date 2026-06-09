@@ -78,6 +78,8 @@ export function AITextGeneratorModal({
 
       if (mode === 'json') {
         finalPrompt += `\n\nÖNEMLİ: Yanıtını SADECE geçerli bir JSON formatında dön. Başka hiçbir açıklama, markdown veya text ekleme. Sadece süslü parantezlerle başlayan ham JSON dön.\nBeklenen Format (örnek):\n${expectedJsonFormat || '{ "sonuc": "..." }'}`
+      } else {
+        finalPrompt += `\n\nÖNEMLİ: Yanıtını LÜTFEN HİÇBİR MARKDOWN İŞARETİ KULLANMADAN (**, ###, \`\`\` vb.) düz metin (plain text) olarak üret.`
       }
 
       const res = await window.api.aiGenerate({ 
@@ -99,6 +101,16 @@ export function AITextGeneratorModal({
           } catch (e) {
             console.warn('AI yanıtı geçerli bir JSON değil, ama yinede yansıtılıyor.', e)
           }
+        } else {
+          // Eğer AI ısrarla markdown gönderirse temizle (text mode)
+          cleanData = cleanData
+            .replace(/\*\*/g, '')
+            .replace(/### /g, '')
+            .replace(/## /g, '')
+            .replace(/# /g, '')
+            .replace(/```[a-z]*\n/g, '')
+            .replace(/```/g, '')
+            .trim()
         }
         setResult(cleanData)
       } else {

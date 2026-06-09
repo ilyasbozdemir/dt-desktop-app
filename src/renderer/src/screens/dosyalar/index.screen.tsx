@@ -30,6 +30,8 @@ import {
 import { cn } from '../../utils/cn'
 import { useWorkspaceStore } from '../../store/workspaceStore'
 import { AITextGeneratorModal } from '../../components/ui/AITextGeneratorModal'
+import { logActivity } from '../../utils/logger'
+import { Button } from '../../components/ui/Button'
 
 // Tur badge renk ve label helper
 function TurBadge({ tur }: { tur: string }) {
@@ -152,25 +154,45 @@ export default function DosyalarScreen(): React.ReactNode {
         'Bu dosyayı silmek istediğinize emin misiniz? Sistemde silinmiş olarak işaretlenecektir.'
       )
     ) {
+      const dosya = dosyalar.find((d) => d.id === id)
       await deleteDosya(id)
+      if (dosya) {
+        await logActivity('Dosya Silindi', `${dosya.temin_no || 'NO BELİRSİZ'} numaralı dosya silindi.`, 'warning')
+      }
       if (activeDosyaId === id) setActiveDosyaId(null)
     }
   }
 
   const handleUpdateStatus = async (id: number, status: string): Promise<void> => {
     await updateDosya({ id, status })
+    const dosya = dosyalar.find((d) => d.id === id)
+    if (dosya) {
+      if (status === 'tamamlandi') {
+        await logActivity('Dosya Tamamlandı', `${dosya.temin_no || 'NO BELİRSİZ'} numaralı dosya tamamlandı olarak işaretlendi.`, 'success')
+      } else if (status === 'devam_ediyor') {
+        await logActivity('Dosya Aktife Alındı', `${dosya.temin_no || 'NO BELİRSİZ'} numaralı dosya tekrar aktife alındı.`, 'info')
+      }
+    }
   }
 
   const handleEkapGonder = async (id: number): Promise<void> => {
     const ekapNo = window.prompt('EKAP İhale Kayıt Numarasını (İKN) giriniz:')
     if (ekapNo !== null) {
       await updateDosya({ id, is_ekap_sent: 1, ekap_no: ekapNo.trim() })
+      const dosya = dosyalar.find((d) => d.id === id)
+      if (dosya) {
+        await logActivity('EKAP Kilit', `${dosya.temin_no || 'NO BELİRSİZ'} numaralı dosya kilitlendi (İKN: ${ekapNo.trim()}).`, 'success')
+      }
     }
   }
 
   const handleKilidiAc = async (id: number): Promise<void> => {
     if (confirm('Kilidi açarsanız dosyanın EKAP bağlantısı/kilit durumu iptal edilecektir. Düzenlemeye devam edebilmek için emin misiniz?')) {
       await updateDosya({ id, is_ekap_sent: 0, ekap_no: null })
+      const dosya = dosyalar.find((d) => d.id === id)
+      if (dosya) {
+        await logActivity('EKAP Kilit Açıldı', `${dosya.temin_no || 'NO BELİRSİZ'} numaralı dosyanın kilidi açıldı.`, 'warning')
+      }
     }
   }
 
@@ -837,64 +859,77 @@ export default function DosyalarScreen(): React.ReactNode {
                     )}
                     {selectedDosya.is_deleted !== 1 && selectedDosya.is_ekap_sent !== 1 && selectedDosya.status === 'tamamlandi' && (
                       <>
-                        <button
-                          onClick={() => handleUpdateStatus(selectedDosya.id, 'devam_ediyor')}
-                          className="px-4 py-2.5 border border-emerald-200 dark:border-emerald-950/20 hover:bg-emerald-50 dark:hover:bg-emerald-955/10 text-emerald-600 dark:text-emerald-400 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer"
-                        >
-                          <Clock size={14} />
-                          Aktife Al
-                        </button>
-                        <button
-                          onClick={() => handleEkapGonder(selectedDosya.id)}
-                          className="px-4 py-2.5 border border-sky-200 dark:border-sky-950/20 hover:bg-sky-50 dark:hover:bg-sky-955/10 text-sky-600 dark:text-sky-400 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer bg-sky-50 dark:bg-sky-900/20"
-                        >
-                          <Lock size={14} />
-                          Kilitle (EKAP)
-                        </button>
+                        <Button asChild desc={`${selectedDosya.temin_no || 'Dosya'} Aktife Alındı (Buton Tıklaması)`}>
+                          <button
+                            onClick={() => handleUpdateStatus(selectedDosya.id, 'devam_ediyor')}
+                            className="px-4 py-2.5 border border-emerald-200 dark:border-emerald-950/20 hover:bg-emerald-50 dark:hover:bg-emerald-955/10 text-emerald-600 dark:text-emerald-400 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+                          >
+                            <Clock size={14} />
+                            Aktife Al
+                          </button>
+                        </Button>
+                        <Button asChild desc={`${selectedDosya.temin_no || 'Dosya'} EKAP Kilitleme (Buton Tıklaması)`}>
+                          <button
+                            onClick={() => handleEkapGonder(selectedDosya.id)}
+                            className="px-4 py-2.5 border border-sky-200 dark:border-sky-950/20 hover:bg-sky-50 dark:hover:bg-sky-955/10 text-sky-600 dark:text-sky-400 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer bg-sky-50 dark:bg-sky-900/20"
+                          >
+                            <Lock size={14} />
+                            Kilitle (EKAP)
+                          </button>
+                        </Button>
                       </>
                     )}
                     {selectedDosya.is_deleted !== 1 && selectedDosya.is_ekap_sent === 1 && (
-                      <button
-                        onClick={() => handleKilidiAc(selectedDosya.id)}
-                        className="col-span-2 px-4 py-2.5 border border-amber-200 dark:border-amber-950/20 hover:bg-amber-50 dark:hover:bg-amber-955/10 text-amber-600 dark:text-amber-400 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer"
-                      >
-                        <Unlock size={14} />
-                        Kilidi Aç
-                      </button>
+                      <Button asChild desc={`${selectedDosya.temin_no || 'Dosya'} EKAP Kilidi Açma (Buton Tıklaması)`}>
+                        <button
+                          onClick={() => handleKilidiAc(selectedDosya.id)}
+                          className="col-span-2 px-4 py-2.5 border border-amber-200 dark:border-amber-950/20 hover:bg-amber-50 dark:hover:bg-amber-955/10 text-amber-600 dark:text-amber-400 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+                        >
+                          <Unlock size={14} />
+                          Kilidi Aç
+                        </button>
+                      </Button>
                     )}
                     {selectedDosya.is_deleted === 1 && (
-                      <button
-                        onClick={() =>
-                          handleUpdateStatus(selectedDosya.id, 'devam_ediyor').then(() =>
-                            updateDosya({ id: selectedDosya.id, is_deleted: 0 })
-                          )
-                        }
-                        className="col-span-2 px-4 py-2.5 border border-emerald-200 dark:border-emerald-950/20 hover:bg-emerald-50 dark:hover:bg-emerald-955/10 text-emerald-600 dark:text-emerald-400 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer"
-                      >
-                        <Edit size={14} />
-                        Silinmişi Geri Al
-                      </button>
+                      <Button asChild desc={`${selectedDosya.temin_no || 'Dosya'} Silinmişi Geri Al (Buton Tıklaması)`}>
+                        <button
+                          onClick={() =>
+                            handleUpdateStatus(selectedDosya.id, 'devam_ediyor').then(() => {
+                              updateDosya({ id: selectedDosya.id, is_deleted: 0 })
+                              logActivity('Dosya Geri Alındı', `${selectedDosya.temin_no || 'NO BELİRSİZ'} numaralı silinmiş dosya geri alındı.`, 'info')
+                            })
+                          }
+                          className="col-span-2 px-4 py-2.5 border border-emerald-200 dark:border-emerald-950/20 hover:bg-emerald-50 dark:hover:bg-emerald-955/10 text-emerald-600 dark:text-emerald-400 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+                        >
+                          <Edit size={14} />
+                          Silinmişi Geri Al
+                        </button>
+                      </Button>
                     )}
                   </div>
 
                   {!isWindowMode && (
-                    <button
-                      onClick={handleOpenInNewWindow}
-                      className="w-full px-4 py-2.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-750 text-slate-750 dark:text-slate-200 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer"
-                    >
-                      <ExternalLink size={14} />
-                      Yeni Pencerede Aç
-                    </button>
+                    <Button asChild desc={`${selectedDosya.temin_no || 'Dosya'} Yeni Pencerede Aç (Buton Tıklaması)`}>
+                      <button
+                        onClick={handleOpenInNewWindow}
+                        className="w-full px-4 py-2.5 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-750 text-slate-750 dark:text-slate-200 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+                      >
+                        <ExternalLink size={14} />
+                        Yeni Pencerede Aç
+                      </button>
+                    </Button>
                   )}
 
                   {/* YAPAY ZEKA ASİSTANI BUTONU */}
-                  <button
-                    onClick={() => handleOpenAI(selectedDosya)}
-                    className="w-full px-4 py-2.5 bg-gradient-to-r from-violet-600 to-fuchsia-600 hover:from-violet-500 hover:to-fuchsia-500 text-white rounded-xl text-xs font-bold transition-all shadow-md shadow-violet-500/20 flex items-center justify-center gap-1.5 cursor-pointer mt-2"
-                  >
-                    <Sparkles size={14} />
-                    Yapay Zeka Asistanı
-                  </button>
+                  <Button asChild desc={`${selectedDosya.temin_no || 'Dosya'} Yapay Zeka Asistanı (Buton Tıklaması)`}>
+                    <button
+                      onClick={() => handleOpenAI(selectedDosya)}
+                      className="w-full px-4 py-2.5 bg-linear-to-r from-violet-600 to-fuchsia-600 hover:from-violet-500 hover:to-fuchsia-500 text-white rounded-xl text-xs font-bold transition-all shadow-md shadow-violet-500/20 flex items-center justify-center gap-1.5 cursor-pointer mt-2"
+                    >
+                      <Sparkles size={14} />
+                      Yapay Zeka Asistanı
+                    </button>
+                  </Button>
                 </div>
               </>
             )}

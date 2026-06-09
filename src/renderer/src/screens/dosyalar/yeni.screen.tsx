@@ -10,7 +10,8 @@ import {
   Copy,
   Search,
   Sparkles,
-  ChevronRight
+  ChevronRight,
+  Bot
 } from 'lucide-react'
 import { Link, useNavigate, useRouterState } from '@tanstack/react-router'
 import { useDosyalarHooks, TeminDosyasi } from './dosyalar.hooks'
@@ -307,6 +308,11 @@ export default function YeniDosyaScreen(): React.JSX.Element {
     targetField: 'isin_aciklamasi'
   })
 
+  // AI Kalem Asistanı State
+  const [aiKalemConfig, setAiKalemConfig] = useState<{
+    isOpen: boolean
+  }>({ isOpen: false })
+
   const openTextGenerator = (targetField: keyof TeminDosyasi, title: string, fieldName: string, systemInstruction?: string) => {
     setTextGenConfig({
       isOpen: true,
@@ -545,20 +551,23 @@ export default function YeniDosyaScreen(): React.JSX.Element {
           <button
             type="button"
             onClick={handleAiFormValidation}
-            className="px-4 py-2 bg-gradient-to-r from-teal-500 to-blue-600 hover:from-teal-600 hover:to-blue-700 text-white rounded-xl text-xs font-bold transition-all shadow-md shadow-teal-500/20 flex items-center gap-2 cursor-pointer"
-            title="Formunuzdaki mantıksal, mali ve mevzuat hatalarını AI ile analiz edin"
+            className="relative px-4 py-2 bg-linear-to-r from-teal-500 to-blue-600 hover:from-teal-600 hover:to-blue-700 text-white rounded-xl text-xs font-bold transition-all shadow-md shadow-teal-500/20 flex items-center gap-2 cursor-pointer"
+            title="Formunuzdaki hataları AI ile analiz edin. (BETA - Eğitiliyor)"
           >
-            ğŸ¤– AI Form Kontrolü
+            <Bot size={14} /> AI Form Kontrolü
+            <span className="absolute -top-2 -right-2 bg-amber-400 text-amber-950 text-[9px] font-extrabold px-1.5 py-0.5 rounded-md border border-white/20 shadow-sm animate-pulse">BETA</span>
           </button>
           
           {/* AI Asistan Butonu */}
           <button
             type="button"
             onClick={handleAiFullFormGenerate}
-            className="px-4 py-2 bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white rounded-xl text-xs font-bold transition-all shadow-md shadow-blue-500/20 flex items-center gap-2 cursor-pointer"
+            title="Tüm formu yapay zeka ile otomatik doldurun. (BETA - Eğitiliyor)"
+            className="relative px-4 py-2 bg-linear-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white rounded-xl text-xs font-bold transition-all shadow-md shadow-blue-500/20 flex items-center gap-2 cursor-pointer"
           >
             <Sparkles size={14} />
             Yapay Zeka Asistanı
+            <span className="absolute -top-2 -right-2 bg-amber-400 text-amber-950 text-[9px] font-extrabold px-1.5 py-0.5 rounded-md border border-white/20 shadow-sm animate-pulse">BETA</span>
           </button>
           {import.meta.env.DEV && (
             <button
@@ -1533,6 +1542,15 @@ export default function YeniDosyaScreen(): React.JSX.Element {
                         <button type="button" className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold shadow-md shadow-blue-500/20 transition-colors w-full md:w-auto whitespace-nowrap">
                           + OKAS'tan Aktar
                         </button>
+                        <button 
+                          type="button" 
+                          onClick={() => setAiKalemConfig({ isOpen: true })}
+                          title="Yapay zeka asistanı halen eğitiliyor. Çıktıları kontrol ediniz."
+                          className="relative px-4 py-2 bg-linear-to-r from-violet-600 to-fuchsia-600 hover:from-violet-500 hover:to-fuchsia-500 text-white rounded-xl text-xs font-bold shadow-md shadow-violet-500/20 transition-colors w-full md:w-auto whitespace-nowrap flex items-center justify-center gap-1.5"
+                        >
+                          <Sparkles size={14} /> AI Kalem Bulucu
+                          <span className="absolute -top-2 -right-2 bg-amber-400 text-amber-950 text-[9px] font-extrabold px-1.5 py-0.5 rounded-md border border-white/20 shadow-sm animate-pulse">BETA</span>
+                        </button>
                       </div>
                     </div>
                   </div>
@@ -1691,6 +1709,27 @@ export default function YeniDosyaScreen(): React.JSX.Element {
             ...prev,
             [textGenConfig.targetField]: text
           }))
+        }}
+      />
+
+      {/* AI Kalem Asistanı Modal */}
+      <AITextGeneratorModal
+        isOpen={aiKalemConfig.isOpen}
+        onClose={() => setAiKalemConfig({ isOpen: false })}
+        title="Yapay Zeka ile Kalem Tanımlama"
+        fieldName="Kalem (OKAS ve Ortak Alımlar Sözlüğü)"
+        initialSubject={formData.konu}
+        mode="json"
+        expectedJsonFormat={'{ "kalemAdi": "Örn: A4 Fotokopi Kağıdı 80gr", "miktari": 50, "birimi": "Paket", "okasKodu": "Örn: 30197630-1" }'}
+        systemInstruction={`Sen bir kamu ihale ve doğrudan temin uzmanısın. Kullanıcı bir mal, hizmet veya yapım işi için listeye kalem eklemek istiyor. 
+Kullanıcının girdiği genel tanıma ve alımın konusuna (${formData.konu || formData.tur}) bakarak:
+1. En uygun, resmi, şartnameye uygun "Kalem Adı"nı belirle.
+2. Bu kalem için EKAP sisteminde kullanılan en uygun "OKAS Kodunu" (Ortak Alımlar Sözlüğü CPV kodu) veya Taşınır/Taşınmaz mal kodunu bul. Bulamazsan uygun bir üst kategori OKAS kodu tahmin et.
+3. Uygun miktar ve ölçü birimi (Adet, Paket, Kg, Ton, Ay, Gün, m2 vb.) öner.
+Yanıtını SADECE JSON formatında ver.`}
+        onApply={(data) => {
+          console.log('AI Kalem Verisi:', data)
+          alert(`Yapay Zeka şu kalemi buldu:\n\nAdı: ${data.kalemAdi}\nOKAS Kodu: ${data.okasKodu}\nMiktar: ${data.miktari} ${data.birimi}\n\nNot: Kalem listesi altyapısı tamamlandığında bu kalem otomatik olarak listeye eklenecektir.`)
         }}
       />
 
