@@ -54,10 +54,13 @@ export interface TeminDosyasi {
   durum_asama_id: number | null
   mevzuat_id: number | null
   notlar: string | null
-  tekrar_no?: number | null
-  status?: string
-  is_deleted?: number
+  tekrar_no: number | null
+  status: string
+  is_deleted: number
+  ekap_no: string | null
+  is_ekap_sent: number
   created_at: string
+  updated_at: string
   birim_adi?: string | null
 }
 

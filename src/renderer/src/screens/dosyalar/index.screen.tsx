@@ -159,6 +159,13 @@ export default function DosyalarScreen(): React.ReactNode {
     await updateDosya({ id, status })
   }
 
+  const handleEkapGonder = async (id: number): Promise<void> => {
+    const ekapNo = window.prompt('EKAP İhale Kayıt Numarasını (İKN) giriniz:')
+    if (ekapNo !== null) {
+      await updateDosya({ id, is_ekap_sent: 1, ekap_no: ekapNo.trim() })
+    }
+  }
+
   const filteredDosyalar = dosyalar.filter((d) => {
     const matchSearch =
       (d.konu || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -611,19 +618,30 @@ export default function DosyalarScreen(): React.ReactNode {
               <>
                 {/* Detay Panel Başlığı */}
                 <div className="p-5 border-b border-slate-100 dark:border-slate-800 bg-gradient-to-b from-blue-50/50 to-transparent dark:from-blue-950/20">
-                  <div className="flex items-start justify-between gap-2 mb-2">
-                    <span className="text-[9px] font-black text-blue-600 dark:text-blue-400 uppercase tracking-widest">
-                      {selectedDosya.is_deleted === 1
-                        ? 'SİLİNMİŞ DOSYA'
-                        : selectedDosya.status === 'tamamlandi'
-                          ? 'TAMAMLANMIŞ DOSYA'
-                          : 'AKTİF İHALE DOSYASI'}
-                    </span>
-                    <DurumBadge
-                      durumAsamaId={selectedDosya.durum_asama_id}
-                      isDeleted={selectedDosya.is_deleted}
-                      status={selectedDosya.status}
-                    />
+                  <div className="flex flex-col gap-2 mb-2">
+                    <div className="flex items-start justify-between gap-2 flex-wrap">
+                      <span className="text-[10px] font-black text-blue-600 dark:text-blue-400 uppercase tracking-widest break-words leading-tight">
+                        {selectedDosya.is_deleted === 1
+                          ? 'SİLİNMİŞ DOSYA'
+                          : selectedDosya.is_ekap_sent === 1
+                            ? 'EKAP\'A GÖNDERİLDİ'
+                            : selectedDosya.status === 'tamamlandi'
+                              ? 'TAMAMLANMIŞ DOSYA'
+                              : 'AKTİF İHALE DOSYASI'}
+                      </span>
+                      <div className="shrink-0 mt-0.5 flex flex-wrap items-center gap-2">
+                        {selectedDosya.is_ekap_sent === 1 && (
+                          <span className="bg-sky-100 text-sky-700 dark:bg-sky-900/40 dark:text-sky-300 px-2 py-0.5 rounded border border-sky-200 dark:border-sky-800 text-[9px] font-bold">
+                            EKAP İKN: {selectedDosya.ekap_no || '-'}
+                          </span>
+                        )}
+                        <DurumBadge
+                          durumAsamaId={selectedDosya.durum_asama_id}
+                          isDeleted={selectedDosya.is_deleted}
+                          status={selectedDosya.status}
+                        />
+                      </div>
+                    </div>
                   </div>
                   <h2
                     className="text-sm font-bold text-slate-850 dark:text-white leading-snug line-clamp-3"
@@ -782,7 +800,7 @@ export default function DosyalarScreen(): React.ReactNode {
                 {/* Aksiyon Butonları */}
                 <div className="p-4 border-t border-slate-100 dark:border-slate-800 space-y-2">
                   <div className="grid grid-cols-2 gap-2">
-                    {selectedDosya.is_deleted !== 1 && (
+                    {selectedDosya.is_deleted !== 1 && selectedDosya.is_ekap_sent !== 1 && (
                       <button
                         onClick={() => navigate({ to: `/dosyalar/yeni?id=${selectedDosya.id}` })}
                         className="px-4 py-2.5 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer"
@@ -791,7 +809,7 @@ export default function DosyalarScreen(): React.ReactNode {
                         Düzenle
                       </button>
                     )}
-                    {selectedDosya.is_deleted !== 1 && (
+                    {selectedDosya.is_deleted !== 1 && selectedDosya.is_ekap_sent !== 1 && (
                       <button
                         onClick={() => handleDelete(selectedDosya.id)}
                         className="px-4 py-2.5 border border-red-200 dark:border-red-950/20 hover:bg-red-50 dark:hover:bg-red-955/10 text-red-600 dark:text-red-400 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer"
@@ -800,7 +818,7 @@ export default function DosyalarScreen(): React.ReactNode {
                         Sil
                       </button>
                     )}
-                    {selectedDosya.is_deleted !== 1 && selectedDosya.status !== 'tamamlandi' && (
+                    {selectedDosya.is_deleted !== 1 && selectedDosya.is_ekap_sent !== 1 && selectedDosya.status !== 'tamamlandi' && (
                       <button
                         onClick={() => handleUpdateStatus(selectedDosya.id, 'tamamlandi')}
                         className="col-span-2 px-4 py-2.5 border border-purple-200 dark:border-purple-950/20 hover:bg-purple-50 dark:hover:bg-purple-955/10 text-purple-600 dark:text-purple-400 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer"
@@ -809,14 +827,23 @@ export default function DosyalarScreen(): React.ReactNode {
                         Tamamlandı İşaretle
                       </button>
                     )}
-                    {selectedDosya.is_deleted !== 1 && selectedDosya.status === 'tamamlandi' && (
-                      <button
-                        onClick={() => handleUpdateStatus(selectedDosya.id, 'devam_ediyor')}
-                        className="col-span-2 px-4 py-2.5 border border-emerald-200 dark:border-emerald-950/20 hover:bg-emerald-50 dark:hover:bg-emerald-955/10 text-emerald-600 dark:text-emerald-400 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer"
-                      >
-                        <Clock size={14} />
-                        Aktife Al
-                      </button>
+                    {selectedDosya.is_deleted !== 1 && selectedDosya.is_ekap_sent !== 1 && selectedDosya.status === 'tamamlandi' && (
+                      <>
+                        <button
+                          onClick={() => handleUpdateStatus(selectedDosya.id, 'devam_ediyor')}
+                          className="px-4 py-2.5 border border-emerald-200 dark:border-emerald-950/20 hover:bg-emerald-50 dark:hover:bg-emerald-955/10 text-emerald-600 dark:text-emerald-400 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+                        >
+                          <Clock size={14} />
+                          Aktife Al
+                        </button>
+                        <button
+                          onClick={() => handleEkapGonder(selectedDosya.id)}
+                          className="px-4 py-2.5 border border-sky-200 dark:border-sky-950/20 hover:bg-sky-50 dark:hover:bg-sky-955/10 text-sky-600 dark:text-sky-400 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer bg-sky-50 dark:bg-sky-900/20"
+                        >
+                          <ExternalLink size={14} />
+                          EKAP'a Gönder
+                        </button>
+                      </>
                     )}
                     {selectedDosya.is_deleted === 1 && (
                       <button

@@ -65,6 +65,8 @@ export const DATA_TeminDosyasi = {
     { name: 'tekrar_no', type: 'INTEGER', default: 1 },
     { name: 'status', type: 'TEXT', default: "'devam_ediyor'" }, // devam_ediyor, tamamlandi, iptal
     { name: 'is_deleted', type: 'INTEGER', default: 0 }, // 0: Aktif, 1: Silinmiş
+    { name: 'ekap_no', type: 'TEXT' }, // EKAP Kayıt Numarası
+    { name: 'is_ekap_sent', type: 'INTEGER', default: 0 }, // 0: Gönderilmedi, 1: Gönderildi
     { name: 'created_at', type: 'DATETIME', default: 'CURRENT_TIMESTAMP' },
     { name: 'updated_at', type: 'DATETIME', default: 'CURRENT_TIMESTAMP' }
   ],
