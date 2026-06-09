@@ -214,7 +214,7 @@ export default function DosyalarScreen(): React.ReactNode {
   const taslakCount = aktifDosyalar.filter(
     (d) => !d.durum_asama_id && d.status !== 'tamamlandi'
   ).length
-  const tamamlananCount = aktifDosyalar.filter((d) => d.status === 'tamamlandi').length
+  // const tamamlananCount = aktifDosyalar.filter((d) => d.status === 'tamamlandi').length
 
   const formatMoney = (val: number) =>
     val ? val.toLocaleString('tr-TR', { minimumFractionDigits: 2 }) : '0.00'
