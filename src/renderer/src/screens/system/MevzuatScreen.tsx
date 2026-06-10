@@ -47,6 +47,7 @@ interface CodeListEditorProps {
   placeholderDesc?: string
   presets?: PresetItem[]
   presetsLabel?: string
+  descOptions?: { value: string; label: string }[]
 }
 
 function CodeListEditor({
@@ -57,7 +58,8 @@ function CodeListEditor({
   placeholderCode,
   placeholderDesc,
   presets,
-  presetsLabel
+  presetsLabel,
+  descOptions
 }: CodeListEditorProps): React.JSX.Element {
   const [newCode, setNewCode] = useState('')
   const [newDesc, setNewDesc] = useState('')
@@ -120,12 +122,26 @@ function CodeListEditor({
           />
         </div>
         <div className="sm:col-span-6">
-          <Input
-            value={newDesc}
-            onChange={(e) => setNewDesc(e.target.value)}
-            placeholder={placeholderDesc || 'Açıklama (Örn: Mal Alımı)...'}
-            className="bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-xs py-1.5 h-8 w-full"
-          />
+          {descOptions ? (
+            <select
+              value={newDesc}
+              onChange={(e) => setNewDesc(e.target.value)}
+              className="bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs py-1.5 h-8 w-full rounded-md px-2 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              title={placeholderDesc || 'Seçiniz...'}
+            >
+              <option value="">{placeholderDesc || 'Seçiniz...'}</option>
+              {descOptions.map(opt => (
+                <option key={opt.value} value={opt.value}>{opt.label}</option>
+              ))}
+            </select>
+          ) : (
+            <Input
+              value={newDesc}
+              onChange={(e) => setNewDesc(e.target.value)}
+              placeholder={placeholderDesc || 'Açıklama (Örn: Mal Alımı)...'}
+              className="bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-xs py-1.5 h-8 w-full"
+            />
+          )}
         </div>
         <div className="sm:col-span-2">
           <Button
@@ -178,12 +194,9 @@ function CodeListEditor({
 }
 
 import { InnerMenu, InnerMenuItem } from '../../components/ui/InnerMenu'
-import {
-  FONKSIYONEL_KODLAR,
-  FINANSMAN_KODLARI,
-  EKONOMIK_KODLAR,
-  GELIR_KODLARI
-} from '../../constants/butce-kodlari'
+import { EKONOMIK_KODLAR, FONKSIYONEL_KODLAR, FINANSMAN_KODLARI, GELIR_KODLARI } from '../../constants/butce-kodlari'
+import { Modal } from '../../components/ui/Modal'
+import { useBirimlerHooks } from '../birimler/birimler.hooks'
 import {
   MADDE_22_BENTLERI,
   MADDE_3_ISTISNA_BENTLERI,
@@ -228,6 +241,8 @@ export function MevzuatScreen(): React.JSX.Element {
   >('limitler')
   const [subTab, setSubTab] = useState<'madde22' | 'madde3'>('madde22')
   const [isSaving, setIsSaving] = useState(false)
+  const [isLoadingCodes, setIsLoadingCodes] = useState(false)
+  const { birimler } = useBirimlerHooks()
   const [isConfirmed, setIsConfirmed] = useState(false)
   const [butceSearch, setButceSearch] = useState('')
   const [copiedText, setCopiedText] = useState('')
@@ -393,8 +408,17 @@ export function MevzuatScreen(): React.JSX.Element {
         ...harcamaBirimleri.map(c => ({ sql: 'INSERT INTO TANIM_KodSozlugu (tur, kod, aciklama) VALUES (?, ?, ?)', params: ['harcama_birimi', c.code, c.description] }))
       ]
       
-      if (insertQueries.length > 0) {
-        await window.electron.ipcRenderer.invoke('db:transaction', insertQueries)
+      // Update TANIM_Birim kurumsal_kod based on Kurumsal Kodlar
+      const updateBirimQueries = [
+        { sql: 'UPDATE TANIM_Birim SET kurumsal_kod = NULL', params: [] },
+        ...kurumsalCodes.map(c => ({
+          sql: 'UPDATE TANIM_Birim SET kurumsal_kod = ? WHERE birim_adi = ?',
+          params: [c.code, c.description]
+        }))
+      ]
+      
+      if (insertQueries.length > 0 || updateBirimQueries.length > 0) {
+        await window.electron.ipcRenderer.invoke('db:transaction', [...insertQueries, ...updateBirimQueries])
       }
 
       await saveSettings(dataToSave)
@@ -781,7 +805,7 @@ export function MevzuatScreen(): React.JSX.Element {
                     {institutionType === 'belediye' && (
                       <div className="text-[10px] text-slate-500 dark:text-slate-400 mt-2 leading-relaxed font-medium">
                         💡 Mahalli İdare şablonu aktif. 5018 sayılı kanun gereği kurumsal kod prefixi <strong>"46"</strong> (Mahalli İdareler) ve finansal kod <strong>"5"</strong> olmalıdır.
-                        <br />Örnek Kurumsal Kod Yapısı: <strong>46 . [İl Kodu] . [Belediye Kodu] . [Müdürlük/Birim Kodu]</strong> (Örn: 46.70.97.03)
+                        <br />Örnek Kurumsal Kod Yapısı: <strong>46 . [İl Kodu] . [Belediye Kodu] . [Müdürlük/Birim Kodu]</strong>
                       </div>
                     )}
                     {institutionType === 'genel_butce' && (
@@ -802,11 +826,12 @@ export function MevzuatScreen(): React.JSX.Element {
                   <div className="mt-4">
                     <CodeListEditor
                       title="Kurumsal Kodlar (Kurum Birimleri)"
-                      description="Kurumunuza ait ana birim ve müdürlük kodları (Örn: 30.11.01.22 - Mali Hizmetler)"
+                      description="Kurumunuza ait ana birim ve müdürlük kodları (Örn: XX.XX.XX.XX - Mali Hizmetler)"
                       codes={kurumsalCodes}
                       onChange={setKurumsalCodes}
                       placeholderCode="Örn: 30.11.01.22"
-                      placeholderDesc="Birim Adı..."
+                      placeholderDesc="Mevcut Birimlerden Seçiniz..."
+                      descOptions={birimler.map(b => ({ value: b.birim_adi, label: b.birim_adi }))}
                     />
                   </div>
 

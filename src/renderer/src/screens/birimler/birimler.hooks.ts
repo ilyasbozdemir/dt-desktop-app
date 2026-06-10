@@ -42,6 +42,23 @@ export function usePersonelList() {
   return { personeller, isLoading }
 }
 
+const fetchKurumsalKodlar = async (): Promise<{ kod: string; aciklama: string }[]> => {
+  const res = await window.electron.ipcRenderer.invoke(
+    'db:query',
+    "SELECT kod, aciklama FROM TANIM_KodSozlugu WHERE tur = 'kurumsal' AND aktif_mi = 1 ORDER BY aciklama ASC"
+  )
+  if (!res.success) throw new Error(res.error)
+  return res.data
+}
+
+export function useKurumsalKodlar() {
+  const { data: kurumsalKodlar = [], isLoading } = useQuery({
+    queryKey: ['kurumsal_kodlar'],
+    queryFn: fetchKurumsalKodlar
+  })
+  return { kurumsalKodlar, isLoading }
+}
+
 export function useBirimlerHooks() {
   const queryClient = useQueryClient()
 

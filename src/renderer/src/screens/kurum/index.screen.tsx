@@ -8,6 +8,7 @@ import { FINANSMAN_KODLARI } from '../../constants/butce-kodlari'
 import { DTVTKoduLabels } from '../../constants/dtvt-kodlari'
 import { InnerMenu, InnerMenuItem } from '../../components/ui/InnerMenu'
 import { useSettingsStore } from '../../store/settingsStore'
+import { kurumKoduAlgila } from '../../utils/kurum-kodu'
 
 type TabType = 'idari' | 'iletisim'
 
@@ -55,6 +56,7 @@ export default function KurumScreen(): React.JSX.Element {
 
   // Yeni Eklenen Mali / Bütçe Kodları
   const [kurumsalKod, setKurumsalKod] = useState('')
+  const [eskiKurumsalKod, setEskiKurumsalKod] = useState('')
   const [fonksiyonelKod, setFonksiyonelKod] = useState('')
   const [muhasebeBirimKodu, setMuhasebeBirimKodu] = useState('')
   const [muhasebeBirimAdi, setMuhasebeBirimAdi] = useState('')
@@ -123,6 +125,7 @@ export default function KurumScreen(): React.JSX.Element {
         setWebsite(settings.website || '')
 
         setKurumsalKod(settings.kurumsalKod || '')
+        setEskiKurumsalKod(settings.eskiKurumsalKod || '')
         setFonksiyonelKod(settings.fonksiyonelKod || '')
         setMuhasebeBirimKodu(settings.muhasebeBirimKodu || '')
         setMuhasebeBirimAdi(settings.muhasebeBirimAdi || '')
@@ -151,6 +154,7 @@ export default function KurumScreen(): React.JSX.Element {
         dataToSave.finansmanKodu = finansmanKodu
         dataToSave.institutionType = institutionType
         dataToSave.kurumsalKod = kurumsalKod
+        dataToSave.eskiKurumsalKod = eskiKurumsalKod
         dataToSave.fonksiyonelKod = fonksiyonelKod
         dataToSave.muhasebeBirimKodu = muhasebeBirimKodu
         dataToSave.muhasebeBirimAdi = muhasebeBirimAdi
@@ -239,12 +243,12 @@ export default function KurumScreen(): React.JSX.Element {
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                       <div>
                         <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1">
-                          Kurum Kodu
+                          Kurum Kodu (Dahili vb.)
                         </label>
                         <Input
                           value={institutionCode}
                           onChange={(e) => setInstitutionCode(e.target.value)}
-                          placeholder="Kurum Kodunu Girin (Örn: 12345)"
+                          placeholder="Kurum Kodunu Girin"
                           className="bg-slate-55 dark:bg-slate-955 border-slate-200 dark:border-slate-800 text-xs"
                         />
                       </div>
@@ -258,6 +262,60 @@ export default function KurumScreen(): React.JSX.Element {
                           placeholder="Kurum Adı"
                           className="bg-slate-55 dark:bg-slate-955 border-slate-200 dark:border-slate-800 text-xs"
                         />
+                      </div>
+                      {/* Kurumsal Kod (Yeni Sistem) */}
+                      <div>
+                        <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5 flex items-center gap-1.5">
+                          Kurumsal Kod (e-Bütçe / Yeni Sistem)
+                        </label>
+                        <Input
+                          value={kurumsalKod}
+                          onChange={(e) => setKurumsalKod(e.target.value)}
+                          placeholder="Örn: xx.xx.xx.xx"
+                          className="bg-slate-55 dark:bg-slate-955 border-slate-200 dark:border-slate-800 text-xs"
+                        />
+                        {kurumsalKod && (
+                          <div className="mt-1.5">
+                            {kurumKoduAlgila(kurumsalKod).format === 'yeni' && (
+                              <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-bold bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-400">
+                                <Info className="w-2.5 h-2.5" /> YENİ FORMAT
+                              </span>
+                            )}
+                            {kurumKoduAlgila(kurumsalKod).format !== 'yeni' && (
+                              <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-bold bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-400">
+                                <Info className="w-2.5 h-2.5" /> STANDART DIŞI FORMAT
+                              </span>
+                            )}
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Kurumsal Kod (Eski Sistem) */}
+                      <div>
+                        <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5 flex items-center gap-1.5">
+                          Kurumsal Kod (Say2000i / Eski Sistem)
+                          <span className="text-[9px] font-normal text-slate-400">(İsteğe Bağlı)</span>
+                        </label>
+                        <Input
+                          value={eskiKurumsalKod}
+                          onChange={(e) => setEskiKurumsalKod(e.target.value)}
+                          placeholder="Örn: xx-xx"
+                          className="bg-slate-55 dark:bg-slate-955 border-slate-200 dark:border-slate-800 text-xs"
+                        />
+                        {eskiKurumsalKod && (
+                          <div className="mt-1.5">
+                            {kurumKoduAlgila(eskiKurumsalKod).format === 'eski' && (
+                              <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-bold bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-400">
+                                <Info className="w-2.5 h-2.5" /> ESKİ FORMAT (Say2000i)
+                              </span>
+                            )}
+                            {kurumKoduAlgila(eskiKurumsalKod).format !== 'eski' && (
+                              <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[9px] font-bold bg-slate-100 text-slate-700 dark:bg-slate-800 dark:text-slate-400">
+                                <Info className="w-2.5 h-2.5" /> STANDART DIŞI FORMAT
+                              </span>
+                            )}
+                          </div>
+                        )}
                       </div>
                       <div className="md:col-span-2">
                         <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1 flex items-center gap-1.5">
@@ -415,25 +473,7 @@ export default function KurumScreen(): React.JSX.Element {
                           </Link>
                         </div>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-                          
-                          {/* Kurumsal Kod */}
-                          <div>
-                            <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5">
-                              Kurumsal Kod (Düzey 1-2-3-4)
-                            </label>
-                            <select
-                              value={kurumsalKod}
-                              onChange={e => setKurumsalKod(e.target.value)}
-                              className="w-full bg-slate-55 dark:bg-slate-955 border border-slate-200 dark:border-slate-800 text-xs rounded-xl py-2 px-3 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-blue-500"
-                            >
-                              <option value="">Seçiniz...</option>
-                              {sozlukData.filter(d => d.tur === 'kurumsal').map(item => (
-                                <option key={item.kod} value={item.kod}>
-                                  {item.kod} — {item.aciklama}
-                                </option>
-                              ))}
-                            </select>
-                          </div>
+
 
                           {/* Fonksiyonel Kod */}
                           <div>
