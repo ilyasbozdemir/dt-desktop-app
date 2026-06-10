@@ -31,11 +31,11 @@ export default function KurumScreen(): React.JSX.Element {
   const [finansmanKodu, setFinansmanKodu] = useState('5')
   const [institutionType, setInstitutionType] = useState('')
 
-  const handleInstitutionTypeChange = (type: string) => {
+  const handleInstitutionTypeChange = (type: string): void => {
     setInstitutionType(type)
     if (type === 'belediye') {
       setFinansmanKodu('5')
-      setLimitType('buyuksehir')
+      setLimitType('diger')
     } else if (type === 'genel_butce') {
       setFinansmanKodu('1')
       setLimitType('diger')
@@ -45,8 +45,10 @@ export default function KurumScreen(): React.JSX.Element {
     } else if (type === 'duzenleyici') {
       setFinansmanKodu('3')
       setLimitType('diger')
+    } else if (type === 'sosyal_guvenlik') {
+      setFinansmanKodu('4')
+      setLimitType('diger')
     } else if (type === 'diger') {
-      setFinansmanKodu('8')
       setLimitType('diger')
     }
   }
@@ -334,25 +336,26 @@ export default function KurumScreen(): React.JSX.Element {
                           className="w-full bg-slate-55 dark:bg-slate-955 border border-slate-200 dark:border-slate-800 text-xs rounded-xl py-2.5 px-3 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-blue-500"
                         >
                           <option value="" disabled>Lütfen Kurum Tipini Seçin...</option>
-                          <option value="belediye">Belediye / Mahalli İdare (Finansman Kodu: 5)</option>
-                          <option value="genel_butce">Bakanlık / İl-İlçe Müdürlüğü / Genel Bütçe (Finansman Kodu: 1)</option>
-                          <option value="ozel_butce">Üniversite / Özel Bütçeli İdare (Finansman Kodu: 2)</option>
-                          <option value="duzenleyici">Düzenleyici ve Denetleyici Kurum (Finansman Kodu: 3)</option>
-                          <option value="diger">Diğer İdareler / Kamu İktisadi Teşebbüsü (Finansman Kodu: 8)</option>
+                          <option value="belediye">Belediye / Mahalli İdare (Finansman Kaynağı: 5)</option>
+                          <option value="genel_butce">Bakanlık / İl-İlçe Müdürlüğü / Genel Bütçe (Finansman Kaynağı: 1)</option>
+                          <option value="ozel_butce">Üniversite / Özel Bütçeli İdare (Finansman Kaynağı: 2)</option>
+                          <option value="duzenleyici">Düzenleyici ve Denetleyici Kurum (Finansman Kaynağı: 3)</option>
+                          <option value="sosyal_guvenlik">SGK / Sosyal Güvenlik Kurumu (Finansman Kaynağı: 4)</option>
+                          <option value="diger">Diğer İdareler / Kamu İktisadi Teşebbüsü (Finansman Kaynağı: Kuruma Göre Değişir)</option>
                         </select>
                         {institutionType === 'belediye' && (
                           <p className="text-[10px] text-emerald-600 dark:text-emerald-400 mt-1 leading-normal font-medium">
-                            💡  Kurumsal kodunuzun "30" (Mahalli İdareler) ile başlaması ve bütçe kodlarında "5" Finansman Kodu kullanılması tavsiye edilir.
+                            💡  Kurumsal kodunuzun "46" (Mahalli İdareler) ile başlaması ve bütçe kodlarında "5" Finansman Kaynağı kullanılması tavsiye edilir.
                           </p>
                         )}
                         {institutionType === 'genel_butce' && (
                           <p className="text-[10px] text-emerald-600 dark:text-emerald-400 mt-1 leading-normal font-medium">
-                            💡 Kurumsal kodunuzun ilgili Bakanlık koduyla başlaması (örn. Sağlık: 18) ve "1" Finansman Kodu kullanılması tavsiye edilir.
+                            💡 Kurumsal kodunuzun ilgili Bakanlık koduyla başlaması (örn. Sağlık: 18) ve "1" Finansman Kaynağı kullanılması tavsiye edilir.
                           </p>
                         )}
                         {institutionType === 'ozel_butce' && (
                           <p className="text-[10px] text-emerald-600 dark:text-emerald-400 mt-1 leading-normal font-medium">
-                            💡 Yükseköğretim ve üniversite kurumsal kodları genellikle "38" ile başlar ve "2" Finansman Kodu kullanılır.
+                            💡 Yükseköğretim ve üniversite kurumsal kodları genellikle "38" ile başlar ve "2" Finansman Kaynağı kullanılır.
                           </p>
                         )}
                       </div>
@@ -377,7 +380,7 @@ export default function KurumScreen(): React.JSX.Element {
 
                       <div className="md:col-span-2">
                         <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5">
-                          Analitik Bütçe Sınıflandırması (ABS) Finansman Tipi *
+                          Analitik Bütçe Sınıflandırması (ABS) Finansman Kaynağı *
                         </label>
                         <select
                           value={finansmanKodu}

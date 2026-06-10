@@ -239,6 +239,7 @@ export function MevzuatScreen(): React.JSX.Element {
   const [ffGuncelEndeks, setFfGuncelEndeks] = useState<string>('1302')
   const [ffEndeksModu, setFfEndeksModu] = useState<boolean>(false)
   const [ffAlimTuru, setFfAlimTuru] = useState<'mal' | 'hizmet'>('mal')
+  const [ffKdvOrani, setFfKdvOrani] = useState<number>(0.20)
 
   const loadFfSample = (type: 'mal' | 'hizmet'): void => {
     if (type === 'mal') {
@@ -264,6 +265,8 @@ export function MevzuatScreen(): React.JSX.Element {
   const [yeniAlimTuru, setYeniAlimTuru] = useState('')
 
   const [institutionType, setInstitutionType] = useState('belediye')
+  const [finansmanKodu, setFinansmanKodu] = useState('5')
+  const [limitType, setLimitType] = useState('diger')
 
   const [kurumsalCodes, setKurumsalCodes] = useState<CodeItem[]>([])
   const [fonksiyonelCodes, setFonksiyonelCodes] = useState<CodeItem[]>([])
@@ -319,21 +322,20 @@ export function MevzuatScreen(): React.JSX.Element {
         .catch(console.error)
 
       setInstitutionType(settings.institutionType || 'belediye')
+      setFinansmanKodu(settings.finansmanKodu || '5')
+      setLimitType(settings.limitType || 'diger')
 
       try {
-        const parsed = settings.ekonomikKodlarList ? JSON.parse(settings.ekonomikKodlarList) : []
-        const normalized = normalizeCodes(parsed)
-        if (normalized.length === 0) {
+        if (settings.ekonomikKodlarList === undefined) {
           setEconomicCodes(
             EKONOMIK_KODLAR.map((item) => ({ code: item.kod, description: item.aciklama }))
           )
         } else {
-          setEconomicCodes(normalized)
+          const parsed = JSON.parse(settings.ekonomikKodlarList)
+          setEconomicCodes(normalizeCodes(parsed))
         }
       } catch {
-        setEconomicCodes(
-          EKONOMIK_KODLAR.map((item) => ({ code: item.kod, description: item.aciklama }))
-        )
+        setEconomicCodes([])
       }
 
       setTaxOffice(settings.taxOffice || '')
@@ -348,12 +350,36 @@ export function MevzuatScreen(): React.JSX.Element {
     }
   }, [settings])
 
+  const handleInstitutionTypeChange = (type: string): void => {
+    setInstitutionType(type)
+    if (type === 'belediye') {
+      setFinansmanKodu('5')
+      setLimitType('diger')
+    } else if (type === 'genel_butce') {
+      setFinansmanKodu('1')
+      setLimitType('diger')
+    } else if (type === 'ozel_butce') {
+      setFinansmanKodu('2')
+      setLimitType('diger')
+    } else if (type === 'duzenleyici') {
+      setFinansmanKodu('3')
+      setLimitType('diger')
+    } else if (type === 'sosyal_guvenlik') {
+      setFinansmanKodu('4')
+      setLimitType('diger')
+    } else if (type === 'diger') {
+      setLimitType('diger')
+    }
+  }
+
   const handleSaveMali = async (): Promise<void> => {
     setSavingMali(true)
     try {
       const dataToSave: Record<string, string> = {
         ekonomikKodlarList: JSON.stringify(economicCodes),
         institutionType,
+        finansmanKodu,
+        limitType,
         taxOffice,
         taxNumber
       }
@@ -740,21 +766,22 @@ export function MevzuatScreen(): React.JSX.Element {
                     </label>
                     <select
                       value={institutionType}
-                      onChange={(e) => setInstitutionType(e.target.value)}
+                      onChange={(e) => handleInstitutionTypeChange(e.target.value)}
                       title="Kurum Tipi Seçin"
                       className="w-full max-w-md bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-xs rounded-xl py-2 px-3 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-blue-500"
                     >
-                      <option value="belediye">Belediye / Mahalli İdare (Finansman Kodu: 5)</option>
-                      <option value="genel_butce">Bakanlık / İl-İlçe Müdürlüğü / Genel Bütçe (Finansman Kodu: 1)</option>
-                      <option value="ozel_butce">Üniversite / Özel Bütçeli İdare (Finansman Kodu: 2)</option>
-                      <option value="duzenleyici">Düzenleyici ve Denetleyici Kurum (Finansman Kodu: 3)</option>
-                      <option value="diger">Diğer İdareler / Kamu İktisadi Teşebbüsü (Finansman Kodu: 8)</option>
+                      <option value="belediye">Belediye / Mahalli İdare (Finansman Kaynağı: 5)</option>
+                      <option value="genel_butce">Bakanlık / İl-İlçe Müdürlüğü / Genel Bütçe (Finansman Kaynağı: 1)</option>
+                      <option value="ozel_butce">Üniversite / Özel Bütçeli İdare (Finansman Kaynağı: 2)</option>
+                      <option value="duzenleyici">Düzenleyici ve Denetleyici Kurum (Finansman Kaynağı: 3)</option>
+                      <option value="sosyal_guvenlik">SGK / Sosyal Güvenlik Kurumu (Finansman Kaynağı: 4)</option>
+                      <option value="diger">Diğer İdareler / Kamu İktisadi Teşebbüsü (Finansman Kaynağı: Kuruma Göre Değişir)</option>
                     </select>
 
                     {institutionType === 'belediye' && (
                       <div className="text-[10px] text-slate-500 dark:text-slate-400 mt-2 leading-relaxed font-medium">
-                        💡 Mahalli İdare şablonu aktif. 5018 sayılı kanun gereği kurumsal kod prefixi <strong>"30"</strong> (Mahalli İdareler) ve finansal kod <strong>"5"</strong> olmalıdır.
-                        <br />Örnek Kurumsal Kod Yapısı: <strong>30 . [İl Kodu] . [Belediye Kodu] . [Müdürlük/Birim Kodu]</strong> (Örn: 30.06.01.30)
+                        💡 Mahalli İdare şablonu aktif. 5018 sayılı kanun gereği kurumsal kod prefixi <strong>"46"</strong> (Mahalli İdareler) ve finansal kod <strong>"5"</strong> olmalıdır.
+                        <br />Örnek Kurumsal Kod Yapısı: <strong>46 . [İl Kodu] . [Belediye Kodu] . [Müdürlük/Birim Kodu]</strong> (Örn: 46.70.97.03)
                       </div>
                     )}
                     {institutionType === 'genel_butce' && (
@@ -1131,7 +1158,7 @@ export function MevzuatScreen(): React.JSX.Element {
                       pnVal = parseFloat(ffPnDirect.replace(/,/g, '.')) || 1
                     }
                     const ffVal = hakedisVal * (pnVal - 1)
-                    const kdvVal = ffVal * 0.20 // varsayılan %20 KDV
+                    const kdvVal = ffVal * ffKdvOrani // seçilen KDV oranı
                     const toplamFf = ffVal + kdvVal
 
                     const formattedHakedis = new Intl.NumberFormat('tr-TR', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(hakedisVal)
