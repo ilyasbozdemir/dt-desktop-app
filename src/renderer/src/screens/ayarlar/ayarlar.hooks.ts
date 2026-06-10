@@ -25,10 +25,12 @@ interface AyarlarHooksReturn {
   exportSmtp: () => Promise<unknown>
 }
 
+const EMPTY_SETTINGS: Record<string, string> = {}
+
 export function useAyarlarHooks(): AyarlarHooksReturn {
   const queryClient = useQueryClient()
 
-  const { data: settings = {}, isLoading: isLoadingSettings } = useQuery({
+  const { data: settings = EMPTY_SETTINGS, isLoading: isLoadingSettings } = useQuery({
     queryKey: ['allSettings'],
     queryFn: fetchAllSettings
   })

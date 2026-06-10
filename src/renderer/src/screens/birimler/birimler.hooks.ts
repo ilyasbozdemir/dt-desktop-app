@@ -34,8 +34,10 @@ const fetchPersonelList = async (): Promise<{ id: number; ad_soyad: string }[]> 
   return res.data
 }
 
+const EMPTY_PERSONEL_LIST: { id: number; ad_soyad: string }[] = []
+
 export function usePersonelList() {
-  const { data: personeller = [], isLoading } = useQuery({
+  const { data: personeller = EMPTY_PERSONEL_LIST, isLoading } = useQuery({
     queryKey: ['personeller_list'],
     queryFn: fetchPersonelList
   })
@@ -51,18 +53,22 @@ const fetchKurumsalKodlar = async (): Promise<{ kod: string; aciklama: string }[
   return res.data
 }
 
+const EMPTY_KURUMSAL_KODLAR: { kod: string; aciklama: string }[] = []
+
 export function useKurumsalKodlar() {
-  const { data: kurumsalKodlar = [], isLoading } = useQuery({
+  const { data: kurumsalKodlar = EMPTY_KURUMSAL_KODLAR, isLoading } = useQuery({
     queryKey: ['kurumsal_kodlar'],
     queryFn: fetchKurumsalKodlar
   })
   return { kurumsalKodlar, isLoading }
 }
 
+const EMPTY_BIRIMLER: Birim[] = []
+
 export function useBirimlerHooks() {
   const queryClient = useQueryClient()
 
-  const { data: birimler = [], isLoading: isLoadingBirimler } = useQuery({
+  const { data: birimler = EMPTY_BIRIMLER, isLoading: isLoadingBirimler } = useQuery({
     queryKey: ['birimler'],
     queryFn: fetchBirimler
   })
