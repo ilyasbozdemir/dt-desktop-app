@@ -54,8 +54,8 @@ export default function KurumScreen(): React.JSX.Element {
   }
 
   // Yeni Eklenen Mali / Bütçe Kodları
-  const [kurumsalKod, setKurumsalKod] = useState('')
-  const [eskiKurumsalKod, setEskiKurumsalKod] = useState('')
+  const [eButceKodu, setEButceKodu] = useState('')
+  const [say2000iKodu, setSay2000iKodu] = useState('')
   const [fonksiyonelKod, setFonksiyonelKod] = useState('')
   const [muhasebeBirimKodu, setMuhasebeBirimKodu] = useState('')
   const [muhasebeBirimAdi, setMuhasebeBirimAdi] = useState('')
@@ -122,8 +122,8 @@ export default function KurumScreen(): React.JSX.Element {
         setInstEmail(settings.institutionEmail || '')
         setWebsite(settings.website || '')
 
-        setKurumsalKod(settings.kurumsalKod || '')
-        setEskiKurumsalKod(settings.eskiKurumsalKod || '')
+        setEButceKodu(settings.eButceKodu || '')
+        setSay2000iKodu(settings.say2000iKodu || '')
         setFonksiyonelKod(settings.fonksiyonelKod || '')
         setMuhasebeBirimKodu(settings.muhasebeBirimKodu || '')
         setMuhasebeBirimAdi(settings.muhasebeBirimAdi || '')
@@ -150,8 +150,8 @@ export default function KurumScreen(): React.JSX.Element {
         dataToSave.limitType = limitType
         dataToSave.finansmanKodu = finansmanKodu
         dataToSave.institutionType = institutionType
-        dataToSave.kurumsalKod = kurumsalKod
-        dataToSave.eskiKurumsalKod = eskiKurumsalKod
+        dataToSave.eButceKodu = eButceKodu
+        dataToSave.say2000iKodu = say2000iKodu
         dataToSave.fonksiyonelKod = fonksiyonelKod
         dataToSave.muhasebeBirimKodu = muhasebeBirimKodu
         dataToSave.muhasebeBirimAdi = muhasebeBirimAdi
@@ -249,28 +249,28 @@ export default function KurumScreen(): React.JSX.Element {
                           className="bg-slate-55 dark:bg-slate-955 border-slate-200 dark:border-slate-800 text-xs"
                         />
                       </div>
-                      {/* Kurumsal Kod (Yeni Sistem) */}
+                      {/* e-Bütçe Kodu */}
                       <div>
                         <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5 flex items-center gap-1.5">
-                          Kurumsal Kod (e-Bütçe / Yeni Sistem)
+                          e-Bütçe Kodu
                         </label>
                         <Input
-                          value={kurumsalKod}
-                          onChange={(e) => setKurumsalKod(e.target.value)}
+                          value={eButceKodu}
+                          onChange={(e) => setEButceKodu(e.target.value)}
                           placeholder="Örn: 46.70.97"
                           className="bg-slate-55 dark:bg-slate-955 border-slate-200 dark:border-slate-800 text-xs"
                         />
                       </div>
 
-                      {/* Kurumsal Kod (Eski Sistem) */}
+                      {/* Say2000i Kodu */}
                       <div>
                         <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5 flex items-center gap-1.5">
-                          Kurumsal Kod (Say2000i / Eski Sistem)
+                          Say2000i Kodu
                           <span className="text-[9px] font-normal text-slate-400">(İsteğe Bağlı)</span>
                         </label>
                         <Input
-                          value={eskiKurumsalKod}
-                          onChange={(e) => setEskiKurumsalKod(e.target.value)}
+                          value={say2000iKodu}
+                          onChange={(e) => setSay2000iKodu(e.target.value)}
                           placeholder="Örn: 70151"
                           className="bg-slate-55 dark:bg-slate-955 border-slate-200 dark:border-slate-800 text-xs"
                         />
@@ -436,11 +436,11 @@ export default function KurumScreen(): React.JSX.Element {
                           {/* Yeni Kurumsal Kod Öneki */}
                           <div>
                             <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5">
-                              Kurumsal Kod Öneki (e-Bütçe)
+                              e-Bütçe Kodu Öneki
                             </label>
                             <Input
-                              value={kurumsalKod}
-                              onChange={(e) => setKurumsalKod(e.target.value)}
+                              value={eButceKodu}
+                              onChange={(e) => setEButceKodu(e.target.value)}
                               placeholder="Örn: 46.70.97"
                               className="w-full bg-slate-55 dark:bg-slate-955 border-slate-200 dark:border-slate-800 text-xs"
                             />
@@ -452,11 +452,11 @@ export default function KurumScreen(): React.JSX.Element {
                           {/* Eski Kurumsal Kod Öneki */}
                           <div>
                             <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5">
-                              Eski Kurumsal Kod Öneki (Say2000i)
+                              Say2000i Kodu Öneki
                             </label>
                             <Input
-                              value={eskiKurumsalKod}
-                              onChange={(e) => setEskiKurumsalKod(e.target.value)}
+                              value={say2000iKodu}
+                              onChange={(e) => setSay2000iKodu(e.target.value)}
                               placeholder="Örn: 70XXX"
                               className="w-full bg-slate-55 dark:bg-slate-955 border-slate-200 dark:border-slate-800 text-xs"
                             />

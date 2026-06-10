@@ -536,28 +536,7 @@ export function MevzuatScreen(): React.JSX.Element {
         </div>
         
         <div className="flex flex-wrap items-center gap-4 shrink-0">
-          {(activeTab === 'limitler' || activeTab === 'oranlar') && (
-            <>
-              <label className="flex items-center gap-2 text-xs text-slate-600 dark:text-slate-400 cursor-pointer select-none">
-                <input
-                  type="checkbox"
-                  checked={isConfirmed}
-                  onChange={(e) => setIsConfirmed(e.target.checked)}
-                  className="w-4 h-4 rounded text-blue-650 border-slate-300 dark:border-slate-850 focus:ring-blue-500 cursor-pointer"
-                />
-                <span>Değerlerin doğruluğunu onaylıyorum</span>
-              </label>
-
-              <button
-                onClick={handleSave}
-                disabled={isSaving || !isConfirmed}
-                className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl text-sm font-medium transition-all shadow-sm shadow-blue-500/30 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
-              >
-                {isSaving ? <CheckCircle2 className="w-4 h-4" /> : <Save className="w-4 h-4" />}
-                {isSaving ? 'Kaydedildi' : 'Değişiklikleri Kaydet'}
-              </button>
-            </>
-          )}
+          {/* Moved to sticky panel header */}
         </div>
       </div>
 
@@ -570,8 +549,47 @@ export function MevzuatScreen(): React.JSX.Element {
           onChange={(id) => setActiveTab(id as any)}
         />
 
-        {/* SAĞ PANEL */}
-        <div className="lg:col-span-9 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-sm min-h-[450px] flex flex-col justify-between overflow-y-auto max-h-[calc(100vh-220px)] custom-scrollbar flex-1">
+      {/* SAĞ PANEL */}
+        <div className="lg:col-span-9 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-sm min-h-[450px] flex flex-col overflow-y-auto max-h-[calc(100vh-220px)] custom-scrollbar flex-1">
+          {/* STICKY ACTION BAR */}
+          {(activeTab === 'limitler' || activeTab === 'oranlar') && (
+            <div className="sticky top-0 z-10 flex items-center justify-between gap-4 px-6 py-3 bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm border-b border-slate-200 dark:border-slate-800 rounded-t-2xl">
+              <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
+                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-500" />
+                <label className="flex items-center gap-2 cursor-pointer select-none">
+                  <input
+                    type="checkbox"
+                    checked={isConfirmed}
+                    onChange={(e) => setIsConfirmed(e.target.checked)}
+                    className="w-4 h-4 rounded text-blue-600 border-slate-300 dark:border-slate-700 focus:ring-blue-500 cursor-pointer"
+                  />
+                  <span>Değerlerin doğruluğunu onaylıyorum</span>
+                </label>
+              </div>
+              <button
+                onClick={handleSave}
+                disabled={isSaving || !isConfirmed}
+                className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-800 disabled:opacity-50 disabled:cursor-not-allowed text-white px-4 py-2 rounded-xl text-sm font-semibold transition-all shadow-sm shadow-blue-500/30 cursor-pointer"
+              >
+                {isSaving ? <CheckCircle2 className="w-4 h-4" /> : <Save className="w-4 h-4" />}
+                {isSaving ? 'Kaydedildi' : 'Değişiklikleri Kaydet'}
+              </button>
+            </div>
+          )}
+          {activeTab === 'mali' && (
+            <div className="sticky top-0 z-10 flex items-center justify-between gap-4 px-6 py-3 bg-white/90 dark:bg-slate-900/90 backdrop-blur-sm border-b border-slate-200 dark:border-slate-800 rounded-t-2xl">
+              <span className="text-xs text-slate-500 dark:text-slate-400">Mali ve kurumsal kodları kaydedin.</span>
+              <button
+                onClick={handleSaveMali}
+                disabled={savingMali}
+                className="flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed text-white px-4 py-2 rounded-xl text-sm font-semibold transition-all shadow-sm shadow-emerald-500/30 cursor-pointer"
+              >
+                {savingMali ? <CheckCircle2 className="w-4 h-4" /> : <Save className="w-4 h-4" />}
+                {savingMali ? 'Kaydedildi' : 'Kaydet'}
+              </button>
+            </div>
+          )}
+          <div className="p-6 flex-1">
           {activeTab === 'limitler' && (
           <div className="space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-300">
             <div className="flex items-start gap-4 p-4 bg-blue-50 dark:bg-blue-900/20 text-blue-800 dark:text-blue-300 rounded-xl border border-blue-100 dark:border-blue-800/50">
@@ -878,7 +896,7 @@ export function MevzuatScreen(): React.JSX.Element {
                                 </div>
                                 <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto shrink-0">
                                   <div className="w-full sm:w-48">
-                                    <label className="text-[10px] text-slate-500 font-semibold mb-1 block">Yeni Kurumsal Kod (e-Bütçe)</label>
+                                    <label className="text-[10px] text-slate-500 font-semibold mb-1 block">e-Bütçe Kodu</label>
                                     <Input
                                       value={currentKurumsal}
                                       onChange={(e) => {
@@ -890,7 +908,7 @@ export function MevzuatScreen(): React.JSX.Element {
                                     />
                                   </div>
                                   <div className="w-full sm:w-48">
-                                    <label className="text-[10px] text-slate-500 font-semibold mb-1 block">Eski Kurumsal Kod (Say2000i)</label>
+                                    <label className="text-[10px] text-slate-500 font-semibold mb-1 block">Say2000i Kodu</label>
                                     <Input
                                       value={currentEski}
                                       onChange={(e) => {
@@ -1854,8 +1872,9 @@ export function MevzuatScreen(): React.JSX.Element {
             </div>
           </div>
         )}
+          </div>
+        </div>
       </div>
     </div>
-  </div>
   )
 }

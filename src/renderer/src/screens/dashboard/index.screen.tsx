@@ -18,7 +18,8 @@ import {
   AlertTriangle,
   Sparkles,
   Mail,
-  CheckCircle2
+  CheckCircle2,
+  Hash
 } from 'lucide-react'
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts'
 import { Link } from '@tanstack/react-router'
@@ -45,7 +46,7 @@ export default function DashboardScreen(): React.JSX.Element {
     harcamaBirimAdi,
     adminName,
     adminTitle,
-    institutionCode
+    eButceKodu
   } = useSettingsStore()
   const { activeDosyaId } = useWorkspaceStore()
   const { stats, isLoading } = useDashboardStats()
@@ -608,10 +609,10 @@ export default function DashboardScreen(): React.JSX.Element {
                   </span>
                 </div>
               </div>
-              {institutionCode && (
-                <div>
-                  <span className="text-[9px] font-bold text-slate-450 dark:text-slate-500 block uppercase">Kurum Kodu</span>
-                  <span className="font-mono font-bold text-slate-800 dark:text-slate-200">{institutionCode}</span>
+              {eButceKodu && (
+                <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-blue-50/50 dark:bg-blue-900/20 border border-blue-100/50 dark:border-blue-800/50 mt-1">
+                  <Hash className="w-3 h-3 text-blue-500" />
+                  <span className="font-mono font-bold text-slate-800 dark:text-slate-200">{eButceKodu}</span>
                 </div>
               )}
               <div className="grid grid-cols-2 gap-2">

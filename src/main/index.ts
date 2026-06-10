@@ -2,9 +2,7 @@ import { app, shell, BrowserWindow, ipcMain, dialog } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import { autoUpdater } from 'electron-updater'
-import isDev from 'electron-is-dev'
 import fs from 'fs'
-import yaml from 'js-yaml'
 import icon from '../../resources/icon.png?asset'
 import { workspaceManager } from './database/workspace'
 import { CURRENT_SCHEMA_VERSION } from './database/migrate'
@@ -561,7 +559,8 @@ if (!gotTheLock) {
           adminName: settingsObj.adminName || 'Sistem Yöneticisi',
           adminTitle: settingsObj.adminTitle || 'Destek Sorumlusu',
           adminUsername: settingsObj.adminUsername || 'admin',
-          institutionCode: settingsObj.institutionCode || '',
+          eButceKodu: settingsObj.eButceKodu || '',
+          say2000iKodu: settingsObj.say2000iKodu || '',
           themeLightVars: settingsObj.themeLightVars || '',
           themeDarkVars: settingsObj.themeDarkVars || '',
           ...settingsObj
@@ -576,7 +575,8 @@ if (!gotTheLock) {
           adminName: 'Sistem Yöneticisi',
           adminTitle: 'Destek Sorumlusu',
           adminUsername: 'admin',
-          institutionCode: '',
+          eButceKodu: '',
+          say2000iKodu: '',
           themeLightVars: '',
           themeDarkVars: ''
         }
@@ -587,7 +587,7 @@ if (!gotTheLock) {
       try {
         const db = workspaceManager.getDb()
         const codeRow = db
-          .prepare("SELECT value FROM settings WHERE key = 'institutionCode'")
+          .prepare("SELECT value FROM settings WHERE key = 'eButceKodu'")
           .get() as { value: string } | undefined
         const userRow = db
           .prepare("SELECT value FROM settings WHERE key = 'adminUsername'")
@@ -611,7 +611,7 @@ if (!gotTheLock) {
       try {
         const db = workspaceManager.getDb()
         db.exec(`
-          INSERT OR REPLACE INTO settings (key, value) VALUES ('institutionCode', '${code.replace(/'/g, "''")}');
+          INSERT OR REPLACE INTO settings (key, value) VALUES ('eButceKodu', '${code.replace(/'/g, "''")}');
           INSERT OR REPLACE INTO settings (key, value) VALUES ('adminUsername', '${user.replace(/'/g, "''")}');
           INSERT OR REPLACE INTO settings (key, value) VALUES ('adminPassword', '${pass.replace(/'/g, "''")}');
         `)
@@ -628,7 +628,7 @@ if (!gotTheLock) {
       try {
         const db = workspaceManager.getDb()
         const codeRow = db
-          .prepare("SELECT value FROM settings WHERE key = 'institutionCode'")
+          .prepare("SELECT value FROM settings WHERE key = 'eButceKodu'")
           .get() as { value: string } | undefined
         const userRow = db
           .prepare("SELECT value FROM settings WHERE key = 'adminUsername'")
@@ -636,12 +636,18 @@ if (!gotTheLock) {
         const passRow = db
           .prepare("SELECT value FROM settings WHERE key = 'adminPassword'")
           .get() as { value: string } | undefined
+        const eskiCodeRow = db
+          .prepare("SELECT value FROM settings WHERE key = 'say2000iKodu'")
+          .get() as { value: string } | undefined
 
         const expectedCode = codeRow?.value || ''
+        const expectedEskiCode = eskiCodeRow?.value || ''
         const expectedUser = userRow?.value || ''
         const expectedPass = passRow?.value || ''
 
-        if (code === expectedCode && user === expectedUser && pass === expectedPass) {
+        const isCodeValid = code === expectedCode || (expectedEskiCode && code === expectedEskiCode)
+
+        if (isCodeValid && user === expectedUser && pass === expectedPass) {
           return { success: true }
         }
         return { success: false, error: 'Kurum kodu, kullanıcı adı veya şifre hatalı!' }

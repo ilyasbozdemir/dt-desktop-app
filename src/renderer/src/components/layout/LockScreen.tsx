@@ -23,7 +23,7 @@ import { useTheme } from '../providers/ThemeProvider'
 
 export default function LockScreen(): React.JSX.Element {
   const { fileName, setIsAuthenticated, closeWorkspace } = useWorkspaceStore()
-  const { institutionName, institutionLogo, logoLeft, logoRight, loadSettings } = useSettingsStore()
+  const { institutionName, institutionLogo, logoLeft, logoRight, loadSettings, eButceKodu } = useSettingsStore()
   const { theme, setTheme } = useTheme()
 
   const [isSetupMode, setIsSetupMode] = useState(false)
@@ -31,7 +31,7 @@ export default function LockScreen(): React.JSX.Element {
   const [recoveryStep, setRecoveryStep] = useState<
     'login' | 'send_code' | 'verify_code' | 'reset_password'
   >('login')
-  const [institutionCode, setInstitutionCode] = useState('')
+  const [eButceKoduState, setEButceKoduState] = useState(eButceKodu || '')
   const [username, setUsername] = useState('admin')
   const [password, setPassword] = useState('')
   const [recoveryCode, setRecoveryCode] = useState('')
@@ -60,17 +60,17 @@ export default function LockScreen(): React.JSX.Element {
         const isRemembered = localStorage.getItem(`rememberMe_${fileName}`) === 'true'
         setRememberMe(isRemembered)
         if (isRemembered) {
-          setInstitutionCode(localStorage.getItem(`rememberedCode_${fileName}`) || '')
+          setEButceKoduState(localStorage.getItem(`rememberedCode_${fileName}`) || eButceKodu || '')
           setUsername(localStorage.getItem(`rememberedUser_${fileName}`) || 'admin')
           setPassword(localStorage.getItem(`rememberedPass_${fileName}`) || '')
         } else {
-          setInstitutionCode('')
+          setEButceKoduState(eButceKodu || '')
           setUsername('admin')
           setPassword('')
         }
       }
     }, 0)
-  }, [loadSettings, fileName])
+  }, [loadSettings, fileName, eButceKodu])
 
   const handleSubmit = async (e: React.FormEvent): Promise<void> => {
     e.preventDefault()
@@ -82,14 +82,14 @@ export default function LockScreen(): React.JSX.Element {
         // Setup new credentials
         const res = await window.electron.ipcRenderer.invoke(
           'db:setup-auth',
-          institutionCode,
+          eButceKoduState,
           username,
           password
         )
         if (res.success) {
           if (rememberMe && fileName) {
             localStorage.setItem(`rememberMe_${fileName}`, 'true')
-            localStorage.setItem(`rememberedCode_${fileName}`, institutionCode)
+            localStorage.setItem(`rememberedCode_${fileName}`, eButceKoduState)
             localStorage.setItem(`rememberedUser_${fileName}`, username)
             localStorage.setItem(`rememberedPass_${fileName}`, password)
           }
@@ -102,14 +102,14 @@ export default function LockScreen(): React.JSX.Element {
         // Login with existing credentials
         const res = await window.electron.ipcRenderer.invoke(
           'db:login',
-          institutionCode,
+          eButceKoduState,
           username,
           password
         )
         if (res.success) {
           if (rememberMe && fileName) {
             localStorage.setItem(`rememberMe_${fileName}`, 'true')
-            localStorage.setItem(`rememberedCode_${fileName}`, institutionCode)
+            localStorage.setItem(`rememberedCode_${fileName}`, eButceKoduState)
             localStorage.setItem(`rememberedUser_${fileName}`, username)
             localStorage.setItem(`rememberedPass_${fileName}`, password)
           } else if (fileName) {
@@ -175,7 +175,7 @@ export default function LockScreen(): React.JSX.Element {
     try {
       const res = await window.electron.ipcRenderer.invoke(
         'db:setup-auth',
-        institutionCode,
+        eButceKoduState,
         username,
         password
       )
@@ -306,16 +306,16 @@ export default function LockScreen(): React.JSX.Element {
           <form onSubmit={handleSubmit} className="space-y-4">
             <div>
               <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5 ml-1">
-                Kurum Kodu
+                e-Bütçe / Say2000i Kodu
               </label>
               <div className="relative">
                 <Building className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 dark:text-slate-550" />
                 <input
                   type="text"
                   required
-                  placeholder={isSetupMode ? 'Örn: 12345' : 'Kurum Kodunu Girin'}
-                  value={institutionCode}
-                  onChange={(e) => setInstitutionCode(e.target.value)}
+                  placeholder={isSetupMode ? 'Örn: 12345' : 'e-Bütçe veya Say2000i Kodu'}
+                  value={eButceKoduState}
+                  onChange={(e) => setEButceKoduState(e.target.value)}
                   className="w-full pl-10 pr-4 py-2.5 bg-slate-50 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-800 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all text-slate-800 dark:text-white placeholder-slate-400 dark:placeholder-slate-600"
                 />
               </div>
@@ -513,8 +513,8 @@ export default function LockScreen(): React.JSX.Element {
                   type="text"
                   required
                   placeholder="Yeni Kurum Kodu"
-                  value={institutionCode}
-                  onChange={(e) => setInstitutionCode(e.target.value)}
+                  value={eButceKoduState}
+                  onChange={(e) => setEButceKoduState(e.target.value)}
                   className="w-full pl-10 pr-4 py-2.5 bg-slate-50 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-800 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all text-slate-800 dark:text-white placeholder-slate-400 dark:placeholder-slate-600"
                 />
               </div>

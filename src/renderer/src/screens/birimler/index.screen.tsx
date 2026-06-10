@@ -3,7 +3,7 @@ import { useBirimlerHooks, BirimInput, usePersonelList } from './birimler.hooks'
 import { useAyarlarHooks } from '../ayarlar/ayarlar.hooks'
 import { Button } from '../../components/ui/Button'
 import { Input } from '../../components/ui/Input'
-import { LayoutGrid, Plus, Trash2, Edit2, ChevronDown, ChevronUp, Building2, Hash, Users, MapPin, Type, AlignLeft, User, PhoneCall, Building } from 'lucide-react'
+import { LayoutGrid, Plus, Trash2, Edit2, ChevronDown, ChevronUp, Hash, Users, MapPin, Type, AlignLeft, User, Building } from 'lucide-react'
 
 import { Modal } from '../../components/ui/Modal'
 
@@ -30,7 +30,7 @@ const Field = ({ label, field, form, handleChange, required, placeholder }: { la
 export default function BirimlerScreen(): React.ReactNode {
   const { birimler, isLoadingBirimler, addBirim, updateBirim, deleteBirim } = useBirimlerHooks()
   const { personeller, isLoading: isLoadingPersonel } = usePersonelList()
-  const { settings } = useAyarlarHooks()
+  const { settings } = useAyarlarHooks() as { settings: Record<string, string> }
   const [form, setForm] = useState<BirimInput>({ ...emptyBirim })
   const [showExtraFields, setShowExtraFields] = useState(false)
   const [isModalOpen, setIsModalOpen] = useState(false)
@@ -48,11 +48,11 @@ export default function BirimlerScreen(): React.ReactNode {
       const dataToSave = { ...form }
       
       // If the user hasn't typed the full code and a prefix exists, append the prefix!
-      if (settings?.institutionCode && form.e_butce && !form.e_butce.startsWith(settings.institutionCode)) {
-        dataToSave.e_butce = `${settings.institutionCode}.${form.e_butce}`
+      if (settings?.eButceKodu && form.e_butce && !form.e_butce.startsWith(settings.eButceKodu)) {
+        dataToSave.e_butce = `${settings.eButceKodu}.${form.e_butce}`
       }
-      if (settings?.eskiKurumsalKod && form.say2000i && !form.say2000i.startsWith(settings.eskiKurumsalKod)) {
-        dataToSave.say2000i = `${settings.eskiKurumsalKod}${form.say2000i}`
+      if (settings?.say2000iKodu && form.say2000i && !form.say2000i.startsWith(settings.say2000iKodu)) {
+        dataToSave.say2000i = `${settings.say2000iKodu}${form.say2000i}`
       }
 
       if (editingBirimId) {
@@ -174,13 +174,13 @@ export default function BirimlerScreen(): React.ReactNode {
                       </h3>
                       <div className="flex flex-wrap items-center gap-2">
                         {birim.e_butce && (
-                          <span className="inline-flex items-center gap-1 font-mono text-[10px] font-semibold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 px-1.5 py-0.5 rounded-md border border-blue-200 dark:border-blue-800/50" title="Yeni Kurumsal Kod (e-Bütçe)">
+                          <span className="inline-flex items-center gap-1 font-mono text-[10px] font-semibold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 px-1.5 py-0.5 rounded-md border border-blue-200 dark:border-blue-800/50" title="e-Bütçe Kodu">
                             <Hash className="w-3 h-3" />
                             {birim.e_butce}
                           </span>
                         )}
                         {birim.say2000i && (
-                          <span className="inline-flex items-center gap-1 font-mono text-[10px] font-semibold text-slate-600 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-md border border-slate-200 dark:border-slate-700" title="Eski Kurumsal Kod (Say2000i)">
+                          <span className="inline-flex items-center gap-1 font-mono text-[10px] font-semibold text-slate-600 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-1.5 py-0.5 rounded-md border border-slate-200 dark:border-slate-700" title="Say2000i Kodu">
                             <Hash className="w-3 h-3" />
                             {birim.say2000i}
                           </span>
@@ -271,12 +271,12 @@ export default function BirimlerScreen(): React.ReactNode {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5">
-                    Kurumsal Kod (e-Bütçe)
+                    e-Bütçe Kodu
                   </label>
                   <div className="flex">
-                    {settings?.institutionCode && (
+                    {settings?.eButceKodu && (
                       <span className="inline-flex items-center px-3 rounded-l-xl border border-r-0 border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-900 text-slate-500 text-xs font-mono">
-                        {settings.institutionCode}.
+                        {settings.eButceKodu}.
                       </span>
                     )}
                     <input
@@ -284,18 +284,18 @@ export default function BirimlerScreen(): React.ReactNode {
                       value={form.e_butce as string || ''}
                       onChange={(e) => handleChange('e_butce', e.target.value)}
                       placeholder="Birim Kodu (Örn: 03)"
-                      className={`flex-1 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs py-1.5 h-9 px-3 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-blue-500 ${settings?.institutionCode ? 'rounded-r-xl' : 'rounded-xl'}`}
+                      className={`flex-1 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs py-1.5 h-9 px-3 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-blue-500 ${settings?.eButceKodu ? 'rounded-r-xl' : 'rounded-xl'}`}
                     />
                   </div>
                 </div>
                 <div>
                   <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5">
-                    Eski Kurumsal Kod (Say2000i)
+                    Say2000i Kodu
                   </label>
                   <div className="flex">
-                    {settings?.eskiKurumsalKod && (
+                    {settings?.say2000iKodu && (
                       <span className="inline-flex items-center px-3 rounded-l-xl border border-r-0 border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-900 text-slate-500 text-xs font-mono">
-                        {settings.eskiKurumsalKod}
+                        {settings.say2000iKodu}
                       </span>
                     )}
                     <input
@@ -303,7 +303,7 @@ export default function BirimlerScreen(): React.ReactNode {
                       value={form.say2000i as string || ''}
                       onChange={(e) => handleChange('say2000i', e.target.value)}
                       placeholder="Birim Kodu (Örn: 01)"
-                      className={`flex-1 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs py-1.5 h-9 px-3 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-blue-500 ${settings?.eskiKurumsalKod ? 'rounded-r-xl' : 'rounded-xl'}`}
+                      className={`flex-1 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs py-1.5 h-9 px-3 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-blue-500 ${settings?.say2000iKodu ? 'rounded-r-xl' : 'rounded-xl'}`}
                     />
                   </div>
                 </div>

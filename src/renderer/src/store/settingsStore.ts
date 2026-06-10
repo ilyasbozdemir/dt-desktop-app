@@ -8,7 +8,8 @@ interface SettingsState {
   adminName: string
   adminTitle: string
   adminUsername: string
-  institutionCode: string
+  eButceKodu: string
+  say2000iKodu: string
   themeLightVars: string
   themeDarkVars: string
   limitType: string
@@ -25,7 +26,8 @@ interface SettingsState {
   setAdminName: (name: string) => void
   setAdminTitle: (title: string) => void
   setAdminUsername: (username: string) => void
-  setInstitutionCode: (code: string) => void
+  setEButceKodu: (code: string) => void
+  setSay2000iKodu: (code: string) => void
   setThemeLightVars: (vars: string) => void
   setThemeDarkVars: (vars: string) => void
   setLimitType: (limitType: string) => void
@@ -48,7 +50,8 @@ export const useSettingsStore = create<SettingsState>((set) => ({
   adminName: 'Sistem Yöneticisi',
   adminTitle: 'Destek Sorumlusu',
   adminUsername: 'admin',
-  institutionCode: '',
+  eButceKodu: '',
+  say2000iKodu: '',
   themeLightVars: '',
   themeDarkVars: '',
   limitType: 'diger',
@@ -65,7 +68,8 @@ export const useSettingsStore = create<SettingsState>((set) => ({
   setAdminName: (name) => set({ adminName: name }),
   setAdminTitle: (title) => set({ adminTitle: title }),
   setAdminUsername: (username) => set({ adminUsername: username }),
-  setInstitutionCode: (code) => set({ institutionCode: code }),
+  setEButceKodu: (code) => set({ eButceKodu: code }),
+  setSay2000iKodu: (code) => set({ say2000iKodu: code }),
   setThemeLightVars: (vars) => set({ themeLightVars: vars }),
   setThemeDarkVars: (vars) => set({ themeDarkVars: vars }),
   setLimitType: (limitType) => set({ limitType }),
@@ -88,7 +92,8 @@ export const useSettingsStore = create<SettingsState>((set) => ({
         adminName: settings.adminName || 'Sistem Yöneticisi',
         adminTitle: settings.adminTitle || 'Destek Sorumlusu',
         adminUsername: settings.adminUsername || 'admin',
-        institutionCode: settings.institutionCode || '',
+        eButceKodu: settings.eButceKodu || '',
+        say2000iKodu: settings.say2000iKodu || '',
         themeLightVars: settings.themeLightVars || '',
         themeDarkVars: settings.themeDarkVars || '',
         limitType: settings.limitType || 'diger',
@@ -111,7 +116,8 @@ export const useSettingsStore = create<SettingsState>((set) => ({
         adminName: 'Sistem Yöneticisi',
         adminTitle: 'Destek Sorumlusu',
         adminUsername: 'admin',
-        institutionCode: '',
+        eButceKodu: '',
+        say2000iKodu: '',
         themeLightVars: '',
         themeDarkVars: '',
         limitType: 'diger',

@@ -105,7 +105,7 @@ const menuGroups: MenuGroup[] = [
 export function Sidebar(): React.JSX.Element {
   const [isCollapsed, setIsCollapsed] = useState(false)
   const [expandedItems, setExpandedItems] = useState<Set<string>>(new Set(['/malzemeler', 'Malzeme & Kodlar']))
-  const { institutionName, institutionLogo, adminUsername, institutionCode, loadSettings } =
+  const { institutionName, institutionLogo, adminUsername, eButceKodu, loadSettings } =
     useSettingsStore()
   const { closeWorkspace, fileName, activeDosyaId, setActiveDosyaId } = useWorkspaceStore()
   const queryClient = useQueryClient()
@@ -524,8 +524,8 @@ export function Sidebar(): React.JSX.Element {
               <p className="text-sm font-medium text-sidebar-hover-text truncate" title={adminUsername}>
                 {adminUsername}
               </p>
-              <p className="text-[10px] text-sidebar-text/75 truncate" title={institutionCode}>
-                Kurum Kodu: {institutionCode}
+              <p className="text-[10px] text-sidebar-text/75 truncate" title={eButceKodu || ''}>
+                Kurum Kodu: {eButceKodu || '-'}
               </p>
             </div>
           )}

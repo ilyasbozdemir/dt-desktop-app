@@ -27,7 +27,7 @@ interface WorkspaceState {
   createWorkspace: (
     filePath: string,
     institutionName: string,
-    institutionCode?: string,
+    eButceKodu?: string,
     adminUsername?: string,
     adminPassword?: string
   ) => Promise<{ success: boolean; error?: string }>
@@ -115,7 +115,7 @@ export const useWorkspaceStore = create<WorkspaceState>((set, get) => ({
   createWorkspace: async (
     filePath: string,
     institutionName: string,
-    institutionCode?: string,
+    eButceKodu?: string,
     adminUsername?: string,
     adminPassword?: string
   ) => {
@@ -124,7 +124,7 @@ export const useWorkspaceStore = create<WorkspaceState>((set, get) => ({
         'workspace:create',
         filePath,
         institutionName,
-        institutionCode || '',
+        eButceKodu || '',
         adminUsername || '',
         adminPassword || ''
       )
