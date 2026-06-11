@@ -845,7 +845,7 @@ export default function DosyalarScreen(): React.ReactNode {
                     {selectedDosya.is_deleted !== 1 && selectedDosya.is_ekap_sent !== 1 && (
                       <button
                         onClick={() => navigate({ to: `/dosyalar/yeni?id=${selectedDosya.id}` })}
-                        className="px-4 py-2.5 border border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+                        className="px-4 py-2.5 bg-bg-200 border border-bg-300 hover:bg-bg-300 text-text-200 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer"
                       >
                         <Edit size={14} />
                         Düzenle
@@ -875,7 +875,7 @@ export default function DosyalarScreen(): React.ReactNode {
                     {selectedDosya.is_deleted !== 1 && selectedDosya.is_ekap_sent !== 1 && selectedDosya.status !== 'tamamlandi' && (
                       <button
                         onClick={() => handleUpdateStatus(selectedDosya.id, 'tamamlandi')}
-                        className="col-span-2 px-4 py-2.5 bg-purple-50 dark:bg-purple-900/20 border border-purple-200 dark:border-purple-800/40 hover:bg-purple-100 dark:hover:bg-purple-900/40 text-purple-600 dark:text-purple-400 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+                        className="col-span-2 px-4 py-2.5 bg-primary-200 border border-primary-300 hover:bg-primary-300 text-bg-100 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer"
                       >
                         <CheckCircle2 size={14} />
                         Tamamlandı İşaretle
@@ -886,7 +886,7 @@ export default function DosyalarScreen(): React.ReactNode {
                         <Button asChild desc={`${selectedDosya.temin_no || 'Dosya'} Aktife Alındı (Buton Tıklaması)`}>
                           <button
                             onClick={() => handleUpdateStatus(selectedDosya.id, 'devam_ediyor')}
-                            className="px-4 py-2.5 bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800/40 hover:bg-emerald-100 dark:hover:bg-emerald-900/40 text-emerald-600 dark:text-emerald-400 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+                            className="px-4 py-2.5 bg-primary-100 border border-primary-200 hover:bg-primary-200 text-primary-300 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer"
                           >
                             <Clock size={14} />
                             Aktife Al
@@ -895,7 +895,7 @@ export default function DosyalarScreen(): React.ReactNode {
                         <Button asChild desc={`${selectedDosya.temin_no || 'Dosya'} EKAP Kilitleme (Buton Tıklaması)`}>
                           <button
                             onClick={() => handleEkapGonder(selectedDosya.id)}
-                            className="px-4 py-2.5 bg-sky-50 dark:bg-sky-900/20 border border-sky-200 dark:border-sky-800/40 hover:bg-sky-100 dark:hover:bg-sky-900/40 text-sky-600 dark:text-sky-400 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+                            className="px-4 py-2.5 bg-bg-200 border border-bg-300 hover:bg-bg-300 text-text-100 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer"
                           >
                             <Lock size={14} />
                             Kilitle (EKAP)
@@ -907,7 +907,7 @@ export default function DosyalarScreen(): React.ReactNode {
                       <Button asChild desc={`${selectedDosya.temin_no || 'Dosya'} EKAP Kilidi Açma (Buton Tıklaması)`}>
                         <button
                           onClick={() => handleKilidiAc(selectedDosya.id)}
-                          className="col-span-2 px-4 py-2.5 bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800/40 hover:bg-amber-100 dark:hover:bg-amber-900/40 text-amber-600 dark:text-amber-400 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+                          className="col-span-2 px-4 py-2.5 bg-bg-200 border border-bg-300 hover:bg-bg-300 text-text-100 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer"
                         >
                           <Unlock size={14} />
                           Kilidi Aç
@@ -923,7 +923,7 @@ export default function DosyalarScreen(): React.ReactNode {
                               logActivity('Dosya Geri Alındı', `${selectedDosya.temin_no || 'NO BELİRSİZ'} numaralı silinmiş dosya geri alındı.`, 'info')
                             })
                           }
-                          className="col-span-2 px-4 py-2.5 bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800/40 hover:bg-emerald-100 dark:hover:bg-emerald-900/40 text-emerald-600 dark:text-emerald-400 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+                          className="col-span-2 px-4 py-2.5 bg-primary-100 border border-primary-200 hover:bg-primary-200 text-primary-300 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer"
                         >
                           <Edit size={14} />
                           Silinmişi Geri Al
@@ -936,7 +936,7 @@ export default function DosyalarScreen(): React.ReactNode {
                     <Button asChild desc={`${selectedDosya.temin_no || 'Dosya'} Yeni Pencerede Aç (Buton Tıklaması)`}>
                       <button
                         onClick={handleOpenInNewWindow}
-                        className="w-full px-4 py-2.5 bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800/40 hover:bg-blue-100 dark:hover:bg-blue-900/40 text-blue-600 dark:text-blue-400 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+                        className="w-full px-4 py-2.5 bg-primary-100 border border-primary-200 hover:bg-primary-200 text-primary-300 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer"
                       >
                         <ExternalLink size={14} />
                         Yeni Pencerede Aç
@@ -948,7 +948,7 @@ export default function DosyalarScreen(): React.ReactNode {
                   <Button asChild desc={`${selectedDosya.temin_no || 'Dosya'} Yapay Zeka Asistanı (Buton Tıklaması)`}>
                     <button
                       onClick={() => handleOpenAI(selectedDosya)}
-                      className="w-full px-4 py-2.5 bg-linear-to-r from-violet-600 to-fuchsia-600 hover:from-violet-500 hover:to-fuchsia-500 text-white rounded-xl text-xs font-bold transition-all shadow-md shadow-violet-500/20 flex items-center justify-center gap-1.5 cursor-pointer mt-2"
+                      className="w-full px-4 py-2.5 bg-accent-100 hover:bg-accent-200 text-bg-100 rounded-xl text-xs font-bold transition-all shadow-md flex items-center justify-center gap-1.5 cursor-pointer mt-2"
                     >
                       <Sparkles size={14} />
                       Yapay Zeka Asistanı
