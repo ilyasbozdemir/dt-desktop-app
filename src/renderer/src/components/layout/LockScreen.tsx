@@ -3,7 +3,6 @@ import {
   Lock,
   LogOut,
   KeyRound,
-  Building,
   Building2,
   User,
   ShieldAlert,
@@ -23,7 +22,7 @@ import { useTheme } from '../providers/ThemeProvider'
 
 export default function LockScreen(): React.JSX.Element {
   const { fileName, setIsAuthenticated, closeWorkspace } = useWorkspaceStore()
-  const { institutionName, institutionLogo, logoLeft, logoRight, loadSettings, eButceKodu } = useSettingsStore()
+  const { institutionName, institutionLogo, logoLeft, logoRight, loadSettings } = useSettingsStore()
   const { theme, setTheme } = useTheme()
 
   const [isSetupMode, setIsSetupMode] = useState(false)
@@ -31,7 +30,7 @@ export default function LockScreen(): React.JSX.Element {
   const [recoveryStep, setRecoveryStep] = useState<
     'login' | 'send_code' | 'verify_code' | 'reset_password'
   >('login')
-  const [eButceKoduState, setEButceKoduState] = useState(eButceKodu || '')
+
   const [username, setUsername] = useState('admin')
   const [password, setPassword] = useState('')
   const [recoveryCode, setRecoveryCode] = useState('')
@@ -60,17 +59,15 @@ export default function LockScreen(): React.JSX.Element {
         const isRemembered = localStorage.getItem(`rememberMe_${fileName}`) === 'true'
         setRememberMe(isRemembered)
         if (isRemembered) {
-          setEButceKoduState(localStorage.getItem(`rememberedCode_${fileName}`) || eButceKodu || '')
           setUsername(localStorage.getItem(`rememberedUser_${fileName}`) || 'admin')
           setPassword(localStorage.getItem(`rememberedPass_${fileName}`) || '')
         } else {
-          setEButceKoduState(eButceKodu || '')
           setUsername('admin')
           setPassword('')
         }
       }
     }, 0)
-  }, [loadSettings, fileName, eButceKodu])
+  }, [loadSettings, fileName])
 
   const handleSubmit = async (e: React.FormEvent): Promise<void> => {
     e.preventDefault()
@@ -82,14 +79,13 @@ export default function LockScreen(): React.JSX.Element {
         // Setup new credentials
         const res = await window.electron.ipcRenderer.invoke(
           'db:setup-auth',
-          eButceKoduState,
+          '',
           username,
           password
         )
         if (res.success) {
           if (rememberMe && fileName) {
             localStorage.setItem(`rememberMe_${fileName}`, 'true')
-            localStorage.setItem(`rememberedCode_${fileName}`, eButceKoduState)
             localStorage.setItem(`rememberedUser_${fileName}`, username)
             localStorage.setItem(`rememberedPass_${fileName}`, password)
           }
@@ -102,19 +98,17 @@ export default function LockScreen(): React.JSX.Element {
         // Login with existing credentials
         const res = await window.electron.ipcRenderer.invoke(
           'db:login',
-          eButceKoduState,
+          '',
           username,
           password
         )
         if (res.success) {
           if (rememberMe && fileName) {
             localStorage.setItem(`rememberMe_${fileName}`, 'true')
-            localStorage.setItem(`rememberedCode_${fileName}`, eButceKoduState)
             localStorage.setItem(`rememberedUser_${fileName}`, username)
             localStorage.setItem(`rememberedPass_${fileName}`, password)
           } else if (fileName) {
             localStorage.setItem(`rememberMe_${fileName}`, 'false')
-            localStorage.removeItem(`rememberedCode_${fileName}`)
             localStorage.removeItem(`rememberedUser_${fileName}`)
             localStorage.removeItem(`rememberedPass_${fileName}`)
           }
@@ -175,7 +169,7 @@ export default function LockScreen(): React.JSX.Element {
     try {
       const res = await window.electron.ipcRenderer.invoke(
         'db:setup-auth',
-        eButceKoduState,
+        '',
         username,
         password
       )
@@ -304,22 +298,7 @@ export default function LockScreen(): React.JSX.Element {
 
         {recoveryStep === 'login' && (
           <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5 ml-1">
-                e-Bütçe / Say2000i Kodu
-              </label>
-              <div className="relative">
-                <Building className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 dark:text-slate-550" />
-                <input
-                  type="text"
-                  required
-                  placeholder={isSetupMode ? 'Örn: 12345' : 'e-Bütçe veya Say2000i Kodu'}
-                  value={eButceKoduState}
-                  onChange={(e) => setEButceKoduState(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2.5 bg-slate-50 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-800 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all text-slate-800 dark:text-white placeholder-slate-400 dark:placeholder-slate-600"
-                />
-              </div>
-            </div>
+
 
             <div>
               <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5 ml-1">
@@ -367,7 +346,7 @@ export default function LockScreen(): React.JSX.Element {
               <div className="flex gap-2 p-3 bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20 rounded-xl text-amber-700 dark:text-amber-550 text-[10px] leading-relaxed">
                 <ShieldAlert className="w-5 h-5 shrink-0" />
                 <span>
-                  Bu şifre ve kurum kodu veritabanına kaydedilir. İnternet olmasa dahi bu kurum
+                  Bu şifre veritabanına kaydedilir. İnternet olmasa dahi bu kurum
                   dosyasına girmek için bu şifreyi kullanacaksınız. Lütfen unutmayın.
                 </span>
               </div>
@@ -503,22 +482,7 @@ export default function LockScreen(): React.JSX.Element {
               Kod başarıyla doğrulandı! Lütfen kurum dosyanız için yeni erişim bilgilerini
               tanımlayın.
             </p>
-            <div>
-              <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5 ml-1">
-                Kurum Kodu
-              </label>
-              <div className="relative">
-                <Building className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 dark:text-slate-550" />
-                <input
-                  type="text"
-                  required
-                  placeholder="Yeni Kurum Kodu"
-                  value={eButceKoduState}
-                  onChange={(e) => setEButceKoduState(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2.5 bg-slate-50 dark:bg-slate-950/60 border border-slate-200 dark:border-slate-800 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500/50 transition-all text-slate-800 dark:text-white placeholder-slate-400 dark:placeholder-slate-600"
-                />
-              </div>
-            </div>
+
 
             <div>
               <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5 ml-1">

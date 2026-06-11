@@ -596,11 +596,10 @@ if (!gotTheLock) {
           .prepare("SELECT value FROM settings WHERE key = 'adminPassword'")
           .get() as { value: string } | undefined
 
-        const hasCode = !!codeRow?.value
         const hasUser = !!userRow?.value
         const hasPass = !!passRow?.value
 
-        return { hasCredentials: hasCode && hasUser && hasPass }
+        return { hasCredentials: hasUser && hasPass }
       } catch (error: any) {
         console.error('Check auth setup error:', error)
         return { hasCredentials: false, error: error.message }
@@ -640,17 +639,13 @@ if (!gotTheLock) {
           .prepare("SELECT value FROM settings WHERE key = 'say2000iKodu'")
           .get() as { value: string } | undefined
 
-        const expectedCode = codeRow?.value || ''
-        const expectedEskiCode = eskiCodeRow?.value || ''
         const expectedUser = userRow?.value || ''
         const expectedPass = passRow?.value || ''
 
-        const isCodeValid = code === expectedCode || (expectedEskiCode && code === expectedEskiCode)
-
-        if (isCodeValid && user === expectedUser && pass === expectedPass) {
+        if (user === expectedUser && pass === expectedPass) {
           return { success: true }
         }
-        return { success: false, error: 'Kurum kodu, kullanıcı adı veya şifre hatalı!' }
+        return { success: false, error: 'Kullanıcı adı veya şifre hatalı!' }
       } catch (error: any) {
         console.error('Login error:', error)
         return { success: false, error: error.message }

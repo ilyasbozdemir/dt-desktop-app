@@ -271,7 +271,7 @@ export default function KurumScreen(): React.JSX.Element {
                         <Input
                           value={say2000iKodu}
                           onChange={(e) => setSay2000iKodu(e.target.value)}
-                          placeholder="Örn: 70151"
+                          placeholder="Say2000i Kodu"
                           className="bg-slate-55 dark:bg-slate-955 border-slate-200 dark:border-slate-800 text-xs"
                         />
                       </div>

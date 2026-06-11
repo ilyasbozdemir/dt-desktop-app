@@ -32,7 +32,6 @@ export default function LauncherScreen(): React.ReactNode {
   const [migrationData, setMigrationData] = useState<{ filePath: string; pendingUpdates: any[] } | null>(null)
 
   const [institutionName, setInstitutionName] = useState('')
-  const [eButceKodu, setEButceKodu] = useState('')
   const [username, setUsername] = useState('admin')
   const [password, setPassword] = useState('')
   const [creating, setCreating] = useState(false)
@@ -64,7 +63,7 @@ export default function LauncherScreen(): React.ReactNode {
       const result = await createWorkspace(
         pendingFilePath,
         institutionName,
-        eButceKodu,
+        undefined,
         username,
         password
       )
@@ -263,19 +262,6 @@ export default function LauncherScreen(): React.ReactNode {
 
               <div>
                 <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1 ml-1">
-                </label>
-                <input
-                  type="text"
-                  required
-                  placeholder="Örn: 12345"
-                  value={eButceKodu}
-                  onChange={(e) => setEButceKodu(e.target.value)}
-                  className="w-full px-3 py-2 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500/50 focus:border-blue-500 text-slate-850 dark:text-white placeholder-slate-400 dark:placeholder-slate-650"
-                />
-              </div>
-
-              <div>
-                <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1 ml-1">
                   Yönetici Kullanıcı Adı
                 </label>
                 <div className="relative">
@@ -318,7 +304,7 @@ export default function LauncherScreen(): React.ReactNode {
               <div className="flex gap-2 p-3 bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20 rounded-xl text-amber-700 dark:text-amber-500 text-[10px] leading-relaxed">
                 <ShieldAlert className="w-5 h-5 shrink-0" />
                 <span>
-                  Bu şifre ve kurum kodu veritabanına kaydedilir. İnternet olmasa dahi bu kurum
+                  Bu şifre veritabanına kaydedilir. İnternet olmasa dahi bu kurum
                   dosyasına girmek için bu şifreyi kullanacaksınız. Lütfen unutmayın.
                 </span>
               </div>
