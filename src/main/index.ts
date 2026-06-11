@@ -1521,7 +1521,8 @@ if (!gotTheLock) {
         if (result === null) {
           return { success: false, error: 'Güncelleme kontrolü bu ortamda atlandı veya desteklenmiyor.' }
         }
-        return { success: true, result }
+        // Cannot clone CancellationToken, downloadPromise etc over IPC
+        return { success: true, version: result.updateInfo.version }
       } catch (error: any) {
         console.error('Manual update check error:', error)
         return { success: false, error: error.message }
