@@ -9,7 +9,7 @@ export function Header(): React.JSX.Element {
   const [updateStatus, setUpdateStatus] = React.useState<{status: string, version?: string} | null>(null)
   const [showNotifications, setShowNotifications] = React.useState(false)
   const notificationRef = useRef<HTMLDivElement>(null)
-  
+
   const { announcements } = useAnnouncements()
 
   React.useEffect(() => {
@@ -38,15 +38,23 @@ export function Header(): React.JSX.Element {
 
   return (
     <header
-      className="h-16 bg-white/70 dark:bg-slate-900/70 backdrop-blur-md border-b border-slate-200/50 dark:border-slate-800/50 flex items-center justify-between px-6 shrink-0 z-50 shadow-sm transition-all duration-300"
+      className="h-16 bg-white/70 dark:bg-slate-900/70 backdrop-blur-md border-b border-slate-200/50 dark:border-slate-800/50 flex items-center justify-between px-6 shrink-0 z-50 shadow-sm transition-all duration-300 relative"
       style={{ WebkitAppRegion: 'drag' } as React.CSSProperties}
     >
-      <div className="flex-1 flex items-center gap-6">
-        <div style={{ WebkitAppRegion: 'no-drag' } as React.CSSProperties}>
-          <TeminSelector />
-        </div>
+      {/* SOL: Boş Alan */}
+      <div className="flex-1 flex items-center gap-6"></div>
+
+      {/* ORTA: TeminSelector */}
+      <div
+        className="absolute left-1/2 -translate-x-1/2 flex items-center z-50"
+        style={{ WebkitAppRegion: 'no-drag' } as React.CSSProperties}
+      >
+        <TeminSelector />
       </div>
 
+
+
+      {/* SAĞ: Kontroller */}
       <div className="flex items-center space-x-1 pr-32">
         <button
           style={{ WebkitAppRegion: 'no-drag' } as React.CSSProperties}
@@ -90,7 +98,7 @@ export function Header(): React.JSX.Element {
             <div className="absolute top-full right-2 mt-2 w-80 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl shadow-2xl overflow-hidden z-[100] animate-in fade-in slide-in-from-top-2">
               <div className="p-3 border-b border-slate-100 dark:border-slate-800 font-bold text-sm text-slate-700 dark:text-slate-200 flex justify-between items-center">
                 Bildirimler ve İşlem Logları
-                <button onClick={() => setShowNotifications(false)} className="text-slate-400 hover:text-slate-600">
+                <button onClick={() => setShowNotifications(false)} className="text-slate-400 hover:text-slate-600" title="Kapat">
                   <X size={14} />
                 </button>
               </div>

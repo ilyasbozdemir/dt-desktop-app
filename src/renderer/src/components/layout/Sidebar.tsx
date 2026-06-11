@@ -342,14 +342,14 @@ export function Sidebar(): React.JSX.Element {
       >
         <div
           className={cn(
-            'rounded-full border-2 border-sidebar-border bg-sidebar-hover-bg flex items-center justify-center overflow-hidden shadow-inner transition-all duration-300 shrink-0',
+            'flex items-center justify-center transition-all duration-300 shrink-0',
             isCollapsed ? 'w-10 h-10' : 'w-16 h-16'
           )}
         >
           {institutionLogo ? (
-            <img src={institutionLogo} alt="Logo" className="w-full h-full object-cover" />
+            <img src={institutionLogo} alt="Logo" className="w-full h-full object-contain" />
           ) : (
-            <Building2 className={cn('text-sidebar-active-text', isCollapsed ? 'w-5 h-5' : 'w-8 h-8')} />
+            <Building2 className={cn('text-sidebar-active-text', isCollapsed ? 'w-6 h-6' : 'w-10 h-10')} />
           )}
         </div>
         {!isCollapsed && (
@@ -510,13 +510,15 @@ export function Sidebar(): React.JSX.Element {
           )}
           title="Kullanıcı Profili ve Güvenlik Ayarlarına Git"
         >
-          <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center shrink-0 overflow-hidden border border-sidebar-border/60">
+          <div className="w-8 h-8 flex items-center justify-center shrink-0">
             {institutionLogo ? (
-              <img src={institutionLogo} alt="Profil" className="w-full h-full object-contain p-0.5" />
+              <img src={institutionLogo} alt="Profil" className="w-full h-full object-contain" />
             ) : (
-              <span className="text-sidebar-hover-text text-xs font-bold">
-                {getInitials(adminUsername || 'SY')}
-              </span>
+              <div className="w-full h-full rounded-full bg-sidebar-hover-bg flex items-center justify-center border border-sidebar-border/30">
+                <span className="text-sidebar-hover-text text-xs font-bold">
+                  {getInitials(adminUsername || 'SY')}
+                </span>
+              </div>
             )}
           </div>
           {!isCollapsed && (

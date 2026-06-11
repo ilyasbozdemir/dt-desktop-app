@@ -10,7 +10,9 @@ import {
   Download,
   Settings,
   Palette,
-  Code
+  Code,
+  Eye,
+  EyeOff
 } from 'lucide-react'
 import { InnerMenu, InnerMenuItem } from '../../components/ui/InnerMenu'
 import TemaScreen from './TemaScreen'
@@ -49,6 +51,7 @@ export default function AyarlarScreen(): React.ReactNode {
   const [smtpPort, setSmtpPort] = useState('')
   const [smtpUser, setSmtpUser] = useState('')
   const [smtpPass, setSmtpPass] = useState('')
+  const [showSmtpPass, setShowSmtpPass] = useState(false)
   const [smtpSecure, setSmtpSecure] = useState(false)
 
   // Tab 6: Geliştirici Ayarları
@@ -305,13 +308,23 @@ export default function AyarlarScreen(): React.ReactNode {
                         <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1">
                           SMTP Şifre (Password)
                         </label>
-                        <Input
-                          type="password"
-                          placeholder="••••••••"
-                          value={smtpPass}
-                          onChange={(e) => setSmtpPass(e.target.value)}
-                          className="bg-slate-55 dark:bg-slate-950 border-slate-200 dark:border-slate-800"
-                        />
+                        <div className="relative">
+                          <input
+                            type={showSmtpPass ? 'text' : 'password'}
+                            placeholder="••••••••"
+                            value={smtpPass}
+                            onChange={(e) => setSmtpPass(e.target.value)}
+                            className="w-full pr-10 px-3 py-2 text-sm rounded-lg bg-slate-55 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-slate-800 dark:text-slate-100 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-primary"
+                          />
+                          <button
+                            type="button"
+                            onClick={() => setShowSmtpPass(!showSmtpPass)}
+                            className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 focus:outline-none"
+                            title={showSmtpPass ? 'Şifreyi Gizle' : 'Şifreyi Göster'}
+                          >
+                            {showSmtpPass ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                          </button>
+                        </div>
                       </div>
                       <div className="md:col-span-3 flex items-center gap-2 pt-1">
                         <input
