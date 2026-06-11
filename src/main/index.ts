@@ -1427,14 +1427,40 @@ if (!gotTheLock) {
     }
 
     // --- Auto Updater Logic ---
+    if (!app.isPackaged) {
+      autoUpdater.forceDevUpdateConfig = true
+    }
+
     // Uygulama açıldıktan saniyeler sonra güncellemeleri kontrol et
-    if (app.isPackaged) {
+    if (app.isPackaged || autoUpdater.forceDevUpdateConfig) {
       setTimeout(() => {
         autoUpdater.checkForUpdates().catch(e => {
           console.error('Update check error:', e.message)
         })
       }, 5000)
     }
+
+    let devUpdateVersionOverride = ''
+
+    ipcMain.handle('updater:set-dev-version', (_, mode: boolean, version: string) => {
+      devUpdateVersionOverride = mode && version ? version : ''
+      if (devUpdateVersionOverride && !app.isPackaged) {
+        try {
+          const semver = require('semver')
+          Object.defineProperty(autoUpdater, 'currentVersion', {
+            get: () => semver.parse(devUpdateVersionOverride) || semver.parse('0.0.0'),
+            configurable: true
+          })
+        } catch (e) {
+          console.error('Mock currentVersion hatası:', e)
+        }
+      }
+      return { success: true }
+    })
+
+    ipcMain.handle('app:get-version', () => {
+      return devUpdateVersionOverride || app.getVersion()
+    })
 
     autoUpdater.on('checking-for-update', () => {
       console.log('Güncellemeler kontrol ediliyor...')
@@ -1448,7 +1474,7 @@ if (!gotTheLock) {
         const versionsPath = join(__dirname, '../../versions.json')
         if (fs.existsSync(versionsPath)) {
           const versionsList: string[] = JSON.parse(fs.readFileSync(versionsPath, 'utf8'))
-          const currentV = (autoUpdater.currentVersion as any)?.version || app.getVersion()
+          const currentV = devUpdateVersionOverride || (autoUpdater.currentVersion as any)?.version || app.getVersion()
           const incomingVersion = info.version.replace(/^v/, '')
           const cleanCurrentV = currentV.replace(/^v/, '')
           

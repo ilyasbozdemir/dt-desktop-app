@@ -84,8 +84,14 @@ export default function AyarlarScreen(): React.ReactNode {
         setSmtpPass(settings.smtp_pass || '')
         setSmtpSecure(settings.smtp_secure === 'true')
         
-        setDevUpdateTestMode(settings.devUpdateTestMode === 'true')
-        setDevUpdateVersion(settings.devUpdateVersion || '')
+        const mode = settings.devUpdateTestMode === 'true'
+        const ver = settings.devUpdateVersion || ''
+        setDevUpdateTestMode(mode)
+        setDevUpdateVersion(ver)
+        if ((window as any).api?.setDevVersion) {
+          ;(window as any).api.setDevVersion(mode, ver)
+          window.dispatchEvent(new Event('app-version-changed'))
+        }
 
         setAiProvider(settings.ai_provider || 'gemini')
         setAiGeminiApiKey(settings.ai_gemini_api_key || '')
@@ -156,6 +162,10 @@ export default function AyarlarScreen(): React.ReactNode {
       } else if (tab === 'developer') {
         dataToSave.devUpdateTestMode = devUpdateTestMode ? 'true' : 'false'
         dataToSave.devUpdateVersion = devUpdateVersion
+        if ((window as any).api?.setDevVersion) {
+          ;(window as any).api.setDevVersion(devUpdateTestMode, devUpdateVersion)
+          window.dispatchEvent(new Event('app-version-changed'))
+        }
       } else if (tab === 'ai') {
         dataToSave.ai_provider = aiProvider
         dataToSave.ai_gemini_api_key = aiGeminiApiKey
@@ -371,7 +381,14 @@ export default function AyarlarScreen(): React.ReactNode {
                               type="checkbox"
                               id="devUpdateTestMode"
                               checked={devUpdateTestMode}
-                              onChange={(e) => setDevUpdateTestMode(e.target.checked)}
+                              onChange={(e) => {
+                                const mode = e.target.checked
+                                setDevUpdateTestMode(mode)
+                                if ((window as any).api?.setDevVersion) {
+                                  ;(window as any).api.setDevVersion(mode, devUpdateVersion)
+                                  window.dispatchEvent(new Event('app-version-changed'))
+                                }
+                              }}
                               className="rounded border-slate-300 dark:border-slate-700 bg-slate-55 dark:bg-slate-950 text-primary focus:ring-primary accent-primary"
                             />
                             <label
@@ -389,7 +406,14 @@ export default function AyarlarScreen(): React.ReactNode {
                               </label>
                               <select
                                 value={devUpdateVersion}
-                                onChange={(e) => setDevUpdateVersion(e.target.value)}
+                                onChange={(e) => {
+                                  const ver = e.target.value
+                                  setDevUpdateVersion(ver)
+                                  if ((window as any).api?.setDevVersion) {
+                                    ;(window as any).api.setDevVersion(devUpdateTestMode, ver)
+                                    window.dispatchEvent(new Event('app-version-changed'))
+                                  }
+                                }}
                                 className="w-full text-sm rounded-lg border border-slate-200 dark:border-slate-800 bg-slate-55 dark:bg-slate-950 text-slate-800 dark:text-slate-200 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-primary"
                               >
                                 <option value="">-- Versiyon Seçiniz --</option>

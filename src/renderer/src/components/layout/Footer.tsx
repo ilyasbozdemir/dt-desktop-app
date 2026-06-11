@@ -4,7 +4,25 @@ import packageJson from '../../../../../package.json'
 
 export function Footer(): React.JSX.Element {
   const [showAbout, setShowAbout] = useState(false)
+  const [appVersion, setAppVersion] = useState(packageJson.version)
   const aboutRef = useRef<HTMLDivElement>(null)
+
+  const fetchVersion = () => {
+    if ((window as any).api?.getAppVersion) {
+      ;(window as any).api
+        .getAppVersion()
+        .then((v: string) => {
+          if (v) setAppVersion(v)
+        })
+        .catch(console.error)
+    }
+  }
+
+  useEffect(() => {
+    fetchVersion()
+    window.addEventListener('app-version-changed', fetchVersion)
+    return () => window.removeEventListener('app-version-changed', fetchVersion)
+  }, [])
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -34,7 +52,7 @@ export function Footer(): React.JSX.Element {
       </div>
 
       <div className="flex items-center space-x-2 relative" ref={aboutRef}>
-        <span>v{packageJson.version}</span>
+        <span>v{appVersion}</span>
 
         <button
           onClick={() => setShowAbout(!showAbout)}
