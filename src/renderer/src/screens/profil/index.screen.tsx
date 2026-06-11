@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { Button } from '../../components/ui/Button'
 import { Input } from '../../components/ui/Input'
 import { useSettingsStore } from '../../store/settingsStore'
-import { User, Shield, KeyRound, Eye, EyeOff, Save, Lock } from 'lucide-react'
+import { User, Shield, KeyRound, Eye, EyeOff, Save } from 'lucide-react'
 
 export default function ProfilScreen(): React.JSX.Element {
   const { loadSettings: reloadSettingsStore } = useSettingsStore()
@@ -20,7 +20,6 @@ export default function ProfilScreen(): React.JSX.Element {
 
   // Toggle Visibility States
   const [showPassword, setShowPassword] = useState(false)
-  const [showEkapPassword, setShowEkapPassword] = useState(false)
 
   useEffect(() => {
     async function loadData(): Promise<void> {

@@ -420,7 +420,7 @@ export default function YeniDosyaScreen(): React.JSX.Element {
       
       const res = await window.api.aiGenerate({ prompt, enableDatabaseAccess: false })
       if (res.success && res.data) {
-        setFormData(prev => ({ ...prev, isin_aciklamasi: res.data.trim() }))
+        setFormData(prev => ({ ...prev, isin_aciklamasi: res.data?.trim() || '' }))
       } else {
         alert('Yapay zeka yanıt üretemedi: ' + (res.error || 'Bilinmeyen hata'))
       }
