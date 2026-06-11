@@ -101,7 +101,7 @@ function DurumBadge({
 }
 
 export default function DosyalarScreen(): React.ReactNode {
-  const { dosyalar, isLoadingDosyalar, deleteDosya, updateDosya } = useDosyalarHooks()
+  const { dosyalar, isLoadingDosyalar, deleteDosya, hardDeleteDosya, updateDosya } = useDosyalarHooks()
   const { activeDosyaId, setActiveDosyaId } = useWorkspaceStore()
   const { updateTabLabel } = useTabStore()
   const routerState = useRouterState()
@@ -151,17 +151,29 @@ export default function DosyalarScreen(): React.ReactNode {
   const handleDelete = async (id: number): Promise<void> => {
     if (
       confirm(
-        'Bu dosyayı silmek istediğinize emin misiniz? Sistemde silinmiş olarak işaretlenecektir.'
+        'Bu dosyayı Arşivlemek / Silmek istediğinize emin misiniz? Dosya listelerde "Silindi/Arşivlendi" olarak işaretlenecektir.'
       )
     ) {
       const dosya = dosyalar.find((d) => d.id === id)
       await deleteDosya(id)
       if (dosya) {
-        await logActivity('Dosya Silindi', `${dosya.temin_no || 'NO BELİRSİZ'} numaralı dosya silindi.`, 'warning')
+        await logActivity('Dosya Arşivlendi', `${dosya.temin_no || 'NO BELİRSİZ'} numaralı dosya arşivlendi/silindi olarak işaretlendi.`, 'warning')
       }
       if (activeDosyaId === id) setActiveDosyaId(null)
     }
   }
+
+  const handleHardDelete = async (id: number): Promise<void> => {
+    if (
+      confirm(
+        'DİKKAT (Geliştirici Modu Özel): Bu dosyayı veritabanından KALICI OLARAK SİLMEK (Hard Delete) istediğinize emin misiniz? Bu işlem geri alınamaz!'
+      )
+    ) {
+      await hardDeleteDosya(id)
+      if (activeDosyaId === id) setActiveDosyaId(null)
+    }
+  }
+
 
   const handleUpdateStatus = async (id: number, status: string): Promise<void> => {
     await updateDosya({ id, status })
@@ -843,9 +855,21 @@ export default function DosyalarScreen(): React.ReactNode {
                       <button
                         onClick={() => handleDelete(selectedDosya.id)}
                         className="px-4 py-2.5 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800/40 hover:bg-red-100 dark:hover:bg-red-900/40 text-red-600 dark:text-red-400 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+                        title="Dosyayı Arşivler (Soft Delete)"
                       >
                         <Trash2 size={14} />
-                        Sil
+                        Arşivle
+                      </button>
+                    )}
+                    {/* Sadece Geliştirme Ortamında Gözüken Kalıcı Sil Butonu */}
+                    {import.meta.env.DEV && (
+                      <button
+                        onClick={() => handleHardDelete(selectedDosya.id)}
+                        className="col-span-2 px-4 py-2.5 bg-rose-100 dark:bg-rose-900/40 border border-rose-300 dark:border-rose-700/60 hover:bg-rose-200 dark:hover:bg-rose-800/60 text-rose-700 dark:text-rose-300 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+                        title="Veritabanından Kalıcı Olarak Siler"
+                      >
+                        <Trash2 size={14} />
+                        Kalıcı Sil (Dev Mode)
                       </button>
                     )}
                     {selectedDosya.is_deleted !== 1 && selectedDosya.is_ekap_sent !== 1 && selectedDosya.status !== 'tamamlandi' && (

@@ -28,8 +28,9 @@ export function TeminSelector(): React.JSX.Element {
 
   const filteredDosyalar = dosyalar.filter(
     (d) =>
-      d.konu?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      d.temin_no?.toLowerCase().includes(searchQuery.toLowerCase())
+      d.is_deleted !== 1 &&
+      (d.konu?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        d.temin_no?.toLowerCase().includes(searchQuery.toLowerCase()))
   )
 
   const handleSelect = (id: number): void => {

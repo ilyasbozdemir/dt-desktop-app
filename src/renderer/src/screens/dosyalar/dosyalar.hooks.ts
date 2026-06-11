@@ -132,11 +132,25 @@ export function useDosyalarHooks() {
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['temin_dosyalari'] })
   })
 
+  const hardDeleteDosyaMutation = useMutation({
+    mutationFn: async (id: number) => {
+      const res = await window.electron.ipcRenderer.invoke(
+        'db:run',
+        'DELETE FROM DATA_TeminDosyasi WHERE id = ?',
+        [id]
+      )
+      if (!res.success) throw new Error(res.error)
+      return res
+    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['temin_dosyalari'] })
+  })
+
   return {
     dosyalar,
     isLoadingDosyalar,
     addDosya: addDosyaMutation.mutateAsync,
     updateDosya: updateDosyaMutation.mutateAsync,
-    deleteDosya: deleteDosyaMutation.mutateAsync
+    deleteDosya: deleteDosyaMutation.mutateAsync,
+    hardDeleteDosya: hardDeleteDosyaMutation.mutateAsync
   }
 }
