@@ -550,14 +550,19 @@ export function AIFormFillModal({ isOpen, onClose, context, onApply }: AIFormFil
             {/* Input */}
             <div className="flex-none border-t border-slate-100 dark:border-slate-800 p-3">
               <div className="flex gap-2">
-                <input
-                  ref={inputRef}
-                  type="text"
+                <textarea
+                  ref={inputRef as any}
+                  rows={2}
                   value={chatInput}
                   onChange={e => setChatInput(e.target.value)}
-                  onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSendMessage() } }}
+                  onKeyDown={e => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                      e.preventDefault();
+                      handleSendMessage();
+                    }
+                  }}
                   placeholder="Mesaj yazın... (örn: Fen İşleri kırtasiye alımı için doldur)"
-                  className="flex-1 px-3.5 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-purple-500/30 text-slate-800 dark:text-slate-200 placeholder-slate-400"
+                  className="flex-1 px-3.5 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-700 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-purple-500/30 text-slate-800 dark:text-slate-200 placeholder-slate-400 custom-scrollbar resize-none"
                   disabled={chatLoading}
                 />
                 <button

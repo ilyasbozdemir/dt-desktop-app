@@ -17,6 +17,7 @@ import {
 import { Link, useNavigate, useRouterState } from '@tanstack/react-router'
 import { useDosyalarHooks, TeminDosyasi } from './dosyalar.hooks'
 import { useTabStore } from '../../store/tabStore'
+import { useSettingsStore } from '../../store/settingsStore'
 import { cn } from '../../utils/cn'
 import { AIFormFillModal, AIFilledValues } from '../../components/ui/AIFormFillModal'
 import { AITextGeneratorModal } from '../../components/ui/AITextGeneratorModal'
@@ -52,6 +53,7 @@ export default function YeniDosyaScreen(): React.JSX.Element {
   const routerState = useRouterState()
   const { dosyalar, addDosya, updateDosya } = useDosyalarHooks()
   const { updateTabLabel } = useTabStore()
+  const { institutionName } = useSettingsStore()
 
   const [showKonuSuggestions, setShowKonuSuggestions] = useState(false)
 
@@ -334,7 +336,7 @@ export default function YeniDosyaScreen(): React.JSX.Element {
         sunulacakMakam: formData.sunulacak_makam || selectedBirim?.sunum_makami,
         antetEkSatir: formData.antet_ek_satir || selectedBirim?.antet_ek_satir,
         ihtiyacYeri: formData.ihtiyac_yeri || selectedBirim?.ihtiyac_yeri_eki,
-        kurumAdi: selectedBirim?.birim_adi
+        kurumAdi: institutionName !== 'Kurum Adı Bulunamadı' ? institutionName : 'Kurum'
       },
       mevcutDegerler: {
         konu: formData.konu,
@@ -461,16 +463,39 @@ export default function YeniDosyaScreen(): React.JSX.Element {
     }
 
     const normalizeTr = (s: string) => s.trim().toLocaleLowerCase('tr-TR')
-    const targetKonu = normalizeTr(formData.konu || '')
-    const matches = dosyalar.filter(d => normalizeTr(d.konu) === targetKonu && (!isEdit || d.id !== editId))
+    let baseKonu = formData.konu?.trim() || ''
+    
+    // Eğer konu sonunda zaten (2) gibi bir ifade varsa, sadece asıl konuyu alalım
+    const baseMatch = baseKonu.match(/^(.*?)\s*\(\d+\)$/)
+    if (baseMatch) {
+      baseKonu = baseMatch[1].trim()
+    }
+    
+    const targetKonu = normalizeTr(baseKonu)
+    
+    // Aynı ismin türevlerini kullanan diğer dosyaları bul
+    const matches = dosyalar.filter(d => {
+      if (isEdit && d.id === editId) return false
+      const dBase = (d.konu || '').trim().replace(/\s*\(\d+\)$/, '').trim()
+      return normalizeTr(dBase) === targetKonu
+    })
+    
+    let finalKonu = formData.konu?.trim() || ''
     let nextTekrarNo = 1
-    if (matches.length > 0) {
-      const maxNo = Math.max(...matches.map(d => d.tekrar_no || 1))
+    
+    if (matches.length > 0 && !isEdit) {
+      const maxNo = Math.max(...matches.map(d => {
+        const m = (d.konu || '').match(/\s*\((\d+)\)$/)
+        const textualNo = m ? parseInt(m[1], 10) : 1
+        return Math.max(d.tekrar_no || 1, textualNo)
+      }))
       nextTekrarNo = maxNo + 1
+      finalKonu = `${baseKonu} (${nextTekrarNo})`
     }
 
     const payload = {
       ...formData,
+      konu: finalKonu,
       tekrar_no: nextTekrarNo
     }
 

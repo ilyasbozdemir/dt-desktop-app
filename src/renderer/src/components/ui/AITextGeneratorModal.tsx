@@ -204,8 +204,16 @@ export function AITextGeneratorModal({
               rows={3}
               value={prompt}
               onChange={(e) => setPrompt(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                  e.preventDefault()
+                  if (!loading && prompt.trim()) {
+                    handleGenerate()
+                  }
+                }
+              }}
               placeholder={isAdvisorMode ? "Yapay zekaya sormak istediğiniz soruyu veya tavsiye konusunu yazın..." : "Yapay zekanın nasıl bir metin üretmesini istediğinizi yazın (örn: Belediye binası temizlik işi ihalesi için idari şartnameye uygun iş tanımı oluştur.)"}
-              className="w-full px-3.5 py-2.5 bg-slate-55 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-purple-500/30 text-slate-800 dark:text-slate-250 font-semibold"
+              className="w-full px-3.5 py-2.5 bg-slate-55 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-purple-500/30 text-slate-800 dark:text-slate-250 font-semibold custom-scrollbar"
             />
           </div>
 
