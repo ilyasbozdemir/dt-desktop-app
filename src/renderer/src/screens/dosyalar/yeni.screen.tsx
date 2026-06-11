@@ -11,6 +11,7 @@ import {
   Search,
   Sparkles,
   ChevronRight,
+  ChevronDown,
   Bot
 } from 'lucide-react'
 import { Link, useNavigate, useRouterState } from '@tanstack/react-router'
@@ -278,6 +279,7 @@ export default function YeniDosyaScreen(): React.JSX.Element {
 
   // AI Form Fill Modal
   const [showAIModal, setShowAIModal] = useState(false)
+  const [showAiMenu, setShowAiMenu] = useState(false)
   const [, setAiModalConfig] = useState<{
     title: string
     fieldName: string
@@ -345,35 +347,69 @@ export default function YeniDosyaScreen(): React.JSX.Element {
         { alan: 'konu', etiket: 'İhale / Dosya Konusu', tip: 'text' as const, zorunlu: true, ornekDeger: 'Fen İşleri Kırtasiye Malzemesi Alımı' },
         { alan: 'isin_aciklamasi', etiket: 'İşin Açıklaması / Kapsamı', tip: 'textarea' as const },
         { alan: 'temin_no', etiket: 'Doğrudan Temin Numarası', tip: 'text' as const, ornekDeger: '2026/DT-001' },
-        { alan: 'sunulacak_makam', etiket: 'Evrakın Sunulacağı Makam', tip: 'text' as const, ornekDeger: 'BAÅKANLIK MAKAMINA' },
+        { alan: 'dosya_acilis_tarihi', etiket: 'Dosya Açılış Tarihi', tip: 'date' as const },
+        { alan: 'butce_yili', etiket: 'Bütçe Yılı', tip: 'number' as const },
+        { alan: 'butce_tipi', etiket: 'Bütçe Tipi', tip: 'text' as const },
+        { alan: 'sunulacak_makam', etiket: 'Evrakın Sunulacağı Makam', tip: 'text' as const, ornekDeger: 'BAŞKANLIK MAKAMINA' },
         { alan: 'ihtiyac_yeri', etiket: 'İhtiyaç Yeri', tip: 'text' as const },
-        { alan: 'yaklasik_maliyet', etiket: 'Yaklaşık Maliyet (₺)', tip: 'number' as const },
+        { alan: 'antet_ek_satir', etiket: 'Antet Ek Satır', tip: 'text' as const },
+        { alan: 'e_butce', etiket: 'e-Bütçe Kodu', tip: 'text' as const },
+        { alan: 'fonksiyonel_kod', etiket: 'Fonksiyonel Kod', tip: 'text' as const },
+        { alan: 'muhasebe_birimi', etiket: 'Muhasebe Birimi Kodu', tip: 'text' as const },
+        { alan: 'harcama_birimi', etiket: 'Harcama Birimi Kodu', tip: 'text' as const },
+        { alan: 'finansman_kodu', etiket: 'Finansman Kodu', tip: 'text' as const },
+        { alan: 'ekonomik_kod', etiket: 'Ekonomik Kod', tip: 'text' as const },
+        { alan: 'talep_tarihi', etiket: 'Talep Tarihi', tip: 'date' as const },
+        { alan: 'talep_sayisi', etiket: 'Talep Sayısı', tip: 'text' as const },
+        { alan: 'ihale_tipi', etiket: 'İhale Tipi', tip: 'text' as const },
+        { alan: 'tur', etiket: 'Tür (mal/hizmet/yapim/danismanlik)', tip: 'text' as const },
+        { alan: 'ihale_sekli', etiket: 'İhale Şekli (22/d* vb.)', tip: 'text' as const },
+        { alan: 'teklif_sozlesme_turu', etiket: 'Teklif/Sözleşme Türü', tip: 'text' as const },
+        { alan: 'alt_yuklenici_olacak_mi', etiket: 'Alt Yüklenici (0/1)', tip: 'number' as const },
+        { alan: 'kismi_teklif_verilecek_mi', etiket: 'Kısmi Teklif (0/1)', tip: 'number' as const },
+        { alan: 'fiyat_farki_dayanagi', etiket: 'Fiyat Farkı Dayanağı', tip: 'text' as const },
+        { alan: 'yatirim_proje_no', etiket: 'Yatırım Proje No', tip: 'text' as const },
+        { alan: 'avans_verilecek_mi', etiket: 'Avans Verilecek (0/1)', tip: 'number' as const },
+        { alan: 'yaklasik_maliyet_hesaplamasi', etiket: 'Yaklaşık Maliyet Hesaplama Yöntemi', tip: 'text' as const },
+        { alan: 'kdv', etiket: 'KDV Oranı (%)', tip: 'text' as const },
+        { alan: 'hesaplama_esasi', etiket: 'Hesaplama Esası', tip: 'text' as const },
         { alan: 'komisyon_takdiri', etiket: 'Komisyon Takdir Yazısı', tip: 'text' as const },
-        { alan: 'hesaplama_esasi', etiket: 'Hesaplama Esası', tip: 'text' as const }
+        { alan: 'tibbi_cihaz_alimi_mi', etiket: 'Tıbbi Cihaz Alımı (0/1)', tip: 'number' as const },
+        { alan: 'son_teklif_verme_tarihi', etiket: 'Son Teklif Verme Tarihi', tip: 'date' as const },
+        { alan: 'teslim_tarihi', etiket: 'Teslim Tarihi', tip: 'date' as const },
+        { alan: 'yaklasik_maliyet', etiket: 'Yaklaşık Maliyet (₺)', tip: 'number' as const },
+        { alan: 'butce_kodu', etiket: 'Bütçe Kodu', tip: 'text' as const },
+        { alan: 'temin_tarihi', etiket: 'Temin Tarihi', tip: 'date' as const },
+        { alan: 'notlar', etiket: 'Notlar', tip: 'textarea' as const }
       ]
     }
   }
 
   const handleAIApply = (values: AIFilledValues) => {
-    setFormData(prev => ({
-      ...prev,
-      ...(values.konu !== undefined && { konu: String(values.konu) }),
-      ...(values.isin_aciklamasi !== undefined && { isin_aciklamasi: String(values.isin_aciklamasi) }),
-      ...(values.temin_no !== undefined && { temin_no: String(values.temin_no) }),
-      ...(values.sunulacak_makam !== undefined && { sunulacak_makam: String(values.sunulacak_makam) }),
-      ...(values.ihtiyac_yeri !== undefined && { ihtiyac_yeri: String(values.ihtiyac_yeri) }),
-      ...(values.antet_ek_satir !== undefined && { antet_ek_satir: String(values.antet_ek_satir) }),
-      ...(values.yaklasik_maliyet !== undefined && { yaklasik_maliyet: Number(values.yaklasik_maliyet) }),
-      ...(values.komisyon_takdiri !== undefined && { komisyon_takdiri: String(values.komisyon_takdiri) }),
-      ...(values.hesaplama_esasi !== undefined && { hesaplama_esasi: String(values.hesaplama_esasi) })
-    }))
+    // Dynamically map all fields from the returned AI JSON into formData.
+    // Parse numeric fields properly if they come as string and are defined in TeminDosyasi as numbers.
+    const numericFields = ['butce_yili', 'yaklasik_maliyet', 'alt_yuklenici_olacak_mi', 'kismi_teklif_verilecek_mi', 'avans_verilecek_mi', 'tibbi_cihaz_alimi_mi'];
+    
+    setFormData(prev => {
+      const updated: any = { ...prev };
+      Object.keys(values).forEach(key => {
+        if (values[key] !== undefined && values[key] !== null) {
+          if (numericFields.includes(key)) {
+            updated[key] = Number(values[key]) || 0;
+          } else {
+            updated[key] = String(values[key]);
+          }
+        }
+      });
+      return updated;
+    });
   }
   const handleAiDescGenerate = () => {
     openTextGenerator(
       'isin_aciklamasi',
       'İşin Açıklamasını Üret',
       'İşin Açıklaması',
-      `Åu ihale konusu için resmi ve profesyonel bir "İşin Kapsamı ve Tanımı" metni oluştur. İhale/İş Adı: "${formData.konu || ''}". Metin kurumsal bir dilde olmalı, gereksiz yorum içermemeli ve doğrudan idari şartname açıklaması formatında olmalı. Eğer metinde ihale makamı vb. geçecekse yer tutucu olarak köşeli parantez ([KURUM ADI] vb.) kullan, gerçek isim verme.`
+      `Şu ihale konusu için resmi ve profesyonel bir "İşin Kapsamı ve Tanımı" metni oluştur. İhale/İş Adı: "${formData.konu || ''}". Metin kurumsal bir dilde olmalı, gereksiz yorum içermemeli ve doğrudan idari şartname açıklaması formatında olmalı. Eğer metinde ihale makamı vb. geçecekse yer tutucu olarak köşeli parantez ([KURUM ADI] vb.) kullan, gerçek isim verme.`
     )
   }
 
@@ -399,14 +435,6 @@ export default function YeniDosyaScreen(): React.JSX.Element {
   }
 
   const handleAiFullFormGenerate = () => {
-    setAiModalConfig({
-      title: 'Dosyayı Yapay Zeka İle Oluştur',
-      fieldName: 'tum_dosya',
-      initialPrompt: '',
-      systemInstruction: 'Sen bir ihale ve doğrudan temin uzmanısın. Kullanıcının verdiği metne göre bir ihale dosyasının temel özelliklerini ve gerekli alanlarını çıkart. Kullanıcı sana karmaşık bir dille ihale isteğini anlatabilir, sen bunu ayrıştırıp aşağıdaki JSON formatına birebir uyan, eksiksiz bir yanıt vereceksin.',
-      mode: 'json',
-      expectedJsonFormat: `{\n  "konu": "Kısa ve öz ihale adı",\n  "isin_aciklamasi": "İşin çok detaylı ve profesyonel kapsam açıklaması (Maddeler halinde olabilir)",\n  "tur": "mal veya hizmet veya yapim_isi veya danismanlik (bunlardan biri olmak zorunda)",\n  "yaklasik_maliyet": 150000 (sayısal),\n  "kdv": "20" veya "0",\n  "komisyon_takdiri": "Komisyon kararı takdiri metni",\n  "ihale_sekli": "22/d*" veya "22/d**"\n}`
-    })
     setShowAIModal(true)
   }
 
@@ -547,28 +575,48 @@ export default function YeniDosyaScreen(): React.JSX.Element {
             </button>
           )}
 
-          {/* AI Form Kontrol Butonu */}
-          <button
-            type="button"
-            onClick={handleAiFormValidation}
-            className="relative px-4 py-2 bg-linear-to-r from-teal-500 to-blue-600 hover:from-teal-600 hover:to-blue-700 text-white rounded-xl text-xs font-bold transition-all shadow-md shadow-teal-500/20 flex items-center gap-2 cursor-pointer"
-            title="Formunuzdaki hataları AI ile analiz edin. (BETA - Eğitiliyor)"
-          >
-            <Bot size={14} /> AI Form Kontrolü
-            <span className="absolute -top-2 -right-2 bg-amber-400 text-amber-950 text-[9px] font-extrabold px-1.5 py-0.5 rounded-md border border-white/20 shadow-sm animate-pulse">BETA</span>
-          </button>
-          
-          {/* AI Asistan Butonu */}
-          <button
-            type="button"
-            onClick={handleAiFullFormGenerate}
-            title="Tüm formu yapay zeka ile otomatik doldurun. (BETA - Eğitiliyor)"
-            className="relative px-4 py-2 bg-linear-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white rounded-xl text-xs font-bold transition-all shadow-md shadow-blue-500/20 flex items-center gap-2 cursor-pointer"
-          >
-            <Sparkles size={14} />
-            Yapay Zeka Asistanı
-            <span className="absolute -top-2 -right-2 bg-amber-400 text-amber-950 text-[9px] font-extrabold px-1.5 py-0.5 rounded-md border border-white/20 shadow-sm animate-pulse">BETA</span>
-          </button>
+          {/* YAPAY ZEKA MENÜSÜ */}
+          <div className="relative">
+            <button
+              type="button"
+              onClick={() => setShowAiMenu(!showAiMenu)}
+              className="px-4 py-2 bg-slate-800 hover:bg-slate-900 text-white rounded-xl text-xs font-bold transition-all shadow-md flex items-center gap-2 cursor-pointer"
+            >
+              <Sparkles size={14} />
+              Yapay Zeka
+              <ChevronDown size={14} className={cn("transition-transform", showAiMenu ? "rotate-180" : "")} />
+              <span className="absolute -top-2 -right-2 bg-amber-400 text-amber-950 text-[9px] font-extrabold px-1.5 py-0.5 rounded-md border border-white/20 shadow-sm animate-pulse">BETA</span>
+            </button>
+            
+            {showAiMenu && (
+              <div className="absolute right-0 mt-2 w-56 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl shadow-xl z-[100] overflow-hidden flex flex-col py-1">
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowAiMenu(false);
+                    handleAiFormValidation();
+                  }}
+                  className="px-4 py-2.5 text-left text-xs font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center gap-2"
+                >
+                  <Bot size={14} className="text-teal-500" />
+                  Hata ve Tutarsızlık Kontrolü
+                </button>
+                <div className="h-px bg-slate-100 dark:bg-slate-800 my-1" />
+                <button
+                  type="button"
+                  onClick={() => {
+                    setShowAiMenu(false);
+                    handleAiFullFormGenerate();
+                  }}
+                  className="px-4 py-2.5 text-left text-xs font-bold text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center gap-2"
+                >
+                  <Sparkles size={14} className="text-indigo-500" />
+                  Metinden Dosya Üret
+                </button>
+              </div>
+            )}
+          </div>
+
           {import.meta.env.DEV && (
             <button
               type="button"

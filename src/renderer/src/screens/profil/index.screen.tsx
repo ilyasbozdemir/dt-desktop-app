@@ -202,7 +202,10 @@ export default function ProfilScreen(): React.JSX.Element {
           </div>
 
           {/* EKAP Bilgileri Paneli */}
-          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-sm space-y-4">
+
+{
+  /*
+  <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-6 shadow-sm space-y-4">
             <h3 className="text-sm font-bold text-slate-800 dark:text-slate-200 flex items-center gap-2 border-b border-slate-100 dark:border-slate-850 pb-2">
               <Lock className="w-4 h-4 text-blue-605" /> EKAP Entegrasyon Bilgileri
             </h3>
@@ -250,6 +253,11 @@ export default function ProfilScreen(): React.JSX.Element {
               </div>
             </div>
           </div>
+  */
+}
+
+          
+
         </div>
       </div>
 
