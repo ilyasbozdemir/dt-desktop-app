@@ -3,7 +3,7 @@ import { useFirmalarHooks, FirmaInput } from './firmalar.hooks'
 import { Button } from '../../components/ui/Button'
 import { Input } from '../../components/ui/Input'
 import { Modal } from '../../components/ui/Modal'
-import { Building2, Plus, Trash2, Search, ChevronDown, ChevronUp } from 'lucide-react'
+import { Building2, Plus, Trash2, Search, ChevronDown, ChevronUp, Edit2 } from 'lucide-react'
 
 const emptyFirma: FirmaInput = {
   firma_kodu: '', unvan: '', ilgili_adi: '', uyrugu: 'T.C.',
@@ -29,56 +29,52 @@ const Field = ({ label, field, form, handleChange, required, placeholder }: { la
 )
 
 export default function FirmalarScreen(): React.JSX.Element {
-  const { firmalar, isLoadingFirmalar, addFirma, deleteFirma } = useFirmalarHooks()
+  const { firmalar, isLoadingFirmalar, addFirma, updateFirma, deleteFirma } = useFirmalarHooks()
   const [form, setForm] = useState<FirmaInput>({ ...emptyFirma })
   const [searchQuery, setSearchQuery] = useState('')
   const [showExtraFields, setShowExtraFields] = useState(false)
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const [editingId, setEditingId] = useState<number | null>(null)
+
+  const openAddModal = () => {
+    setForm({ ...emptyFirma })
+    setEditingId(null)
+    setShowExtraFields(false)
+    setIsModalOpen(true)
+  }
+
+  const openEditModal = (firma: any) => {
+    const { id, aktif_mi, created_at, ...editableData } = firma
+    setForm(editableData)
+    setEditingId(id)
+    setShowExtraFields(false)
+    setIsModalOpen(true)
+  }
 
   const handleChange = (key: keyof FirmaInput, value: string): void => {
     setForm((prev) => ({ ...prev, [key]: value }))
   }
 
-  const handleAdd = async (e: React.FormEvent): Promise<void> => {
+  const handleSubmit = async (e: React.FormEvent): Promise<void> => {
     e.preventDefault()
     if (!form.unvan.trim()) return
 
-    // Duplicate kontrolleri
-    if (form.vergi_no?.trim()) {
-      const isDuplicate = firmalar.some(f => f.vergi_no === form.vergi_no.trim())
-      if (isDuplicate) {
-        alert('Bu vergi numarasına sahip bir firma zaten sistemde kayıtlı!')
-        return
-      }
-    }
-
-    if (form.tc_kimlik_no?.trim()) {
-      const isDuplicateTC = firmalar.some(f => f.tc_kimlik_no === form.tc_kimlik_no.trim())
-      if (isDuplicateTC) {
-        alert('Bu TC Kimlik numarasına sahip bir kişi/firma zaten sistemde kayıtlı!')
-        return
-      }
-    }
-
-    // Aynı ünvanda firma var mı diye yumuşak uyarı verebiliriz ama engellemeyelim (Bazen şubeler vs olabiliyor)
-    const isNameDuplicate = firmalar.some(f => f.unvan.trim().toLowerCase() === form.unvan.trim().toLowerCase())
-    if (isNameDuplicate) {
-      if (!confirm('Aynı ünvanla kayıtlı başka bir firma daha var. Yine de eklemek istiyor musunuz?')) {
-        return
-      }
-    }
+    // Duplicate kontrolleri (addFirma ve updateFirma hook'u içinde de var ama UX için önden verebiliriz, 
+    // Ancak hook'taki mesajları kullanmak daha temiz olduğu için burada basit kontroller yapabiliriz,
+    // Veya direkt hook'a bırakabiliriz. Şimdilik hook'a bırakıyorum ki id kontrolleri doğru çalışsın.)
 
     try {
-      await addFirma(form)
+      if (editingId) {
+        await updateFirma({ id: editingId, data: form })
+      } else {
+        await addFirma(form)
+      }
       setForm({ ...emptyFirma })
+      setEditingId(null)
       setShowExtraFields(false)
       setIsModalOpen(false)
     } catch (err: any) {
-      if (err.message?.includes('UNIQUE')) {
-        alert('Bu firma zaten kayıtlı!')
-      } else {
-        alert('Firma eklenirken hata oluştu!')
-      }
+      alert(err.message || 'İşlem sırasında hata oluştu!')
     }
   }
 
@@ -122,7 +118,7 @@ export default function FirmalarScreen(): React.JSX.Element {
             <div className="text-[10px] text-slate-400 uppercase tracking-wider font-bold">Kayıtlı Firma</div>
           </div>
           <Button
-            onClick={() => setIsModalOpen(true)}
+            onClick={openAddModal}
             className="gap-2 bg-blue-600 hover:bg-blue-700 shadow-md flex items-center px-4 py-2 text-sm"
           >
             <Plus className="w-4 h-4" /> Yeni Firma Ekle
@@ -162,6 +158,15 @@ export default function FirmalarScreen(): React.JSX.Element {
                 className="flex flex-col p-4 bg-slate-50/50 dark:bg-slate-950/20 border border-slate-150 dark:border-slate-850 rounded-xl hover:border-blue-300 dark:hover:border-blue-800 transition-colors group relative"
               >
                 <div className="absolute top-2 right-2 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                  <Button
+                    title="Düzenle"
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => openEditModal(firma)}
+                    className="h-7 w-7 p-0 text-slate-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-950/20"
+                  >
+                    <Edit2 className="w-3.5 h-3.5" />
+                  </Button>
                   <Button
                     title="Sil"
                     variant="ghost"
@@ -216,11 +221,11 @@ export default function FirmalarScreen(): React.JSX.Element {
       <Modal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}
-        title="Yeni Firma Ekle"
-        description="Tedarikçi firma bilgilerini sisteme kaydedin."
+        title={editingId ? "Firma Düzenle" : "Yeni Firma Ekle"}
+        description={editingId ? "Firma bilgilerini güncelleyin." : "Tedarikçi firma bilgilerini sisteme kaydedin."}
         className="max-w-2xl"
       >
-        <form onSubmit={handleAdd} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
             <Field label="Firma Kodu" field="firma_kodu" form={form} handleChange={handleChange} placeholder="Örn: FRM-001" />
             <Field label="Firma Ünvanı" field="unvan" form={form} handleChange={handleChange} required placeholder="Firma ticari ünvanı" />
@@ -279,7 +284,7 @@ export default function FirmalarScreen(): React.JSX.Element {
               İptal
             </Button>
             <Button type="submit" className="bg-blue-600 hover:bg-blue-700 shadow-md">
-              Firmayı Kaydet
+              {editingId ? "Güncelle" : "Firmayı Kaydet"}
             </Button>
           </div>
         </form>

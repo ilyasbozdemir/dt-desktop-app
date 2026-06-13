@@ -53,6 +53,7 @@ export default function ImportScreen(): React.JSX.Element {
   const [mappings, setMappings] = useState<Record<string, string>>({})
   const [isImporting, setIsImporting] = useState(false)
   const [importResult, setImportResult] = useState<{ success: boolean; count?: number; total?: number; error?: string } | null>(null)
+  const [toast, setToast] = useState<{message: string, type: 'success' | 'error'} | null>(null)
 
   const handleParse = () => {
     try {
@@ -154,13 +155,20 @@ export default function ImportScreen(): React.JSX.Element {
       })
       setImportResult(res)
       if (res.success) {
+        setToast({ message: `İçe aktarma tamamlandı: ${res.count} kayıt eklendi.`, type: 'success' })
+        setTimeout(() => setToast(null), 5000)
         // clear if success
         setJsonText('')
         setParsedData(null)
         setMappings({})
+      } else {
+        setToast({ message: `İçe aktarma hatası: ${res.error}`, type: 'error' })
+        setTimeout(() => setToast(null), 5000)
       }
     } catch (err: any) {
       setImportResult({ success: false, error: err.message })
+      setToast({ message: `Sistemsel Hata: ${err.message}`, type: 'error' })
+      setTimeout(() => setToast(null), 5000)
     } finally {
       setIsImporting(false)
     }
@@ -348,6 +356,16 @@ export default function ImportScreen(): React.JSX.Element {
           </div>
         </div>
       </div>
+      {toast && (
+        <div className={`fixed bottom-6 right-6 px-4 py-3 rounded-lg shadow-xl border text-sm flex items-center gap-3 animate-in fade-in slide-in-from-bottom-4 z-50 transition-all duration-300 ${
+          toast.type === 'success' 
+            ? 'bg-green-50 border-green-200 text-green-800 dark:bg-green-950/80 dark:border-green-800 dark:text-green-300' 
+            : 'bg-red-50 border-red-200 text-red-800 dark:bg-red-950/80 dark:border-red-800 dark:text-red-300'
+        }`}>
+          {toast.type === 'success' ? <CheckCircle2 className="w-5 h-5 shrink-0" /> : <AlertCircle className="w-5 h-5 shrink-0" />}
+          <div className="font-medium">{toast.message}</div>
+        </div>
+      )}
     </div>
   )
 }

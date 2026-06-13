@@ -525,7 +525,15 @@ if (!gotTheLock) {
               }
               const keys = columnMap.get(col)!
               const parts = keys.map(k => row[k]).filter(v => v !== undefined && v !== null && v !== '')
-              if (parts.length === 0) return null
+              if (parts.length === 0) {
+                if (col === 'barkod_id') return Math.floor(1000000000000 + Math.random() * 9000000000000).toString()
+                if (col === 'tipi') return 'Mal'
+                if (col === 'birim') return 'Adet'
+                if (col === 'aktif_mi') return 1
+                if (col === 'kdv_orani') return 20
+                if (col === 'is_personel' || col === 'ihale_yetkilisi_mi' || col === 'harcama_yetkilisi_mi') return 0
+                return null
+              }
               // Birden fazla alan aynı sütuna eşleştiyse aralarında boşluk bırakarak birleştir
               let combined = parts.join(' ')
               
