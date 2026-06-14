@@ -630,6 +630,34 @@ if (!gotTheLock && !isMultiInstance) {
       }
     })
 
+    ipcMain.handle('export-pdf', async (_, htmlContent: string) => {
+      try {
+        const { canceled, filePath } = await dialog.showSaveDialog({
+          title: 'PDF Olarak Kaydet',
+          defaultPath: 'Cikti.pdf',
+          filters: [{ name: 'PDF Dosyası', extensions: ['pdf'] }]
+        })
+        if (canceled || !filePath) return { success: false, error: 'İptal edildi' }
+        
+        const win = new BrowserWindow({ show: false })
+        await win.loadURL(`data:text/html;charset=utf-8,${encodeURIComponent(htmlContent)}`)
+        
+        const pdfData = await win.webContents.printToPDF({
+          printBackground: true,
+          displayHeaderFooter: true,
+          headerTemplate: '<div></div>',
+          footerTemplate: '<div style="font-size: 10px; width: 100%; text-align: right; padding-right: 2.54cm;">Sayfa <span class="pageNumber"></span> / <span class="totalPages"></span></div>'
+        })
+        
+        fs.writeFileSync(filePath, pdfData)
+        win.destroy()
+        
+        return { success: true, filePath }
+      } catch (err: any) {
+        return { success: false, error: err.message }
+      }
+    })
+
     ipcMain.handle('export-html', async (_, htmlContent: string, options?: { paperSize?: string }) => {
       try {
         const paperSize = options?.paperSize || 'A4'

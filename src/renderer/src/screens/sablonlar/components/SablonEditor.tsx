@@ -111,6 +111,20 @@ export function SablonEditor({ sablon, onBack }: { sablon?: Sablon, onBack: () =
     }
   }
 
+  const handleExportPdf = async () => {
+    try {
+      const finalHtml = Mustache.render(htmlCode, parsedData)
+      const res = await window.electron.ipcRenderer.invoke('export-pdf', finalHtml)
+      if (res.success) {
+        alert('Şablon başarıyla PDF olarak dışa aktarıldı.')
+      } else if (res.error !== 'İptal edildi') {
+        alert('Dışa aktarma hatası: ' + res.error)
+      }
+    } catch (err: any) {
+      alert('Hata: ' + err.message)
+    }
+  }
+
   const handleSave = async () => {
     if (!ad || !dosyaAdi) {
       alert('Lütfen şablon adı ve dosya adını girin.')
@@ -167,6 +181,10 @@ export function SablonEditor({ sablon, onBack }: { sablon?: Sablon, onBack: () =
           <Button onClick={handleExportHtml} className="bg-blue-600 hover:bg-blue-700 text-xs font-semibold py-2 px-4 shadow-md flex items-center gap-2 text-white">
             <Download className="w-3.5 h-3.5" />
             HTML İndir
+          </Button>
+          <Button onClick={handleExportPdf} className="bg-red-600 hover:bg-red-700 text-xs font-semibold py-2 px-4 shadow-md flex items-center gap-2 text-white">
+            <Download className="w-3.5 h-3.5" />
+            PDF İndir
           </Button>
           <Button
               variant="outline"
