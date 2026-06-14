@@ -7,9 +7,24 @@ import { Input } from '../../../components/ui/Input'
 export function RehberTab(): React.JSX.Element {
   const { data: sablonlarData } = useSablonlar()
   const [alimTurleri, setAlimTurleri] = useState([
-    { id: '1', ad: 'Mal Alımı', ikon: 'Building2', belgeler: [{ ad: 'Onay Belgesi', sablonId: '' }, { ad: 'Piyasa Fiyat Araştırması Tutanağı', sablonId: '' }, { ad: 'Muayene Kabul ve Tespit Komisyonu Tutanağı', sablonId: '' }, { ad: 'Fatura / e-Arşiv Fatura', sablonId: '' }, { ad: 'Taşınır İşlem Fişi (TİF)', sablonId: '' }] },
-    { id: '2', ad: 'Hizmet Alımı', ikon: 'Briefcase', belgeler: [{ ad: 'Onay Belgesi', sablonId: '' }, { ad: 'Piyasa Fiyat Araştırması Tutanağı', sablonId: '' }, { ad: 'Hizmet İşleri Kabul Tutanağı', sablonId: '' }, { ad: 'Fatura / e-Arşiv Fatura', sablonId: '' }] },
-    { id: '3', ad: 'Yapım İşi', ikon: 'HardHat', belgeler: [{ ad: 'Yaklaşık Maliyet Hesap Cetveli', sablonId: '' }, { ad: 'Onay Belgesi', sablonId: '' }, { ad: 'Piyasa Fiyat Araştırması Tutanağı', sablonId: '' }, { ad: 'Yapım İşleri Kabul Tutanağı', sablonId: '' }, { ad: 'Sözleşme (İdare Gerekli Görürse)', sablonId: '' }] }
+    { 
+      id: 'dt-sureci', 
+      ad: 'Doğrudan Temin İşlem Süreci', 
+      ikon: 'FileText', 
+      belgeler: [
+        { ad: '1- İhtiyacın Tespiti', aciklama: 'Standart form yok, “Lüzum Müzekkeresi” veya “İhtiyaç Raporu” adı altında belge oluşturulur.', sablonId: '' },
+        { ad: '2- Onay Belgesi Düzenlenmesi', aciklama: 'İhale onay belgeleri; alım konusu işin nev\'i, miktarı, yaklaşık maliyeti ve uygulanacak usulü gösterir. Üzerinde oynama yapılarak kullanılabilir.', sablonId: '' },
+        { ad: '3- Görevlendirme Yapılması', aciklama: 'Onay belgesi üzerinde veya ayrı bir yazıyla görevlendirme yapılır.', sablonId: '' },
+        { ad: '4- Piyasa Fiyat Araştırması Yapılması', aciklama: 'Standart formu bulunmaktadır (Örnek 3).', sablonId: '' },
+        { ad: '5- Fiyatın Harcama Yetkilisi Tarafından Onaylanması', aciklama: 'Piyasa fiyat araştırması tutanağının altına olur verilir.', sablonId: '' },
+        { ad: '6- 4734 62/I Maddesine Göre %10 Kontrolü', aciklama: 'Kamu İhale Kanunu uyarınca %10 limit kontrolü yapılır.', sablonId: '' },
+        { ad: '7- Alımın Yapılması', aciklama: 'Fatura düzenlenmesi, muayene kabul belgeleri ve taşınır işlem fişi (TİF) düzenlenmesi.', sablonId: '' },
+        { ad: '8- Ödeme', aciklama: 'Standart formu bulunmaktadır. Ödeme Emri Belgesi düzenlenir ve ekine gerekli belgeler konulur.', sablonId: '' }
+      ] 
+    },
+    { id: '1', ad: 'Mal Alımı (Örnek)', ikon: 'Building2', belgeler: [{ ad: 'Onay Belgesi', sablonId: '' }, { ad: 'Piyasa Fiyat Araştırması Tutanağı', sablonId: '' }, { ad: 'Muayene Kabul ve Tespit Komisyonu Tutanağı', sablonId: '' }, { ad: 'Fatura / e-Arşiv Fatura', sablonId: '' }, { ad: 'Taşınır İşlem Fişi (TİF)', sablonId: '' }] },
+    { id: '2', ad: 'Hizmet Alımı (Örnek)', ikon: 'Briefcase', belgeler: [{ ad: 'Onay Belgesi', sablonId: '' }, { ad: 'Piyasa Fiyat Araştırması Tutanağı', sablonId: '' }, { ad: 'Hizmet İşleri Kabul Tutanağı', sablonId: '' }, { ad: 'Fatura / e-Arşiv Fatura', sablonId: '' }] },
+    { id: '3', ad: 'Yapım İşi (Örnek)', ikon: 'HardHat', belgeler: [{ ad: 'Yaklaşık Maliyet Hesap Cetveli', sablonId: '' }, { ad: 'Onay Belgesi', sablonId: '' }, { ad: 'Piyasa Fiyat Araştırması Tutanağı', sablonId: '' }, { ad: 'Yapım İşleri Kabul Tutanağı', sablonId: '' }] }
   ])
   const [yeniAlimTuru, setYeniAlimTuru] = useState('')
 
@@ -67,7 +82,10 @@ export function RehberTab(): React.JSX.Element {
                 <li key={idx} className="flex flex-col gap-1.5 border-b border-slate-100 dark:border-slate-800/50 pb-2.5">
                   <div className="flex items-start gap-2">
                     <CheckCircle2 className="w-4 h-4 text-emerald-500 mt-0.5 shrink-0" />
-                    <span className="font-medium text-[13px]">{belge.ad}</span>
+                    <div className="flex flex-col">
+                      <span className="font-medium text-[13px]">{belge.ad}</span>
+                      {belge.aciklama && <span className="text-[11px] text-slate-500 mt-0.5">{belge.aciklama}</span>}
+                    </div>
                   </div>
                   <div className="pl-6">
                     <select 
