@@ -93,44 +93,60 @@ export function SablonListesi({ onEdit, onCreate }: { onEdit: (s: Sablon) => voi
             <p>Henüz şablon bulunmuyor.</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {sablonlar?.map((sablon) => (
-              <div 
-                key={sablon.id} 
-                className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 hover:shadow-lg hover:border-purple-200 dark:hover:border-purple-900/50 transition-all group flex flex-col"
-              >
-                <div className="flex items-start justify-between mb-3 cursor-pointer" onClick={() => onEdit(sablon)}>
-                  <div className="flex-1">
-                    <h3 className="font-semibold text-slate-800 dark:text-slate-100 line-clamp-1 hover:text-purple-600 transition-colors">{sablon.ad}</h3>
-                    <p className="text-xs text-slate-500 font-mono mt-1 flex items-center gap-1">
-                      {sablon.dosya_adi}{sablon.dosya_adi.endsWith(`.${sablon.dosya_turu}`) ? '' : `.${sablon.dosya_turu}`}
-                    </p>
-                  </div>
-                  <div className="bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400 text-[10px] font-bold px-2 py-1 rounded">
-                    v{sablon.versiyon}
-                  </div>
-                </div>
-                
-                <p className="text-sm text-slate-600 dark:text-slate-400 line-clamp-2 min-h-[40px] mb-4 cursor-pointer" onClick={() => onEdit(sablon)}>
-                  {sablon.aciklama || 'Açıklama yok'}
-                </p>
+          <div className="flex flex-col gap-8 pb-8">
+            {Object.entries(
+              sablonlar!.reduce((acc, sablon) => {
+                const kat = sablon.kategori || 'Genel Şablonlar'
+                if (!acc[kat]) acc[kat] = []
+                acc[kat].push(sablon)
+                return acc
+              }, {} as Record<string, Sablon[]>)
+            ).sort(([a], [b]) => a.localeCompare(b)).map(([kategori, sabs]) => (
+              <div key={kategori} className="flex flex-col gap-4">
+                <h2 className="text-lg font-bold text-slate-700 dark:text-slate-200 border-b border-slate-200 dark:border-slate-800 pb-2">
+                  {kategori}
+                </h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {sabs.map((sablon) => (
+                    <div 
+                      key={sablon.id} 
+                      className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 hover:shadow-lg hover:border-purple-200 dark:hover:border-purple-900/50 transition-all group flex flex-col"
+                    >
+                      <div className="flex items-start justify-between mb-3 cursor-pointer" onClick={() => onEdit(sablon)}>
+                        <div className="flex-1">
+                          <h3 className="font-semibold text-slate-800 dark:text-slate-100 line-clamp-1 hover:text-purple-600 transition-colors">{sablon.ad}</h3>
+                          <p className="text-xs text-slate-500 font-mono mt-1 flex items-center gap-1">
+                            {sablon.dosya_adi}{sablon.dosya_adi.endsWith(`.${sablon.dosya_turu}`) ? '' : `.${sablon.dosya_turu}`}
+                          </p>
+                        </div>
+                        <div className="bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400 text-[10px] font-bold px-2 py-1 rounded">
+                          v{sablon.versiyon}
+                        </div>
+                      </div>
+                      
+                      <p className="text-sm text-slate-600 dark:text-slate-400 line-clamp-2 min-h-[40px] mb-4 cursor-pointer" onClick={() => onEdit(sablon)}>
+                        {sablon.aciklama || 'Açıklama yok'}
+                      </p>
 
-                {(sablon.created_at || sablon.updated_at) && (
-                  <div className="flex items-start gap-2 text-[11px] text-slate-600 dark:text-slate-400 mb-4 pt-3 border-t border-slate-100 dark:border-slate-800/60 cursor-pointer" onClick={() => onEdit(sablon)}>
-                    <Calendar className="w-3.5 h-3.5 shrink-0 text-slate-400 mt-0.5" />
-                    <div>
-                      <span className="font-semibold text-slate-700 dark:text-slate-300 block mb-0.5">Son Güncelleme</span>
-                      <span className="line-clamp-1 leading-relaxed">
-                        {new Date((sablon.updated_at || sablon.created_at).replace(' ', 'T') + ((sablon.updated_at || sablon.created_at).includes('Z') ? '' : 'Z')).toLocaleDateString('tr-TR', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
-                      </span>
+                      {(sablon.created_at || sablon.updated_at) && (
+                        <div className="flex items-start gap-2 text-[11px] text-slate-600 dark:text-slate-400 mb-4 pt-3 border-t border-slate-100 dark:border-slate-800/60 cursor-pointer" onClick={() => onEdit(sablon)}>
+                          <Calendar className="w-3.5 h-3.5 shrink-0 text-slate-400 mt-0.5" />
+                          <div>
+                            <span className="font-semibold text-slate-700 dark:text-slate-300 block mb-0.5">Son Güncelleme</span>
+                            <span className="line-clamp-1 leading-relaxed">
+                              {new Date((sablon.updated_at || sablon.created_at).replace(' ', 'T') + ((sablon.updated_at || sablon.created_at).includes('Z') ? '' : 'Z')).toLocaleDateString('tr-TR', { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                            </span>
+                          </div>
+                        </div>
+                      )}
+                      
+                      <div className="mt-auto pt-3 border-t border-slate-100 dark:border-slate-800">
+                        <Button onClick={(e) => { e.stopPropagation(); setHistorySablon(sablon); }} variant="ghost" className="w-full justify-center text-xs text-purple-600 hover:text-purple-700 hover:bg-purple-50 dark:hover:bg-purple-900/20">
+                          <History className="w-3.5 h-3.5 mr-2" /> Versiyon Geçmişi
+                        </Button>
+                      </div>
                     </div>
-                  </div>
-                )}
-                
-                <div className="mt-auto pt-3 border-t border-slate-100 dark:border-slate-800">
-                  <Button onClick={(e) => { e.stopPropagation(); setHistorySablon(sablon); }} variant="ghost" className="w-full justify-center text-xs text-purple-600 hover:text-purple-700 hover:bg-purple-50 dark:hover:bg-purple-900/20">
-                    <History className="w-3.5 h-3.5 mr-2" /> Versiyon Geçmişi
-                  </Button>
+                  ))}
                 </div>
               </div>
             ))}

@@ -10,6 +10,7 @@ export interface Sablon {
   aktif_mi: number
   parent_id: number | null
   versiyon: number
+  kategori: string | null
   created_at: string
   updated_at: string
 }

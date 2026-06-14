@@ -129,16 +129,35 @@ function seedTemplates(db: Database.Database): void {
     for (const filePath of htmlFiles) {
       const file = path.basename(filePath)
       const content = fs.readFileSync(filePath, 'utf-8')
-      const exists = db.prepare('SELECT 1 FROM TANIM_Sablon WHERE dosya_adi = ?').get(file)
-      if (!exists) {
-        let ad = file.replace('.html', '').replace(/-/g, ' ').toUpperCase()
-        if (file === 'ihtiyac-listesi.html') ad = 'İHTİYAÇ LİSTESİ' 
-        
+      
+      let ad = file.replace('.html', '').replace(/-/g, ' ').toUpperCase()
+      if (file === 'ihtiyac-listesi.html') ad = 'İHTİYAÇ LİSTESİ' 
+      
+      let kategori = 'Genel Şablonlar'
+      const parentDir = path.basename(path.dirname(filePath))
+      if (parentDir !== 'templates') {
+        // Kategori adını klasör adından (örn: 1-ihtiyac-tespiti -> İhtiyaç Tespiti) oluştur
+        const parts = parentDir.split('-')
+        if (parts.length > 1 && !isNaN(parseInt(parts[0], 10))) {
+          const no = parts[0]
+          const name = parts.slice(1).map((p) => p.charAt(0).toUpperCase() + p.slice(1)).join(' ')
+          kategori = `${no}. ${name}`
+        } else {
+          kategori = parentDir.charAt(0).toUpperCase() + parentDir.slice(1).replace(/-/g, ' ')
+        }
+      }
+
+      const existing = db.prepare('SELECT * FROM TANIM_Sablon WHERE dosya_adi = ?').get(file) as any
+      if (!existing) {
         db.prepare(`
-          INSERT INTO TANIM_Sablon (ad, dosya_adi, dosya_turu, icerik, aciklama, aktif_mi)
-          VALUES (?, ?, 'html', ?, ?, 1)
-        `).run(ad, file, content, 'Sistem varsayılan şablonu')
-        console.log(`[Seed] Seeded default template: ${file}`)
+          INSERT INTO TANIM_Sablon (ad, dosya_adi, dosya_turu, icerik, aciklama, aktif_mi, kategori)
+          VALUES (?, ?, 'html', ?, ?, 1, ?)
+        `).run(ad, file, content, 'Sistem varsayılan şablonu', kategori)
+        console.log(`[Seed] Seeded default template: ${file} in category: ${kategori}`)
+      } else if (!existing.kategori || existing.kategori !== kategori) {
+        // Kategori boşsa veya değişmişse güncelle
+        db.prepare('UPDATE TANIM_Sablon SET kategori = ? WHERE id = ?').run(kategori, existing.id)
+        console.log(`[Seed] Updated category for template: ${file} to ${kategori}`)
       }
     }
   } catch (err: any) {

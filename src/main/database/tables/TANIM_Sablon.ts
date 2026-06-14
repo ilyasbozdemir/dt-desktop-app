@@ -11,6 +11,7 @@ export const TANIM_Sablon = {
     { name: 'aktif_mi', type: 'INTEGER', notNull: true, default: 1 },
     { name: 'parent_id', type: 'INTEGER' },
     { name: 'versiyon', type: 'INTEGER', default: 1 },
+    { name: 'kategori', type: 'TEXT' },
     { name: 'created_at', type: 'DATETIME', default: 'CURRENT_TIMESTAMP' },
     { name: 'updated_at', type: 'DATETIME', default: 'CURRENT_TIMESTAMP' }
   ],
