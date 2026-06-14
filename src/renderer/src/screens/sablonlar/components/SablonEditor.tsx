@@ -35,9 +35,6 @@ export function SablonEditor({ sablon, onBack }: { sablon?: Sablon, onBack: () =
   "dosyaTarihi": "${today}",
   "firma_adi": "Test Firması A.Ş.",
   "kurumIci": false,
-  "antetSatir1": "T.C.",
-  "antetSatir2": "SAĞLIK BAKANLIĞI",
-  "antetSatir3": "ANKARA İL SAĞLIK MÜDÜRLÜĞÜ",
   "evrakSayisi": "E-12345",
   "sunulacakMakamAdi": "MAKAM ONAYINA",
   "dosyaKonusu": "Hastane laboratuvar",
@@ -45,12 +42,6 @@ export function SablonEditor({ sablon, onBack }: { sablon?: Sablon, onBack: () =
   "hazirlayanPersonelUnvan": "Satınalma Memuru",
   "onaylayanPersonelAdi": "Dr. Mehmet Demir",
   "onaylayanPersonelUnvan": "İl Sağlık Müdürü",
-  "kurumAdres": "Çankaya / Ankara",
-  "kurumWeb": "www.ankara.saglik.gov.tr",
-  "kurumEmail": "info@ankara.saglik.gov.tr",
-  "kurumTelefon": "0312 000 00 00",
-  "kurumFaks": "0312 000 00 01",
-  "kurumKepAdres": "ankara.saglik@hs01.kep.tr",
   "ilgiliPersonelAdi": "Ayşe Kaya",
   "ihtiyacKalemleri": [
     { "siraNo": 1, "kodu": "LAB-001", "malzemeAdi": "Eldiven", "ozelligi": "Nitril", "birimi": "Kutu", "kdvOrani": "%20", "miktar": 50 },
@@ -61,9 +52,11 @@ export function SablonEditor({ sablon, onBack }: { sablon?: Sablon, onBack: () =
   const [testJson, setTestJson] = useState(defaultTestJson)
   const [activeTab, setActiveTab] = useState<'design' | 'preview'>('design')
   const [masterHtml, setMasterHtml] = useState('')
+  const [masterJson, setMasterJson] = useState({})
   const iframeRef = useRef<HTMLIFrameElement>(null)
 
   useEffect(() => {
+    // Load master HTML
     window.electron.ipcRenderer
       .invoke('template:read-system', 'master.html')
       .then((res) => {
@@ -74,6 +67,20 @@ export function SablonEditor({ sablon, onBack }: { sablon?: Sablon, onBack: () =
         }
       })
       .catch((err) => console.error('Master template yüklenemedi:', err))
+
+    // Load master JSON
+    window.electron.ipcRenderer
+      .invoke('template:read-system', 'master.html.json')
+      .then((res) => {
+        if (typeof res === 'string' && res.trim().length > 0) {
+          try {
+            setMasterJson(JSON.parse(res))
+          } catch (e) {
+            console.error('Master JSON parse edilemedi:', e)
+          }
+        }
+      })
+      .catch((err) => console.error('Master JSON yüklenemedi:', err))
   }, [])
 
   
@@ -81,16 +88,21 @@ export function SablonEditor({ sablon, onBack }: { sablon?: Sablon, onBack: () =
 
   const parsedData = React.useMemo(() => {
     try {
-      return JSON.parse(testJson)
+      const specificData = JSON.parse(testJson)
+      return { ...masterJson, ...specificData }
     } catch {
-      // return empty or keep previous? A simple fallback is {}
-      return {}
+      return masterJson
     }
-  }, [testJson])
+  }, [testJson, masterJson])
 
   // Calculate final HTML synchronously so iframe instantly updates via srcDoc
   const finalHtmlForPreview = (() => {
     try {
+      if (dosyaAdi === 'master.html') {
+        // Infinite recursion önlemi: Master şablonun kendisini düzenlerken, onu tekrar master içine sarmayız.
+        return Mustache.render(htmlCode, parsedData, { content: '<div style="padding:40px; text-align:center; border: 2px dashed #ccc; background: #fafafa; color: #999; margin: 20px;">[ Şablon İçeriği Buraya Gelecek ]</div>' })
+      }
+
       if (!masterHtml) return '<div style="padding:20px;">Master şablon yükleniyor...</div>'
       return Mustache.render(masterHtml, parsedData, { content: htmlCode })
     } catch (e) {
@@ -116,7 +128,7 @@ export function SablonEditor({ sablon, onBack }: { sablon?: Sablon, onBack: () =
     try {
       if (!masterHtml) return
       const finalHtml = Mustache.render(masterHtml, parsedData, { content: htmlCode })
-      const res = await window.electron.ipcRenderer.invoke('export-html', finalHtml, { paperSize: 'A4' })
+      const res = await window.electron.ipcRenderer.invoke('export-html', finalHtml, { paperSize: 'A4' }, ad || dosyaAdi)
       if (res.success) {
         alert('Şablon başarıyla HTML olarak dışa aktarıldı.')
       } else if (res.error !== 'İptal edildi') {
@@ -131,7 +143,7 @@ export function SablonEditor({ sablon, onBack }: { sablon?: Sablon, onBack: () =
     try {
       if (!masterHtml) return
       const finalHtml = Mustache.render(masterHtml, parsedData, { content: htmlCode })
-      const res = await window.electron.ipcRenderer.invoke('export-pdf', finalHtml)
+      const res = await window.electron.ipcRenderer.invoke('export-pdf', finalHtml, ad || dosyaAdi)
       if (res.success) {
         alert('Şablon başarıyla PDF olarak dışa aktarıldı.')
       } else if (res.error !== 'İptal edildi') {

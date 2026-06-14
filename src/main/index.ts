@@ -607,11 +607,11 @@ if (!gotTheLock && !isMultiInstance) {
       return { canceled, filePath: filePaths && filePaths.length > 0 ? filePaths[0] : null }
     })
 
-    ipcMain.handle('export-docx', async (_, htmlContent: string) => {
+    ipcMain.handle('export-docx', async (_, htmlContent: string, fileName?: string) => {
       try {
         const { canceled, filePath } = await dialog.showSaveDialog({
           title: 'DOCX Olarak Kaydet',
-          defaultPath: 'Cikti.docx',
+          defaultPath: fileName ? `${fileName}.docx` : 'Cikti.docx',
           filters: [{ name: 'Word Document', extensions: ['docx'] }]
         })
         if (canceled || !filePath) return { success: false, error: 'İptal edildi' }
@@ -630,11 +630,11 @@ if (!gotTheLock && !isMultiInstance) {
       }
     })
 
-    ipcMain.handle('export-pdf', async (_, htmlContent: string) => {
+    ipcMain.handle('export-pdf', async (_, htmlContent: string, fileName?: string) => {
       try {
         const { canceled, filePath } = await dialog.showSaveDialog({
           title: 'PDF Olarak Kaydet',
-          defaultPath: 'Cikti.pdf',
+          defaultPath: fileName ? `${fileName}.pdf` : 'Cikti.pdf',
           filters: [{ name: 'PDF Dosyası', extensions: ['pdf'] }]
         })
         if (canceled || !filePath) return { success: false, error: 'İptal edildi' }
@@ -658,7 +658,7 @@ if (!gotTheLock && !isMultiInstance) {
       }
     })
 
-    ipcMain.handle('export-html', async (_, htmlContent: string, options?: { paperSize?: string }) => {
+    ipcMain.handle('export-html', async (_, htmlContent: string, options?: { paperSize?: string }, fileName?: string) => {
       try {
         const paperSize = options?.paperSize || 'A4'
         const isA4 = paperSize === 'A4'
@@ -666,7 +666,7 @@ if (!gotTheLock && !isMultiInstance) {
 
         const { canceled, filePath } = await dialog.showSaveDialog({
           title: 'HTML Olarak Kaydet',
-          defaultPath: 'Cikti.html',
+          defaultPath: fileName ? `${fileName}.html` : 'Cikti.html',
           filters: [{ name: 'HTML Dosyası', extensions: ['html'] }]
         })
         if (canceled || !filePath) return { success: false, error: 'İptal edildi' }
