@@ -118,7 +118,11 @@ if (!gotTheLock && !isMultiInstance) {
       const filePath = commandLine.find((arg) => isSupportedFile(arg))
       if (filePath) {
         const { spawn } = require('child_process')
-        spawn(process.execPath, [filePath, '--multi-instance'], {
+        const args = app.isPackaged 
+          ? [filePath, '--multi-instance'] 
+          : [app.getAppPath(), filePath, '--multi-instance']
+        
+        spawn(process.execPath, args, {
           detached: true,
           stdio: 'ignore'
         }).unref()
