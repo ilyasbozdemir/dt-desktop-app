@@ -1,28 +1,20 @@
-import React, { useState, useRef, useEffect } from 'react'
+import React, { useState, useEffect, useMemo } from 'react'
 
 import Mustache from 'mustache'
-import { Panel, Group as PanelGroup, Separator as PanelResizeHandle } from 'react-resizable-panels'
 import {
   FileText,
   Upload,
   Download,
   Save,
-  GripVertical,
-  Database,
   ArrowLeft,
   LayoutTemplate,
-  Eye,
-  RefreshCw
+  Eye
 } from 'lucide-react'
 import { Button } from '../../../components/ui/Button'
 import { Sablon, useSaveSablon } from '../sablonlar.hooks'
 import { A4Editor } from '../../../components/editor/A4Editor'
-
-const ResizeHandle = () => (
-  <PanelResizeHandle className="w-2 flex items-center justify-center bg-slate-100 hover:bg-slate-200 dark:bg-slate-800/50 dark:hover:bg-slate-700/50 transition-colors cursor-col-resize group">
-    <GripVertical className="w-4 h-4 text-slate-300 group-hover:text-slate-500 transition-colors" />
-  </PanelResizeHandle>
-)
+import { PreviewTab } from './tabs/PreviewTab'
+import { PdfTab } from './tabs/PdfTab'
 
 export function SablonEditor({ sablon, onBack }: { sablon?: Sablon, onBack: () => void }) {
   const [ad, setAd] = useState(sablon?.ad || '')
@@ -56,7 +48,6 @@ export function SablonEditor({ sablon, onBack }: { sablon?: Sablon, onBack: () =
   const [isPdfLoading, setIsPdfLoading] = useState(false)
   const [masterHtml, setMasterHtml] = useState('')
   const [masterJson, setMasterJson] = useState({})
-  const iframeRef = useRef<HTMLIFrameElement>(null)
 
   useEffect(() => {
     // Load master HTML
@@ -115,6 +106,10 @@ export function SablonEditor({ sablon, onBack }: { sablon?: Sablon, onBack: () =
 
   const handleImportDocx = async () => {
     try {
+      if (!window.electron) {
+        alert('Bu özellik yalnızca masaüstü uygulamasında (Electron) çalışır.')
+        return
+      }
       const res = await window.electron.ipcRenderer.invoke('import-docx')
       if (res.success && res.html) {
         setHtmlCode(res.html)
@@ -130,6 +125,10 @@ export function SablonEditor({ sablon, onBack }: { sablon?: Sablon, onBack: () =
   const handleExportHtml = async () => {
     try {
       if (!masterHtml) return
+      if (!window.electron) {
+        alert('Bu özellik yalnızca masaüstü uygulamasında (Electron) çalışır.')
+        return
+      }
       const finalHtml = Mustache.render(masterHtml, parsedData, { content: htmlCode })
       const res = await window.electron.ipcRenderer.invoke('export-html', finalHtml, { paperSize: 'A4' }, ad || dosyaAdi)
       if (res.success) {
@@ -145,6 +144,10 @@ export function SablonEditor({ sablon, onBack }: { sablon?: Sablon, onBack: () =
   const handleExportPdf = async () => {
     try {
       if (!masterHtml) return
+      if (!window.electron) {
+        alert('Bu özellik yalnızca masaüstü uygulamasında (Electron) çalışır.')
+        return
+      }
       const finalHtml = Mustache.render(masterHtml, parsedData, { content: htmlCode })
       const res = await window.electron.ipcRenderer.invoke('export-pdf', finalHtml, ad || dosyaAdi)
       if (res.success) {
@@ -159,6 +162,10 @@ export function SablonEditor({ sablon, onBack }: { sablon?: Sablon, onBack: () =
 
   const handleUpdatePdfPreview = async () => {
     if (!masterHtml) return
+    if (!window.electron) {
+      alert('PDF önizleme özelliği yalnızca masaüstü uygulamasında (Electron) çalışır. Tarayıcıda desteklenmemektedir.')
+      return
+    }
     setIsPdfLoading(true)
     try {
       const finalHtml = Mustache.render(masterHtml, parsedData, { content: htmlCode })
@@ -254,6 +261,10 @@ export function SablonEditor({ sablon, onBack }: { sablon?: Sablon, onBack: () =
               onClick={async () => {
                 if (confirm('Varsayılan şablona dönmek istediğinize emin misiniz? Yapılan tüm özelleştirmeler silinecektir.')) {
                   try {
+                    if (!window.electron) {
+                      alert('Bu özellik yalnızca masaüstü uygulamasında (Electron) çalışır.')
+                      return
+                    }
                     const content = await window.electron.ipcRenderer.invoke('template:read-system', dosyaAdi);
                     if (content) {
                       setHtmlCode(content);
@@ -343,119 +354,19 @@ export function SablonEditor({ sablon, onBack }: { sablon?: Sablon, onBack: () =
           <A4Editor content={htmlCode} onChange={setHtmlCode} />
         </div>
       ) : activeTab === 'preview' ? (
-        <div className="flex-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden shadow-sm">
-          <PanelGroup orientation="horizontal">
-            {/* SOL PANEL: HTML VE TEST VERİSİ */}
-            <Panel defaultSize={35} minSize={20}>
-              <PanelGroup orientation="vertical">
-                {/* ÜST SOL PANEL: RAW HTML */}
-                <Panel defaultSize={50} minSize={20}>
-                  <div className="flex flex-col h-full border-r border-b border-slate-200 dark:border-slate-800">
-                    <div className="px-4 py-2 border-b border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 flex items-center justify-between shrink-0">
-                      <div className="flex items-center gap-2">
-                        <FileText className="w-4 h-4 text-slate-500" />
-                        <h2 className="text-xs font-bold text-slate-700 dark:text-slate-300">Şablon (Ham HTML)</h2>
-                      </div>
-                    </div>
-                    <div className="flex-1 min-h-0 relative bg-[#1e1e1e]">
-                      <textarea
-                        className="w-full h-full p-4 bg-[#1e1e1e] text-[#d4d4d4] font-mono text-[13px] resize-none outline-none custom-scrollbar border-0"
-                        value={htmlCode}
-                        onChange={(e) => setHtmlCode(e.target.value)}
-                        spellCheck={false}
-                        placeholder="HTML Şablon kodu..."
-                      />
-                    </div>
-                  </div>
-                </Panel>
-                
-                <PanelResizeHandle className="h-2 flex items-center justify-center bg-slate-100 hover:bg-slate-200 dark:bg-slate-800/50 dark:hover:bg-slate-700/50 transition-colors cursor-row-resize" />
-
-                {/* ALT SOL PANEL: TEST JSON */}
-                <Panel defaultSize={50} minSize={20}>
-                  <div className="flex flex-col h-full border-r border-slate-200 dark:border-slate-800">
-                    <div className="px-4 py-2 border-b border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 flex items-center justify-between shrink-0">
-                      <div className="flex items-center gap-2">
-                        <Database className="w-4 h-4 text-slate-500" />
-                        <h2 className="text-xs font-bold text-slate-700 dark:text-slate-300">Test Verisi (JSON)</h2>
-                      </div>
-                    </div>
-                    <div className="flex-1 min-h-0 relative bg-[#1e1e1e]">
-                      <textarea
-                        className="w-full h-full p-4 bg-[#1e1e1e] text-[#d4d4d4] font-mono text-[13px] resize-none outline-none custom-scrollbar border-0"
-                        value={testJson}
-                        onChange={(e) => setTestJson(e.target.value)}
-                        spellCheck={false}
-                        placeholder="JSON Test verisi..."
-                      />
-                    </div>
-                  </div>
-                </Panel>
-              </PanelGroup>
-            </Panel>
-
-            <ResizeHandle />
-
-            {/* SAĞ PANEL: CANLI ÖNİZLEME */}
-            <Panel defaultSize={65} minSize={30}>
-              <div className="flex flex-col h-full bg-slate-50 dark:bg-slate-900/50">
-                <div className="px-4 py-2 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex items-center gap-2 shrink-0">
-                  <FileText className="w-4 h-4 text-slate-500" />
-                  <h2 className="text-xs font-bold text-slate-700 dark:text-slate-300">İndirilecek Çıktı Önizleme (Varsayılan: A4)</h2>
-                </div>
-                <div className="flex-1 min-h-0 overflow-auto bg-slate-200 dark:bg-slate-800 p-8 flex justify-center custom-scrollbar">
-                  <div className="w-[210mm] min-h-[297mm] bg-white shadow-lg border border-slate-300 relative">
-                    <iframe
-                      ref={iframeRef}
-                      title="preview"
-                      srcDoc={finalHtmlForPreview}
-                      className="w-full h-full border-0 absolute inset-0"
-                      sandbox="allow-same-origin allow-scripts"
-                    />
-                  </div>
-                </div>
-              </div>
-            </Panel>
-          </PanelGroup>
-        </div>
+        <PreviewTab
+          htmlCode={htmlCode}
+          setHtmlCode={setHtmlCode}
+          testJson={testJson}
+          setTestJson={setTestJson}
+          finalHtmlForPreview={finalHtmlForPreview}
+        />
       ) : activeTab === 'pdf' ? (
-        <div className="flex-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden shadow-sm p-4 flex flex-col">
-          <div className="flex justify-between items-center mb-4">
-            <div className="flex items-center gap-2">
-              <FileText className="w-5 h-5 text-blue-600" />
-              <div>
-                <h2 className="text-sm font-bold text-slate-700 dark:text-slate-300">Gerçek PDF Çıktısı Önizleme</h2>
-                <p className="text-xs text-slate-500">Sayfalanmış, antetli ve altbilgili son halini görüntülüyorsunuz.</p>
-              </div>
-            </div>
-            <Button onClick={handleUpdatePdfPreview} disabled={isPdfLoading} className="bg-blue-600 hover:bg-blue-700 text-white text-xs py-1.5 px-4 shadow-sm flex items-center gap-2">
-              <RefreshCw className={`w-3.5 h-3.5 ${isPdfLoading ? 'animate-spin' : ''}`} />
-              {isPdfLoading ? 'Oluşturuluyor...' : 'PDF\'i Yenile'}
-            </Button>
-          </div>
-          <div className="flex-1 relative bg-slate-200 dark:bg-slate-800 rounded-lg overflow-hidden flex justify-center border border-slate-300 dark:border-slate-700">
-             {isPdfLoading ? (
-               <div className="absolute inset-0 flex items-center justify-center bg-white/60 dark:bg-slate-900/60 backdrop-blur-sm z-10">
-                 <div className="flex flex-col items-center gap-3">
-                   <div className="w-8 h-8 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
-                   <div className="text-blue-600 dark:text-blue-400 font-semibold text-sm">PDF Hazırlanıyor...</div>
-                 </div>
-               </div>
-             ) : null}
-             {pdfBase64 ? (
-               <iframe
-                 title="pdf-preview"
-                 src={`data:application/pdf;base64,${pdfBase64}`}
-                 className="w-full h-full border-0"
-               />
-             ) : (
-               <div className="flex flex-col items-center justify-center text-slate-500 h-full">
-                 <FileText className="w-12 h-12 text-slate-300 mb-3" />
-                 <p>PDF oluşturmak için Yenile butonuna basın.</p>
-               </div>
-             )}
-          </div>
-        </div>
+        <PdfTab
+          isPdfLoading={isPdfLoading}
+          pdfBase64={pdfBase64}
+          handleUpdatePdfPreview={handleUpdatePdfPreview}
+        />
       ) : null}
     </div>
   )
