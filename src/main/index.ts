@@ -768,6 +768,37 @@ if (!gotTheLock && !isMultiInstance) {
       }
     })
 
+    ipcMain.handle('template:read-system', async (_, fileName: string) => {
+      const templatesDirDev = join(app.getAppPath(), 'resources', 'templates')
+      const templatesDirProd = join(process.resourcesPath, 'templates')
+      const targetDir = fs.existsSync(templatesDirProd) ? templatesDirProd : templatesDirDev
+      
+      const findFile = (dir: string): string | null => {
+        try {
+          const list = fs.readdirSync(dir)
+          for (const file of list) {
+            const filePath = join(dir, file)
+            const stat = fs.statSync(filePath)
+            if (stat.isDirectory()) {
+              const found = findFile(filePath)
+              if (found) return found
+            } else if (file === fileName) {
+              return filePath
+            }
+          }
+        } catch (e) {
+          // ignore
+        }
+        return null
+      }
+      
+      const filePath = findFile(targetDir)
+      if (filePath) {
+        return fs.readFileSync(filePath, 'utf-8')
+      }
+      return null
+    })
+
     ipcMain.handle('db:get-settings', async () => {
       try {
         const db = workspaceManager.getDb()
