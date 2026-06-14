@@ -921,13 +921,20 @@ if (!gotTheLock) {
           expiresAt: Date.now() + 10 * 60 * 1000 // 10 minutes expiry
         }
 
+        const port = parseInt(portRow.value) || 587
+        const userSecure = secureRow?.value === 'true'
+        const actualSecure = port === 465 ? true : (port === 587 ? false : userSecure)
+
         const transporter = nodemailer.createTransport({
           host: hostRow.value,
-          port: parseInt(portRow.value) || 587,
-          secure: secureRow?.value === 'true',
+          port: port,
+          secure: actualSecure,
           auth: {
             user: userRow.value,
             pass: passRow.value
+          },
+          tls: {
+            rejectUnauthorized: false
           }
         })
 

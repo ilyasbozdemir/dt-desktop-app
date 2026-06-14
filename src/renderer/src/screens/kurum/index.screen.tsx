@@ -162,6 +162,28 @@ export default function KurumScreen(): React.JSX.Element {
         dataToSave.dtvtKodu = dtvtKodu
         dataToSave.detsisKodu = detsisKodu
       } else if (tab === 'iletisim') {
+        if (website && instEmail) {
+          try {
+            let webUrl = website.trim()
+            if (!webUrl.startsWith('http://') && !webUrl.startsWith('https://')) {
+              webUrl = 'http://' + webUrl
+            }
+            const webDomain = new URL(webUrl).hostname.replace(/^www\./, '').toLowerCase()
+            const emailParts = instEmail.trim().split('@')
+            
+            if (emailParts.length === 2) {
+              const emailDomain = emailParts[1].toLowerCase()
+              if (emailDomain !== webDomain) {
+                alert(`Kayıt Başarısız!\n\nKurumsal e-posta alan adı (@${emailDomain}) ile web sitesi alan adı (${webDomain}) eşleşmiyor.\nLütfen aynı etki alanına sahip bir e-posta adresi girin veya web sitesi bilgisini boş bırakın.`)
+                setSaving(false)
+                return
+              }
+            }
+          } catch (e) {
+            // Ignore parse errors, let standard HTML validation handle format
+          }
+        }
+
         dataToSave.address = address
         dataToSave.district = district
         dataToSave.postalCode = postalCode
