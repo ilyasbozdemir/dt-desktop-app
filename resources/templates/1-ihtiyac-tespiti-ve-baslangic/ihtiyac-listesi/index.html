@@ -2,6 +2,8 @@
   {{sunulacakMakamAdi}}
 </div>
 
+<div class="title">İHTİYAÇ LİSTESİ</div>
+
 <div class="konu">
   {{dosyaKonusu}} ihtiyacı olan aşağıda yazılı mal/hizmet kalemlerinin temin edilmesi gerekmektedir.
   Söz konusu ihtiyacın 4734 sayılı Kamu İhale Kanunun ilgili maddesine göre temini için
@@ -45,9 +47,9 @@
 
 <div class="signature" style="display: flex; justify-content: space-around; margin-top: 40px; gap: 20px; flex-wrap: wrap;">
   {{#onaylayanlar}}
-  <div style="display: inline-block; text-align: center; min-width: 200px;">
+  <div style="display: inline-block; text-align: center; min-width: 200px; page-break-inside: avoid;">
     OLUR<br>
-    {{dosyaTarihi}}<br><br>
+    {{dosyaTarihi}}<br><br><br>
     {{onaylayanPersonelAdi}}<br>
     {{onaylayanPersonelUnvan}}
   </div>

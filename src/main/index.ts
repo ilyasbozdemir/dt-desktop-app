@@ -646,17 +646,57 @@ if (!gotTheLock && !isMultiInstance) {
         const win = new BrowserWindow({ show: false })
         await win.loadURL(`data:text/html;charset=utf-8,${encodeURIComponent(htmlContent)}`)
         
-        const pdfData = await win.webContents.printToPDF({
+        let pdfData = await win.webContents.printToPDF({
           printBackground: true,
-          displayHeaderFooter: true,
-          headerTemplate: '<div></div>',
-          footerTemplate: '<div style="font-size: 9px; color: #555; width: 100%; text-align: right; padding-right: 1.5cm; padding-bottom: 0.5cm;">Sayfa <span class="pageNumber"></span> / <span class="totalPages"></span></div>'
+          displayHeaderFooter: false
         })
+        
+        const pdfString = pdfData.toString('utf8')
+        const pageCount = (pdfString.match(/\/Type\s*\/Page\b/g) || []).length
+        
+        if (pageCount > 1) {
+          pdfData = await win.webContents.printToPDF({
+            printBackground: true,
+            displayHeaderFooter: true,
+            headerTemplate: '<div></div>',
+            footerTemplate: '<div style="font-size: 9px; color: #555; width: 100%; text-align: right; padding-right: 1.5cm; padding-bottom: 0.5cm;">Sayfa <span class="pageNumber"></span> / <span class="totalPages"></span></div>'
+          })
+        }
         
         fs.writeFileSync(filePath, pdfData)
         win.destroy()
         
         return { success: true, filePath }
+      } catch (err: any) {
+        return { success: false, error: err.message }
+      }
+    })
+
+    ipcMain.handle('preview-pdf', async (_, htmlContent: string) => {
+      try {
+        const win = new BrowserWindow({ show: false })
+        await win.loadURL(`data:text/html;charset=utf-8,${encodeURIComponent(htmlContent)}`)
+        
+        let pdfData = await win.webContents.printToPDF({
+          printBackground: true,
+          displayHeaderFooter: false
+        })
+        
+        const pdfString = pdfData.toString('utf8')
+        const pageCount = (pdfString.match(/\/Type\s*\/Page\b/g) || []).length
+        
+        if (pageCount > 1) {
+          pdfData = await win.webContents.printToPDF({
+            printBackground: true,
+            displayHeaderFooter: true,
+            headerTemplate: '<div></div>',
+            footerTemplate: '<div style="font-size: 9px; color: #555; width: 100%; text-align: right; padding-right: 1.5cm; padding-bottom: 0.5cm;">Sayfa <span class="pageNumber"></span> / <span class="totalPages"></span></div>'
+          })
+        }
+        
+        win.destroy()
+        
+        return { success: true, data: pdfData.toString('base64') }
       } catch (err: any) {
         return { success: false, error: err.message }
       }
@@ -1736,7 +1776,7 @@ if (!gotTheLock && !isMultiInstance) {
 
     // --- Auto Updater Logic ---
     if (!app.isPackaged) {
-      autoUpdater.forceDevUpdateConfig = false
+      autoUpdater.forceDevUpdateConfig = true
     }
 
     // Uygulama açıldıktan saniyeler sonra güncellemeleri kontrol et
