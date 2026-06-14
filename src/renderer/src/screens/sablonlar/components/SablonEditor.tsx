@@ -28,7 +28,37 @@ export function SablonEditor({ sablon, onBack }: { sablon?: Sablon, onBack: () =
   const [dosyaAdi, setDosyaAdi] = useState(sablon?.dosya_adi || '')
   const [aciklama, setAciklama] = useState(sablon?.aciklama || '')
   const [htmlCode, setHtmlCode] = useState(sablon?.icerik || `<p>Merhaba, {{ffirma_adi}}!</p>`)
-  const [testJson, setTestJson] = useState(`{\n  "firma_adi": "Test Firması A.Ş.",\n  "kurumIci": false\n}`)
+  const today = new Intl.DateTimeFormat('tr-TR', { timeZone: 'Europe/Istanbul', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date())
+  
+  const defaultTestJson = `{
+  "tarih": "${today}",
+  "dosyaTarihi": "${today}",
+  "firma_adi": "Test Firması A.Ş.",
+  "kurumIci": false,
+  "antetSatir1": "T.C.",
+  "antetSatir2": "SAĞLIK BAKANLIĞI",
+  "antetSatir3": "ANKARA İL SAĞLIK MÜDÜRLÜĞÜ",
+  "evrakSayisi": "E-12345",
+  "sunulacakMakamAdi": "MAKAM ONAYINA",
+  "dosyaKonusu": "Hastane laboratuvar",
+  "hazirlayanPersonelAdi": "Ahmet Yılmaz",
+  "hazirlayanPersonelUnvan": "Satınalma Memuru",
+  "onaylayanPersonelAdi": "Dr. Mehmet Demir",
+  "onaylayanPersonelUnvan": "İl Sağlık Müdürü",
+  "kurumAdres": "Çankaya / Ankara",
+  "kurumWeb": "www.ankara.saglik.gov.tr",
+  "kurumEmail": "info@ankara.saglik.gov.tr",
+  "kurumTelefon": "0312 000 00 00",
+  "kurumFaks": "0312 000 00 01",
+  "kurumKepAdres": "ankara.saglik@hs01.kep.tr",
+  "ilgiliPersonelAdi": "Ayşe Kaya",
+  "ihtiyacKalemleri": [
+    { "siraNo": 1, "kodu": "LAB-001", "malzemeAdi": "Eldiven", "ozelligi": "Nitril", "birimi": "Kutu", "kdvOrani": "%20", "miktar": 50 },
+    { "siraNo": 2, "kodu": "LAB-002", "malzemeAdi": "Maske", "ozelligi": "N95", "birimi": "Adet", "kdvOrani": "%10", "miktar": 200 }
+  ]
+}`
+
+  const [testJson, setTestJson] = useState(defaultTestJson)
   const [activeTab, setActiveTab] = useState<'design' | 'preview'>('design')
   const iframeRef = useRef<HTMLIFrameElement>(null)
   
@@ -223,31 +253,59 @@ export function SablonEditor({ sablon, onBack }: { sablon?: Sablon, onBack: () =
       ) : activeTab === 'preview' ? (
         <div className="flex-1 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-2xl overflow-hidden shadow-sm">
           <PanelGroup orientation="horizontal">
-            {/* SOL PANEL: TEST VERİSİ */}
-            <Panel defaultSize={30} minSize={20}>
-              <div className="flex flex-col h-full border-r border-slate-200 dark:border-slate-800">
-                <div className="px-4 py-2 border-b border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 flex items-center justify-between shrink-0">
-                  <div className="flex items-center gap-2">
-                    <Database className="w-4 h-4 text-slate-500" />
-                    <h2 className="text-xs font-bold text-slate-700 dark:text-slate-300">Test Verisi (JSON)</h2>
+            {/* SOL PANEL: HTML VE TEST VERİSİ */}
+            <Panel defaultSize={35} minSize={20}>
+              <PanelGroup orientation="vertical">
+                {/* ÜST SOL PANEL: RAW HTML */}
+                <Panel defaultSize={50} minSize={20}>
+                  <div className="flex flex-col h-full border-r border-b border-slate-200 dark:border-slate-800">
+                    <div className="px-4 py-2 border-b border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 flex items-center justify-between shrink-0">
+                      <div className="flex items-center gap-2">
+                        <FileText className="w-4 h-4 text-slate-500" />
+                        <h2 className="text-xs font-bold text-slate-700 dark:text-slate-300">Şablon (Ham HTML)</h2>
+                      </div>
+                    </div>
+                    <div className="flex-1 min-h-0 relative bg-[#1e1e1e]">
+                      <textarea
+                        className="w-full h-full p-4 bg-[#1e1e1e] text-[#d4d4d4] font-mono text-[13px] resize-none outline-none custom-scrollbar border-0"
+                        value={htmlCode}
+                        onChange={(e) => setHtmlCode(e.target.value)}
+                        spellCheck={false}
+                        placeholder="HTML Şablon kodu..."
+                      />
+                    </div>
                   </div>
-                </div>
-                <div className="flex-1 min-h-0 relative bg-[#1e1e1e]">
-                  <textarea
-                    className="w-full h-full p-4 bg-[#1e1e1e] text-[#d4d4d4] font-mono text-[13px] resize-none outline-none custom-scrollbar border-0"
-                    value={testJson}
-                    onChange={(e) => setTestJson(e.target.value)}
-                    spellCheck={false}
-                    placeholder="JSON Test verisi..."
-                  />
-                </div>
-              </div>
+                </Panel>
+                
+                <PanelResizeHandle className="h-2 flex items-center justify-center bg-slate-100 hover:bg-slate-200 dark:bg-slate-800/50 dark:hover:bg-slate-700/50 transition-colors cursor-row-resize" />
+
+                {/* ALT SOL PANEL: TEST JSON */}
+                <Panel defaultSize={50} minSize={20}>
+                  <div className="flex flex-col h-full border-r border-slate-200 dark:border-slate-800">
+                    <div className="px-4 py-2 border-b border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-900 flex items-center justify-between shrink-0">
+                      <div className="flex items-center gap-2">
+                        <Database className="w-4 h-4 text-slate-500" />
+                        <h2 className="text-xs font-bold text-slate-700 dark:text-slate-300">Test Verisi (JSON)</h2>
+                      </div>
+                    </div>
+                    <div className="flex-1 min-h-0 relative bg-[#1e1e1e]">
+                      <textarea
+                        className="w-full h-full p-4 bg-[#1e1e1e] text-[#d4d4d4] font-mono text-[13px] resize-none outline-none custom-scrollbar border-0"
+                        value={testJson}
+                        onChange={(e) => setTestJson(e.target.value)}
+                        spellCheck={false}
+                        placeholder="JSON Test verisi..."
+                      />
+                    </div>
+                  </div>
+                </Panel>
+              </PanelGroup>
             </Panel>
 
             <ResizeHandle />
 
             {/* SAĞ PANEL: CANLI ÖNİZLEME */}
-            <Panel defaultSize={70} minSize={30}>
+            <Panel defaultSize={65} minSize={30}>
               <div className="flex flex-col h-full bg-slate-50 dark:bg-slate-900/50">
                 <div className="px-4 py-2 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 flex items-center gap-2 shrink-0">
                   <FileText className="w-4 h-4 text-slate-500" />
