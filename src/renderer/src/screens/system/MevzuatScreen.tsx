@@ -313,6 +313,7 @@ export function MevzuatScreen(): React.JSX.Element {
     { id: '4', ad: 'KDV (İndirimli)', oran: '10', tur: 'yuzde', hesapKodu: '' },
     { id: '5', ad: 'KDV (Özel)', oran: '1', tur: 'yuzde', hesapKodu: '' }
   ])
+  
   const setRates = (val: React.SetStateAction<typeof rates>) => {
     _setRates(val)
     setIsConfirmed(false)

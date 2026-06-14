@@ -78,6 +78,8 @@ export function AITextGeneratorModal({
 
       if (mode === 'json') {
         finalPrompt += `\n\nÖNEMLİ: Yanıtını SADECE geçerli bir JSON formatında dön. Başka hiçbir açıklama, markdown veya text ekleme. Sadece süslü parantezlerle başlayan ham JSON dön.\nBeklenen Format (örnek):\n${expectedJsonFormat || '{ "sonuc": "..." }'}`
+      } else if (isAdvisorMode) {
+        finalPrompt += `\n\nÖNEMLİ: Yanıtını LÜTFEN MARKDOWN FORMATINDA (**, ###, listeler vb. kullanarak) okunabilir ve yapılandırılmış olarak üret.`
       } else {
         finalPrompt += `\n\nÖNEMLİ: Yanıtını LÜTFEN HİÇBİR MARKDOWN İŞARETİ KULLANMADAN (**, ###, \`\`\` vb.) düz metin (plain text) olarak üret.`
       }
@@ -101,7 +103,7 @@ export function AITextGeneratorModal({
           } catch (e) {
             console.warn('AI yanıtı geçerli bir JSON değil, ama yinede yansıtılıyor.', e)
           }
-        } else {
+        } else if (!isAdvisorMode) {
           // Eğer AI ısrarla markdown gönderirse temizle (text mode)
           cleanData = cleanData
             .replace(/\*\*/g, '')
