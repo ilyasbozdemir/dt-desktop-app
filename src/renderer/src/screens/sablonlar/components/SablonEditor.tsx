@@ -13,7 +13,6 @@ import {
 import { Button } from '../../../components/ui/Button'
 import { Sablon, useSaveSablon } from '../sablonlar.hooks'
 
-const cmToInches = (cm: number) => cm / 2.54
 
 import { A4Editor } from '../../../components/editor/A4Editor'
 import { PreviewTab } from './tabs/PreviewTab'
