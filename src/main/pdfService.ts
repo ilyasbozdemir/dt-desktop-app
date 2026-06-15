@@ -1,5 +1,6 @@
 import { BrowserWindow } from 'electron'
 import * as fs from 'fs'
+import * as path from 'path'
 
 /**
  * Renders HTML to a PDF Buffer using Paged.js for pagination.
@@ -19,7 +20,8 @@ export async function renderPdfBuffer(htmlContent: string): Promise<Buffer> {
     await win.loadURL(`data:text/html;charset=utf-8,${encodeURIComponent(htmlContent)}`)
 
     // 2. Inject Paged.js polyfill
-    const pagedJsPath = require.resolve('pagedjs/dist/paged.polyfill.js')
+    // eslint-disable-next-line
+    const pagedJsPath = path.join(require.resolve('pagedjs'), '../../dist/paged.polyfill.js')
     const pagedJsScript = fs.readFileSync(pagedJsPath, 'utf-8')
     
     await win.webContents.executeJavaScript(pagedJsScript)
