@@ -23,7 +23,7 @@ export function SablonEditor({ sablon, onBack }: { sablon?: Sablon, onBack: () =
   const [ad, setAd] = useState(sablon?.ad || '')
   const [dosyaAdi, setDosyaAdi] = useState(sablon?.dosya_adi || '')
   const [aciklama, setAciklama] = useState(sablon?.aciklama || '')
-  const [htmlCode, setHtmlCode] = useState(sablon?.icerik || `<p>Merhaba, {{ffirma_adi}}!</p>`)
+  const [htmlCode, setHtmlCode] = useState(sablon?.icerik || `<p>Merhaba, {{firma_adi}}!</p>`)
   const today = new Intl.DateTimeFormat('tr-TR', { timeZone: 'Europe/Istanbul', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date())
   
   const defaultTestJson = `{
