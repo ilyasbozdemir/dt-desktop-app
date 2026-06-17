@@ -15,15 +15,27 @@
     .footer-info { font-size: 8pt; }
 
     /* ── Paged.js Running Elements ── */
-    .paged-header        { position: running(pagedHeader); display: block; width: 100%; }
-    .paged-footer        { position: running(pagedFooter); display: block; width: 100%; }
+    .paged-header {
+      position: running(pagedHeader);
+      display: block;
+      width: 100%;
+    }
+
+    .paged-footer {
+      position: running(pagedFooter);
+      display: block;
+      width: 100%;
+    }
+
     .paged-keep-together { break-inside: avoid; }
     .paged-break-before  { break-before: page; }
     .paged-break-after   { break-after: page; }
 
+    /* PAGE RULES — SINGLE SOURCE OF TRUTH */
     @page {
       @bottom-left { content: element(pagedFooter); }
     }
+
     @page:first {
       @top-center  { content: element(pagedHeader); }
       @bottom-left { content: none; }
