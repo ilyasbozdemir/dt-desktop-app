@@ -21,8 +21,8 @@
     "kurumKep": "saglikbakanligi@hs01.kep.tr",
     "ilgiliPersonelAdi": "Ayşe Demir",
     "ilgiliPersonelUnvan": "V.H.K.İ.",
-    "solLogo": "https://upload.wikimedia.org/wikipedia/commons/d/d4/Logo_of_the_Ministry_of_Health_%28Turkey%29.svg",
-    "sagLogo": "https://upload.wikimedia.org/wikipedia/commons/d/d4/Logo_of_the_Ministry_of_Health_%28Turkey%29.svg",
+    "solLogo": "https://raw.githubusercontent.com/ilyasbozdemir/dt-desktop-app/refs/heads/main/resources/icon.png",
+    "sagLogo": "https://upload.wikimedia.org/wikipedia/commons/0/0f/Logo_of_100th_years_of_the_Republic_of_T%C3%BCrkiye.svg",
     "ihtiyacYeri": "İhtiyacın yapılacağı yer",
     "ihtiyacKalemleri": [
         {
