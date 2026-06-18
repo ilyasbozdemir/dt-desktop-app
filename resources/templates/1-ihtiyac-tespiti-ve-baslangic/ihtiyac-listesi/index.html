@@ -280,27 +280,50 @@
   </div>
 
   <script>
-    // Tablo satırlarını sayfalara eşitçe bölerek "OLUR" imza alanının tek başına son sayfada kalmasını engellemek için
+    // Tablo satırlarını dengelemek ve "OLUR" imza alanının tek başına son sayfada kalmasını engellemek için
+    // İmza alanını ve tablonun son satırlarını birlikte tutacak bir yapı oluşturuyoruz.
     window.addEventListener('DOMContentLoaded', () => {
-      const tbody = document.querySelector('.content-table tbody');
-      if (!tbody) return;
-      const rows = Array.from(tbody.querySelectorAll('tr'));
-      const totalRows = rows.length;
+      const table = document.querySelector('.content-table');
+      const tbody = table ? table.querySelector('tbody') : null;
+      const approval = document.querySelector('.approval');
       
-      // Bir sayfaya sığabilecek yaklaşık maksimum satır sayısı
-      const MAX_ROWS_PER_PAGE = 25; 
-      
-      const estimatedPages = Math.ceil(totalRows / MAX_ROWS_PER_PAGE);
-      
-      if (estimatedPages > 1) {
-         // Satırları sayfalara eşit paylaştırmak için sayfa başına düşen ideal satır sayısını bul
-         const rowsPerChunk = Math.ceil(totalRows / estimatedPages);
-         rows.forEach((row, index) => {
-           if (index > 0 && index % rowsPerChunk === 0) {
-             row.style.breakBefore = 'page';
-             row.style.pageBreakBefore = 'always';
-           }
-         });
+      if (table && tbody && approval) {
+        const rows = Array.from(tbody.querySelectorAll('tr'));
+        if (rows.length > 0) {
+          // Sayfa kırılmasını engelleyeceğimiz yeni bir tbody oluştur
+          const keepTogetherBody = document.createElement('tbody');
+          keepTogetherBody.style.breakInside = 'avoid';
+          keepTogetherBody.style.pageBreakInside = 'avoid';
+          
+          // Son 2 satırı (veya sadece 1 satır varsa onu) yeni tbody'e taşı
+          const rowsToMove = Math.min(2, rows.length);
+          for (let i = rows.length - rowsToMove; i < rows.length; i++) {
+            keepTogetherBody.appendChild(rows[i]);
+          }
+          
+          // Tablodaki sütun sayısını bul (colspan için)
+          let colCount = 6;
+          const firstRow = table.querySelector('tr');
+          if (firstRow) {
+            colCount = firstRow.children.length;
+          }
+          
+          // Approval divini yeni bir satır olarak ekle
+          const tr = document.createElement('tr');
+          const td = document.createElement('td');
+          td.colSpan = colCount;
+          td.style.border = 'none'; // Kenarlık olmasın
+          td.style.padding = '0';
+          td.style.paddingTop = '10px';
+          
+          // Mevcut approval divini td içine taşı
+          td.appendChild(approval);
+          tr.appendChild(td);
+          keepTogetherBody.appendChild(tr);
+          
+          // Yeni tbody'i tabloya ekle
+          table.appendChild(keepTogetherBody);
+        }
       }
     });
   </script>

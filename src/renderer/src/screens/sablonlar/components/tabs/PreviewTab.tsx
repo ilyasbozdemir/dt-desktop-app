@@ -1,6 +1,7 @@
 import React from 'react'
 import { Panel, Group as PanelGroup, Separator as PanelResizeHandle } from 'react-resizable-panels'
 import { FileText, Database, GripVertical } from 'lucide-react'
+import Editor from '@monaco-editor/react'
 
 const ResizeHandle = () => (
   <PanelResizeHandle className="h-2 flex items-center justify-center bg-slate-100 hover:bg-slate-200 dark:bg-slate-800/50 dark:hover:bg-slate-700/50 transition-colors cursor-row-resize group">
@@ -47,12 +48,18 @@ export function PreviewTab({
                   </div>
                 </div>
                 <div className="flex-1 min-h-0 relative bg-[#1e1e1e]">
-                  <textarea
-                    className="w-full h-full p-4 bg-[#1e1e1e] text-[#d4d4d4] font-mono text-[13px] resize-none outline-none custom-scrollbar border-0"
+                  <Editor
+                    height="100%"
+                    defaultLanguage="html"
+                    theme="vs-dark"
                     value={htmlCode}
-                    onChange={(e) => setHtmlCode(e.target.value)}
-                    spellCheck={false}
-                    placeholder="HTML Şablon kodu..."
+                    onChange={(value) => setHtmlCode(value || '')}
+                    options={{
+                      minimap: { enabled: false },
+                      wordWrap: 'on',
+                      fontSize: 13,
+                      padding: { top: 16 }
+                    }}
                   />
                 </div>
               </div>
@@ -70,12 +77,18 @@ export function PreviewTab({
                   </div>
                 </div>
                 <div className="flex-1 min-h-0 relative bg-[#1e1e1e]">
-                  <textarea
-                    className="w-full h-full p-4 bg-[#1e1e1e] text-[#d4d4d4] font-mono text-[13px] resize-none outline-none custom-scrollbar border-0"
+                  <Editor
+                    height="100%"
+                    defaultLanguage="json"
+                    theme="vs-dark"
                     value={testJson}
-                    onChange={(e) => setTestJson(e.target.value)}
-                    spellCheck={false}
-                    placeholder="JSON Test verisi..."
+                    onChange={(value) => setTestJson(value || '')}
+                    options={{
+                      minimap: { enabled: false },
+                      wordWrap: 'on',
+                      fontSize: 13,
+                      padding: { top: 16 }
+                    }}
                   />
                 </div>
               </div>
