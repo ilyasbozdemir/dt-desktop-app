@@ -280,50 +280,43 @@
   </div>
 
   <script>
-    // Tablo satırlarını dengelemek ve "OLUR" imza alanının tek başına son sayfada kalmasını engellemek için
-    // İmza alanını ve tablonun son satırlarını birlikte tutacak bir yapı oluşturuyoruz.
+    // Tablo satırlarını sayıp maksimum satır sınırlarına göre sayfalara bölme
     window.addEventListener('DOMContentLoaded', () => {
-      const table = document.querySelector('.content-table');
-      const tbody = table ? table.querySelector('tbody') : null;
-      const approval = document.querySelector('.approval');
+      const tbody = document.querySelector('.content-table tbody');
+      if (!tbody) return;
+      const rows = Array.from(tbody.querySelectorAll('tr'));
       
-      if (table && tbody && approval) {
-        const rows = Array.from(tbody.querySelectorAll('tr'));
-        if (rows.length > 0) {
-          // Sayfa kırılmasını engelleyeceğimiz yeni bir tbody oluştur
-          const keepTogetherBody = document.createElement('tbody');
-          keepTogetherBody.style.breakInside = 'avoid';
-          keepTogetherBody.style.pageBreakInside = 'avoid';
-          
-          // Son 2 satırı (veya sadece 1 satır varsa onu) yeni tbody'e taşı
-          const rowsToMove = Math.min(2, rows.length);
-          for (let i = rows.length - rowsToMove; i < rows.length; i++) {
-            keepTogetherBody.appendChild(rows[i]);
-          }
-          
-          // Tablodaki sütun sayısını bul (colspan için)
-          let colCount = 6;
-          const firstRow = table.querySelector('tr');
-          if (firstRow) {
-            colCount = firstRow.children.length;
-          }
-          
-          // Approval divini yeni bir satır olarak ekle
-          const tr = document.createElement('tr');
-          const td = document.createElement('td');
-          td.colSpan = colCount;
-          td.style.border = 'none'; // Kenarlık olmasın
-          td.style.padding = '0';
-          td.style.paddingTop = '10px';
-          
-          // Mevcut approval divini td içine taşı
-          td.appendChild(approval);
-          tr.appendChild(td);
-          keepTogetherBody.appendChild(tr);
-          
-          // Yeni tbody'i tabloya ekle
-          table.appendChild(keepTogetherBody);
-        }
+      const MAX_ROWS = 20; // Normal sayfalar için maksimum satır
+      const SAFE_LAST_PAGE_ROWS = 12; // İmzanın da sığabileceği maksimum satır
+      
+      let rowsOnCurrentPage = 0;
+      
+      for (let i = 0; i < rows.length; i++) {
+         rowsOnCurrentPage++;
+         const isLastRow = i === rows.length - 1;
+         
+         if (isLastRow) {
+            // Son satırdayız. Eğer bu sayfada imza için yeterli yer kalmadıysa
+            // son satırı (ve doğal olarak imzayı) yeni sayfaya at.
+            if (rowsOnCurrentPage > SAFE_LAST_PAGE_ROWS) {
+               rows[i].style.breakBefore = 'page';
+               rows[i].style.pageBreakBefore = 'always';
+            }
+         } else {
+            // Normal satır
+            if (rowsOnCurrentPage >= MAX_ROWS) {
+               // Maksimum satıra ulaştık, zorunlu sayfa sonu
+               rows[i + 1].style.breakBefore = 'page';
+               rows[i + 1].style.pageBreakBefore = 'always';
+               rowsOnCurrentPage = 0;
+            } else if (rows.length - i <= 5 && rowsOnCurrentPage > 15) {
+               // Kalan satır sayısı az (<= 5) ve mevcut sayfa bayağı doldu (>15)
+               // İmzayı yalnız bırakmamak için kalan satırları şimdiden yeni sayfaya atalım.
+               rows[i + 1].style.breakBefore = 'page';
+               rows[i + 1].style.pageBreakBefore = 'always';
+               rowsOnCurrentPage = 0;
+            }
+         }
       }
     });
   </script>
