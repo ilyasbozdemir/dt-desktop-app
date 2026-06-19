@@ -84,6 +84,7 @@ export default function KurumScreen(): React.JSX.Element {
   const [phone, setPhone] = useState('')
   const [fax, setFax] = useState('')
   const [instEmail, setInstEmail] = useState('')
+  const [kepAddress, setKepAddress] = useState('')
   const [website, setWebsite] = useState('')
 
   useEffect(() => {
@@ -120,6 +121,7 @@ export default function KurumScreen(): React.JSX.Element {
         setPhone(settings.phone || '')
         setFax(settings.fax || '')
         setInstEmail(settings.institutionEmail || '')
+        setKepAddress(settings.kepAddress || '')
         setWebsite(settings.website || '')
 
         setEButceKodu(settings.eButceKodu || '')
@@ -190,6 +192,7 @@ export default function KurumScreen(): React.JSX.Element {
         dataToSave.phone = phone
         dataToSave.fax = fax
         dataToSave.institutionEmail = instEmail
+        dataToSave.kepAddress = kepAddress
         dataToSave.website = website
       }
 
@@ -936,6 +939,17 @@ export default function KurumScreen(): React.JSX.Element {
                           value={instEmail}
                           onChange={(e) => setInstEmail(e.target.value)}
                           placeholder="E-posta"
+                          className="bg-slate-55 dark:bg-slate-955 border-slate-200 dark:border-slate-800 text-xs"
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1">
+                          KEP Adresi
+                        </label>
+                        <Input
+                          value={kepAddress}
+                          onChange={(e) => setKepAddress(e.target.value)}
+                          placeholder="KEP Adresi (Örn: kurum@hs01.kep.tr)"
                           className="bg-slate-55 dark:bg-slate-955 border-slate-200 dark:border-slate-800 text-xs"
                         />
                       </div>
