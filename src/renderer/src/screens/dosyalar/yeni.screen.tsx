@@ -168,25 +168,20 @@ export default function YeniDosyaScreen(): React.JSX.Element {
     loadData()
   }, [isEdit, editId])
 
-  // Otomatik Temin Numarası (TN2026-0001) Oluşturma
+  // Otomatik Temin Numarası (DT2026/01) Oluşturma
   useEffect(() => {
     if (!isEdit && !formData.temin_no && !loadingDb) {
       const year = new Date().getFullYear()
       const yearStr = year.toString()
       
       const yearDosyalar = dosyalar.filter(d => 
-        d.temin_no && (d.temin_no.startsWith(`TN${yearStr}-`) || d.temin_no.startsWith(`${yearStr}/DT-`))
+        d.temin_no && d.temin_no.startsWith(`DT${yearStr}/`)
       )
       
       let maxSeq = 0
       yearDosyalar.forEach(d => {
         const no = d.temin_no!
-        let seqStr = ''
-        if (no.startsWith(`TN${yearStr}-`)) {
-          seqStr = no.split('-')[1]
-        } else if (no.startsWith(`${yearStr}/DT-`)) {
-          seqStr = no.split('-')[1]
-        }
+        let seqStr = no.split('/')[1]
         
         if (seqStr) {
           const seq = parseInt(seqStr, 10)
@@ -196,10 +191,10 @@ export default function YeniDosyaScreen(): React.JSX.Element {
         }
       })
       
-      const nextSeq = String(maxSeq + 1).padStart(4, '0')
+      const nextSeq = String(maxSeq + 1).padStart(2, '0')
       setFormData(prev => ({
         ...prev,
-        temin_no: `TN${yearStr}-${nextSeq}`
+        temin_no: `DT${yearStr}/${nextSeq}`
       }))
     }
   }, [isEdit, formData.temin_no, loadingDb, dosyalar])
@@ -445,16 +440,7 @@ export default function YeniDosyaScreen(): React.JSX.Element {
     )
   }
 
-  const handleAiKomisyonGenerate = () => {
-    setAiModalConfig({
-      title: 'Komisyon Karar Takdiri',
-      fieldName: 'komisyon_takdiri',
-      initialPrompt: `"${formData.konu || 'Mal Alımı'}" ihalesine ilişkin komisyon kararı ve yetki devri metnini resmi bir üslupla oluştur.`,
-      systemInstruction: 'Sen resmi bir ihale komisyon sekreterisin. Karar takdiri için kısa ve net bir ifade üret.',
-      mode: 'text'
-    })
-    setShowAIModal(true)
-  }
+
 
   const handleAiFullFormGenerate = () => {
     setShowAIModal(true)
@@ -930,28 +916,7 @@ export default function YeniDosyaScreen(): React.JSX.Element {
                       />
                     </div>
 
-                     <div className="md:col-span-2">
-                       <div className="flex items-center justify-between mb-1.5">
-                         <label className="block text-xs font-bold text-slate-600 dark:text-slate-455">
-                           Komisyon Karar Takdiri
-                         </label>
-                         <button
-                           type="button"
-                           onClick={handleAiKomisyonGenerate}
-                           className="text-[10px] text-blue-600 hover:text-blue-700 font-bold flex items-center gap-1 cursor-pointer bg-blue-50 dark:bg-blue-900/20 px-2 py-1 rounded"
-                         >
-                           <Sparkles size={11} />
-                           AI ile Üret
-                         </button>
-                       </div>
-                       <input
-                         type="text"
-                         value={formData.komisyon_takdiri || ''}
-                         onChange={e => setFormData({ ...formData, komisyon_takdiri: e.target.value })}
-                         placeholder="Resmi kurul kararı veya yetki belgesi referansı..."
-                         className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-955 border border-slate-200 dark:border-slate-800 rounded-xl text-xs focus:outline-none focus:ring-1 focus:ring-blue-500 text-slate-800 dark:text-slate-200"
-                       />
-                     </div>
+
 
                     <div>
                       <label className="block text-xs font-bold text-slate-600 dark:text-slate-450 mb-1.5">
@@ -1627,18 +1592,7 @@ export default function YeniDosyaScreen(): React.JSX.Element {
                       />
                     </div>
 
-                    <div className="md:col-span-2">
-                      <label className="block text-xs font-bold text-slate-600 dark:text-slate-455 mb-1.5">
-                        Komisyon Karar Takdiri
-                      </label>
-                      <input
-                        type="text"
-                        value={formData.komisyon_takdiri || ''}
-                        onChange={e => setFormData({ ...formData, komisyon_takdiri: e.target.value })}
-                        placeholder="Resmi kurul kararı veya yetki belgesi referansı..."
-                        className="w-full px-3.5 py-2.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl text-xs focus:outline-none focus:ring-1 focus:ring-blue-500 text-slate-800 dark:text-slate-200"
-                      />
-                    </div>
+
                   </div>
                 </div>
               )}
