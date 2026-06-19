@@ -15,6 +15,7 @@ import { generateContent, testConnection, AIGenerateOptions } from './ai/index'
 import { renderPdfBuffer } from './pdfService'
 import { startExpressServer, stopExpressServer } from './network/expressServer'
 import FormData from 'form-data' // Electron's Node may not have full FormData for file streams, so we can use node-fetch or similar, but let's try native fetch with blob first, or just write a small push function.
+import { registerArchiveHandlers } from './archive'
 
 process.on('uncaughtException', (error) => {
   console.error('UNCAUGHT EXCEPTION:', error)
@@ -219,6 +220,8 @@ if (!gotTheLock && !isMultiInstance) {
 
     // IPC test
     ipcMain.on('ping', () => console.log('pong'))
+
+    registerArchiveHandlers()
 
     ipcMain.on('install-update', () => {
       autoUpdater.quitAndInstall(false, true)

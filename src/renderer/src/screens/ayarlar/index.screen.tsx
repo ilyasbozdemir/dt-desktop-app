@@ -17,9 +17,9 @@ import {
 import { InnerMenu, InnerMenuItem } from '../../components/ui/InnerMenu'
 import TemaScreen from './TemaScreen'
 import { useLocation } from '@tanstack/react-router'
-import { Bot } from 'lucide-react'
+import { Bot, Archive } from 'lucide-react'
 
-type TabType = 'smtp' | 'tema' | 'developer' | 'ai'
+type TabType = 'smtp' | 'tema' | 'developer' | 'ai' | 'archive'
 
 
 export default function AyarlarScreen(): React.ReactNode {
@@ -30,7 +30,7 @@ export default function AyarlarScreen(): React.ReactNode {
   const [activeTab, setActiveTab] = useState<TabType>(() => {
     const params = new URLSearchParams(location.search)
     const tabParam = params.get('tab') as TabType
-    if (tabParam === 'smtp' || tabParam === 'tema' || tabParam === 'developer' || tabParam === 'ai') {
+    if (tabParam === 'smtp' || tabParam === 'tema' || tabParam === 'developer' || tabParam === 'ai' || tabParam === 'archive') {
       return tabParam
     }
     return 'smtp'
@@ -39,7 +39,7 @@ export default function AyarlarScreen(): React.ReactNode {
   useEffect(() => {
     const params = new URLSearchParams(location.search)
     const tabParam = params.get('tab') as TabType
-    if (tabParam === 'smtp' || tabParam === 'tema' || tabParam === 'developer' || tabParam === 'ai') {
+    if (tabParam === 'smtp' || tabParam === 'tema' || tabParam === 'developer' || tabParam === 'ai' || tabParam === 'archive') {
       setActiveTab(tabParam)
     }
   }, [location.search])
@@ -68,6 +68,10 @@ export default function AyarlarScreen(): React.ReactNode {
   const [aiTestMsg, setAiTestMsg] = useState('')
 
   const [isPackaged, setIsPackaged] = useState(false)
+
+  // Tab 8: Arşiv
+  const [archiveYear, setArchiveYear] = useState<number>(new Date().getFullYear() - 1)
+  const [isArchiving, setIsArchiving] = useState(false)
 
   useEffect(() => {
     window.electron.ipcRenderer.invoke('app:isPackaged').then((packaged: boolean) => {
@@ -215,6 +219,8 @@ export default function AyarlarScreen(): React.ReactNode {
     { id: 'tema', label: 'Renk & Tema', icon: <Palette className="w-4 h-4 shrink-0" /> },
     { id: 'div2', label: '', icon: null, isDivider: true },
     { id: 'ai', label: 'Yapay Zeka', icon: <Bot className="w-4 h-4 shrink-0" /> },
+    { id: 'div3', label: '', icon: null, isDivider: true },
+    { id: 'archive', label: 'Veri & Arşiv', icon: <Archive className="w-4 h-4 shrink-0" /> },
     ...(import.meta.env.DEV ? [{ id: 'developer', label: 'Geliştirici & Test', icon: <Code className="w-4 h-4 shrink-0" /> }] : [])
   ] as InnerMenuItem[]
 
@@ -573,9 +579,82 @@ export default function AyarlarScreen(): React.ReactNode {
                     </div>
                   </div>
                 )}
+
+                {/* TAB 8: ARŞİV */}
+                {activeTab === 'archive' && (
+                  <div className="space-y-4">
+                    <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-2">
+                      <div>
+                        <h2 className="text-lg font-bold text-slate-850 dark:text-slate-100">
+                          Eski Yılları Arşivle
+                        </h2>
+                        <p className="text-xs text-slate-500">
+                          Belirlediğiniz yıldan daha eski olan doğrudan temin dosyalarını ana veritabanından çıkartıp, sıkıştırılmış arşiv dosyasına (.dtz) aktarır. Böylece sisteminiz daha hızlı çalışır ve dosya boyutu küçülür.
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="grid grid-cols-1 gap-4 mt-4">
+                      <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-xl border border-blue-100 dark:border-blue-900/30">
+                        <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">
+                          Hangi yıldan öncekiler arşivlensin? (Seçili yıl DAHİL arşivlenir)
+                        </label>
+                        <div className="flex items-center gap-3">
+                          <Input
+                            type="number"
+                            value={archiveYear}
+                            onChange={(e) => setArchiveYear(parseInt(e.target.value))}
+                            className="w-32 bg-white dark:bg-slate-950 border-slate-200 dark:border-slate-800"
+                            min={2000}
+                            max={new Date().getFullYear()}
+                          />
+                          <Button
+                            onClick={async () => {
+                              if (window.confirm(`${archiveYear} ve öncesindeki tüm dosyalar sistemden silinip arşiv dosyasına taşınacak. Onaylıyor musunuz?`)) {
+                                setIsArchiving(true)
+                                try {
+                                  const res = await window.electron.ipcRenderer.invoke('db:archive-old-records', archiveYear)
+                                  if (res.success) {
+                                    alert(`Başarılı! ${res.count} adet dosya arşivlendi.\nKaydedilen Yer: ${res.filePath}`)
+                                    window.location.reload()
+                                  } else {
+                                    alert('Hata: ' + res.message)
+                                  }
+                                } catch (e: any) {
+                                  alert('Beklenmeyen hata: ' + e.message)
+                                } finally {
+                                  setIsArchiving(false)
+                                }
+                              }
+                            }}
+                            disabled={isArchiving}
+                            className="bg-amber-600 hover:bg-amber-700 text-white rounded-lg px-4"
+                          >
+                            {isArchiving ? 'Arşivleniyor...' : 'Arşivlemeyi Başlat'}
+                          </Button>
+                        </div>
+                        <p className="text-xs text-slate-500 mt-3">
+                          Not: Firma, personel ve birim tanımlarınız silinmez. Yalnızca eski temin dosyaları arşivlenir. Oluşan <b>.dtz</b> dosyasını daha sonra uygulamadan tekrar açıp inceleyebilirsiniz.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
 
               {/* SEKMEYİ KAYDET BUTONU */}
+              {activeTab !== 'archive' && (
+                <div className="flex justify-end border-t border-slate-100 dark:border-slate-800 pt-4 mt-6">
+                  <Button
+                    onClick={() => handleSaveTab(activeTab)}
+                    disabled={saving}
+                    className="gap-2 bg-primary hover:bg-primary/90 text-primary-foreground rounded-xl py-2 px-5 text-sm font-semibold transition-all shadow-md shadow-primary/20"
+                  >
+                    <Save className="w-4 h-4" /> Sekme Ayarlarını Kaydet
+                  </Button>
+                </div>
+              )}
+
               <div className="flex justify-end border-t border-slate-100 dark:border-slate-800 pt-4 mt-6">
                 <Button
                   onClick={() => handleSaveTab(activeTab)}
