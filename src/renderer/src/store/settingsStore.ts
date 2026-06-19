@@ -22,6 +22,7 @@ interface SettingsState {
   harcamaBirimKodu: string
   harcamaBirimAdi: string
   ekapDonemKurali: string
+  isDisclaimerAccepted: boolean
   setInstitutionName: (name: string) => void
   setInstitutionLogo: (logo: string | null) => void
   setAdminName: (name: string) => void
@@ -40,6 +41,7 @@ interface SettingsState {
   setMuhasebeBirimAdi: (val: string) => void
   setHarcamaBirimKodu: (val: string) => void
   setHarcamaBirimAdi: (val: string) => void
+  setDisclaimerAccepted: (val: boolean) => void
   loadSettings: () => Promise<void>
 }
 
@@ -65,6 +67,7 @@ export const useSettingsStore = create<SettingsState>((set) => ({
   harcamaBirimKodu: '',
   harcamaBirimAdi: '',
   ekapDonemKurali: '',
+  isDisclaimerAccepted: false,
   setInstitutionName: (name) => set({ institutionName: name }),
   setInstitutionLogo: (logo) => set({ institutionLogo: logo }),
   setAdminName: (name) => set({ adminName: name }),
@@ -83,6 +86,7 @@ export const useSettingsStore = create<SettingsState>((set) => ({
   setMuhasebeBirimAdi: (val) => set({ muhasebeBirimAdi: val }),
   setHarcamaBirimKodu: (val) => set({ harcamaBirimKodu: val }),
   setHarcamaBirimAdi: (val) => set({ harcamaBirimAdi: val }),
+  setDisclaimerAccepted: (val) => set({ isDisclaimerAccepted: val }),
   loadSettings: async () => {
     try {
       const settings = await window.electron.ipcRenderer.invoke('db:get-settings')
@@ -107,7 +111,8 @@ export const useSettingsStore = create<SettingsState>((set) => ({
         muhasebeBirimAdi: settings.muhasebeBirimAdi || '',
         harcamaBirimKodu: settings.harcamaBirimKodu || '',
         harcamaBirimAdi: settings.harcamaBirimAdi || '',
-        ekapDonemKurali: settings.ekapDonemKurali || ''
+        ekapDonemKurali: settings.ekapDonemKurali || '',
+        isDisclaimerAccepted: settings.isDisclaimerAccepted === 'true'
       })
     } catch (error) {
       console.error('Ayarlar yüklenemedi:', error)
@@ -132,7 +137,8 @@ export const useSettingsStore = create<SettingsState>((set) => ({
         muhasebeBirimAdi: '',
         harcamaBirimKodu: '',
         harcamaBirimAdi: '',
-        ekapDonemKurali: ''
+        ekapDonemKurali: '',
+        isDisclaimerAccepted: false
       })
     }
   }
