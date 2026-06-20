@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { useAyarlarHooks } from '../ayarlar/ayarlar.hooks'
 import { Button } from '../../components/ui/Button'
 import { Input } from '../../components/ui/Input'
-import { Building2, Save, Upload, MapPin, ImageIcon, Info, X, ExternalLink, Plus, HelpCircle } from 'lucide-react'
+import { Building2, Save, Upload, MapPin, ImageIcon, Info, X, ExternalLink, Plus, HelpCircle, FileText } from 'lucide-react'
 import { Link } from '@tanstack/react-router'
 import { FINANSMAN_KODLARI } from '../../constants/butce-kodlari'
 import { InnerMenu, InnerMenuItem } from '../../components/ui/InnerMenu'
@@ -55,6 +55,7 @@ export default function KurumScreen(): React.JSX.Element {
   const [harcamaBirimAdi, setHarcamaBirimAdi] = useState('')
   const [dtvtKodu, setDtvtKodu] = useState('')
   const [detsisKodu, setDetsisKodu] = useState('')
+  const [konuOrtalamaSiniri, setKonuOrtalamaSiniri] = useState('true')
 
   const [sozlukData, setSozlukData] = useState<{ tur: string; kod: string; aciklama: string }[]>([])
 
@@ -126,6 +127,7 @@ export default function KurumScreen(): React.JSX.Element {
         setHarcamaBirimAdi(settings.harcamaBirimAdi || '')
         setDtvtKodu(settings.dtvtKodu || '')
         setDetsisKodu(settings.detsisKodu || '')
+        setKonuOrtalamaSiniri(settings.konuOrtalamaSiniri || 'true')
       }, 0)
     }
   }, [settings])
@@ -155,6 +157,7 @@ export default function KurumScreen(): React.JSX.Element {
         dataToSave.harcamaBirimAdi = harcamaBirimAdi
         dataToSave.dtvtKodu = dtvtKodu
         dataToSave.detsisKodu = detsisKodu
+        dataToSave.konuOrtalamaSiniri = konuOrtalamaSiniri
       } else if (tab === 'iletisim') {
         if (website && instEmail) {
           try {
@@ -625,6 +628,36 @@ export default function KurumScreen(): React.JSX.Element {
                             </div>
                           </div>
 
+                        </div>
+                      </div>
+
+                      {/* RESMİ YAZIŞMA VE ŞABLON KURALLARI */}
+                      <div className="md:col-span-2 mt-4 pt-6 border-t border-slate-100 dark:border-slate-800">
+                        <div className="flex items-center justify-between mb-4">
+                          <h3 className="text-sm font-bold text-slate-850 dark:text-slate-100 flex items-center gap-2">
+                            <FileText className="w-4 h-4 text-emerald-500" />
+                            Resmi Yazışma ve Şablon Kuralları
+                          </h3>
+                        </div>
+                        <div className="grid grid-cols-1 gap-5">
+                          <div className="bg-slate-50/50 dark:bg-slate-950/30 p-4 rounded-xl border border-slate-200 dark:border-slate-800">
+                            <label className="flex items-start gap-3 cursor-pointer">
+                              <input 
+                                type="checkbox" 
+                                checked={konuOrtalamaSiniri === 'true'}
+                                onChange={(e) => setKonuOrtalamaSiniri(e.target.checked ? 'true' : 'false')}
+                                className="mt-0.5 rounded border-slate-300 text-blue-600 focus:ring-blue-500 bg-white dark:bg-slate-900 w-4 h-4" 
+                              />
+                              <div>
+                                <span className="text-xs font-semibold text-slate-700 dark:text-slate-300 block mb-1">
+                                  Konu Satırı Dikey Orta Hizayı Geçmesin
+                                </span>
+                                <p className="text-[10px] text-slate-500 dark:text-slate-400 leading-relaxed">
+                                  Resmi Yazışmalarda Uygulanacak Usul ve Esaslar Hakkında Yönetmelik gereği, belgenin konusu yazı alanının dikey orta hizasını geçmeyecek biçimde sınırlandırılır. Seçili olduğunda şablonlarda "Konu" metni dikey orta hizadan itibaren otomatik olarak alt satıra geçer.
+                                </p>
+                              </div>
+                            </label>
+                          </div>
                         </div>
                       </div>
 
