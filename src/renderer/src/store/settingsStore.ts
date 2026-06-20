@@ -10,6 +10,7 @@ interface SettingsState {
   adminUsername: string
   eButceKodu: string
   say2000iKodu: string
+  detsisKodu: string
   themeLightVars: string
   themeDarkVars: string
   limitType: string
@@ -30,6 +31,7 @@ interface SettingsState {
   setAdminUsername: (username: string) => void
   setEButceKodu: (code: string) => void
   setSay2000iKodu: (code: string) => void
+  setDetsisKodu: (code: string) => void
   setThemeLightVars: (vars: string) => void
   setThemeDarkVars: (vars: string) => void
   setLimitType: (limitType: string) => void
@@ -55,6 +57,7 @@ export const useSettingsStore = create<SettingsState>((set) => ({
   adminUsername: 'admin',
   eButceKodu: '',
   say2000iKodu: '',
+  detsisKodu: '',
   themeLightVars: '',
   themeDarkVars: '',
   limitType: 'diger',
@@ -75,6 +78,7 @@ export const useSettingsStore = create<SettingsState>((set) => ({
   setAdminUsername: (username) => set({ adminUsername: username }),
   setEButceKodu: (code) => set({ eButceKodu: code }),
   setSay2000iKodu: (code) => set({ say2000iKodu: code }),
+  setDetsisKodu: (code) => set({ detsisKodu: code }),
   setThemeLightVars: (vars) => set({ themeLightVars: vars }),
   setThemeDarkVars: (vars) => set({ themeDarkVars: vars }),
   setLimitType: (limitType) => set({ limitType }),
@@ -100,6 +104,7 @@ export const useSettingsStore = create<SettingsState>((set) => ({
         adminUsername: settings.adminUsername || 'admin',
         eButceKodu: settings.eButceKodu || '',
         say2000iKodu: settings.say2000iKodu || '',
+        detsisKodu: settings.detsisKodu || '',
         themeLightVars: settings.themeLightVars || '',
         themeDarkVars: settings.themeDarkVars || '',
         limitType: settings.limitType || 'diger',
@@ -126,6 +131,7 @@ export const useSettingsStore = create<SettingsState>((set) => ({
         adminUsername: 'admin',
         eButceKodu: '',
         say2000iKodu: '',
+        detsisKodu: '',
         themeLightVars: '',
         themeDarkVars: '',
         limitType: 'diger',
