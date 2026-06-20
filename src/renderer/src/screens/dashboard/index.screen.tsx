@@ -14,7 +14,6 @@ import {
   Briefcase,
   Megaphone,
   Info,
-  ShieldAlert,
   AlertTriangle,
   Sparkles,
   Mail,
@@ -49,8 +48,7 @@ export default function DashboardScreen(): React.JSX.Element {
     adminName,
     adminTitle,
     eButceKodu,
-    say2000iKodu,
-    detsisKodu
+    say2000iKodu
   } = useSettingsStore()
   const { activeDosyaId } = useWorkspaceStore()
   const { stats, isLoading } = useDashboardStats()
@@ -200,17 +198,6 @@ export default function DashboardScreen(): React.JSX.Element {
         </div>
       )}
 
-      {/* YASAL UYARI / EULA BANNER */}
-      <div className="p-4 rounded-2xl bg-slate-100 dark:bg-slate-900 border border-slate-300 dark:border-slate-700 flex flex-col md:flex-row items-start gap-4 shadow-sm">
-        <ShieldAlert className="w-6 h-6 shrink-0 mt-0.5 text-slate-500 dark:text-slate-400" />
-        <div className="flex-1">
-          <h4 className="text-sm font-bold text-slate-800 dark:text-slate-200">Yasal Uyarı ve Sorumluluk Reddi</h4>
-          <p className="text-xs mt-1 text-slate-600 dark:text-slate-400 leading-relaxed">
-            Bu uygulama, kamu kurumları ve kuruluşlarının Doğrudan Temin süreçlerini dijitalleştirmek amacıyla <strong>yardımcı bir araç</strong> olarak geliştirilmiştir.
-            Uygulama üzerinden üretilen hesaplamaların, belgelerin ve raporların doğruluğunu, yasal mevzuata uygunluğunu ve güncelliğini kontrol etmek <strong>tamamen kullanıcının sorumluluğundadır</strong>. Geliştirici, hatalı hesaplamalar veya mevzuata aykırı işlemlerden doğabilecek <strong>hukuki, idari ve mali sorumlulukları kabul etmez</strong>.
-          </p>
-        </div>
-      </div>
 
       <div className="p-6 rounded-3xl bg-linear-to-r from-blue-600/10 via-indigo-600/5 to-transparent border border-blue-500/10 dark:border-blue-500/5 flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
@@ -672,38 +659,13 @@ export default function DashboardScreen(): React.JSX.Element {
               )}
               
               <div className="grid grid-cols-2 gap-2">
-                {say2000iKodu && (
-                  <div className="flex items-center gap-2 p-2 rounded-xl bg-indigo-50/80 dark:bg-indigo-900/20 border border-indigo-100/80 dark:border-indigo-800/50 mt-1 shadow-sm">
-                    <div className="p-1 bg-indigo-100 dark:bg-indigo-900/50 rounded-md">
-                      <Hash className="w-3 h-3 text-indigo-600 dark:text-indigo-400" />
-                    </div>
-                    <div>
-                      <span className="text-[9px] font-bold text-indigo-500 dark:text-indigo-400 block uppercase leading-none mb-0.5 flex items-center gap-1">
-                        Say2000i Kodu
-                        <span title="Kurumun Say2000i sistemindeki kodu"><Info className="w-2.5 h-2.5 cursor-help" /></span>
-                      </span>
-                      <span className="font-mono font-bold text-slate-850 dark:text-slate-100">{say2000iKodu}</span>
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              <div className="grid grid-cols-2 gap-2 mt-2">
-                {detsisKodu && (
+                {kurumsalKod && (
                   <div className="bg-slate-50/80 dark:bg-slate-800/30 p-2.5 rounded-xl border border-slate-100 dark:border-slate-700/50 relative group/link">
                     <span className="text-[9px] font-bold text-slate-450 dark:text-slate-500 block uppercase mb-0.5 flex items-center justify-between">
                       DETSİS Kodu
                       <a href="https://www.kaysis.gov.tr/" target="_blank" rel="noreferrer" className="text-blue-500 hover:text-blue-600 opacity-0 group-hover/link:opacity-100 transition-opacity" title="DETSİS'te Sorgula">
                         <ExternalLink className="w-2.5 h-2.5" />
                       </a>
-                    </span>
-                    <span className="font-mono font-bold text-slate-800 dark:text-slate-200">{detsisKodu}</span>
-                  </div>
-                )}
-                {kurumsalKod && (
-                  <div className="bg-slate-50/80 dark:bg-slate-800/30 p-2.5 rounded-xl border border-slate-100 dark:border-slate-700/50 relative group/link">
-                    <span className="text-[9px] font-bold text-slate-450 dark:text-slate-500 block uppercase mb-0.5 flex items-center justify-between">
-                      Kurumsal Kod
                     </span>
                     <span className="font-mono font-bold text-slate-800 dark:text-slate-200">{kurumsalKod}</span>
                   </div>
