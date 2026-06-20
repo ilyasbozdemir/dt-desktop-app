@@ -318,7 +318,7 @@ export default function KurumScreen(): React.JSX.Element {
                       </div>
                       <div>
                         <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1">
-                          Sunulacak Makam Adı
+                          Sunulacak Makam Adı (Muhatap)
                         </label>
                         <Input
                           value={recipientTitle}
