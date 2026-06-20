@@ -23,6 +23,7 @@ import {
   Compass,
   FileCheck,
   CreditCard,
+  HelpCircle
 } from 'lucide-react'
 import { cn } from '../../utils/cn'
 import { useSettingsStore } from '../../store/settingsStore'
@@ -95,6 +96,7 @@ const menuGroups: MenuGroup[] = [
     items: [
       { name: 'Raporlar', path: '/raporlar', icon: BarChart3 },
       { name: 'Sürüm Notları', path: '/changelog', icon: Megaphone },
+      { name: 'Yardım & Kılavuzlar', path: '/yardim', icon: HelpCircle },
       {
         name: 'Ayarlar',
         icon: Settings,

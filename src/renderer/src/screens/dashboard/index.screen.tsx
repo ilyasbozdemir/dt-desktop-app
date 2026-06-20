@@ -641,6 +641,9 @@ export default function DashboardScreen(): React.JSX.Element {
                   <span className="text-[9px] font-bold text-slate-450 dark:text-slate-500 block uppercase mb-0.5">Limit Grubu</span>
                   <span className="font-bold text-slate-700 dark:text-slate-300 truncate block" title={limitType === 'buyuksehir' ? 'Büyükşehir Limitleri' : 'Diğer İdare Limitleri'}>
                     {limitType === 'buyuksehir' ? 'Büyükşehir' : 'Diğer İdare'}
+                    {
+                      limitType
+                    }
                   </span>
                 </div>
               </div>
@@ -682,7 +685,7 @@ export default function DashboardScreen(): React.JSX.Element {
                   <div className="bg-slate-50/80 dark:bg-slate-800/30 p-2.5 rounded-xl border border-slate-100 dark:border-slate-700/50 relative group/link">
                     <span className="text-[9px] font-bold text-slate-450 dark:text-slate-500 block uppercase mb-0.5 flex items-center justify-between">
                       DETSİS Kodu
-                      <a href="https://www.kaysis.gov.tr/" target="_blank" rel="noreferrer" className="text-blue-500 hover:text-blue-600 opacity-0 group-hover/link:opacity-100 transition-opacity" title="DETSİS'te Sorgula">
+                      <a href={`https://www.kaysis.gov.tr/Kutuphane/Kurum/Detay/${detsisKodu}`} target="_blank" rel="noreferrer" className="text-blue-500 hover:text-blue-600 opacity-0 group-hover/link:opacity-100 transition-opacity" title="DETSİS'te Sorgula">
                         <ExternalLink className="w-2.5 h-2.5" />
                       </a>
                     </span>

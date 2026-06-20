@@ -492,13 +492,29 @@ export default function KurumScreen(): React.JSX.Element {
                             </p>
                           </div>
 
+                          {/* DETSİS Kodu */}
+                          <div>
+                            <label className="text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5 flex items-center gap-1.5">
+                              DETSİS Kodu (DTVT)
+                              <a href={detsisKodu ? `https://detsis.gov.tr/ara//${detsisKodu}` : "https://www.detsis.gov.tr/"} target="_blank" rel="noreferrer" className="text-[10px] text-blue-600 hover:underline flex items-center gap-1 ml-auto" title="Devlet Teşkilatı Merkezi Kayıt Sistemi">
+                                DETSİS Sorgula <ExternalLink className="w-3 h-3" />
+                              </a>
+                            </label>
+                            <Input
+                              value={detsisKodu}
+                              onChange={(e) => setDetsisKodu(e.target.value)}
+                              placeholder="DETSİS Kodunuzu girin..."
+                              className="w-full bg-slate-55 dark:bg-slate-955 border-slate-200 dark:border-slate-800 text-xs"
+                            />
+                            <p className="text-[10px] text-slate-400 mt-1 leading-normal">
+                              Kurumunuzun Devlet Teşkilatı Merkezi Kayıt Sistemi'ndeki kodu.
+                            </p>
+                          </div>
+
                           {/* Kurumsal Kod */}
                           <div>
                             <label className="text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5 flex items-center gap-1.5">
                               Kurumsal Kod (Düzey 1-2-3-4)
-                              <a href="https://www.kaysis.gov.tr/" target="_blank" rel="noreferrer" className="text-[10px] text-blue-600 hover:underline flex items-center gap-1 ml-auto" title="Devlet Teşkilatı Merkezi Kayıt Sistemi">
-                                DETSİS Sorgula <ExternalLink className="w-3 h-3" />
-                              </a>
                             </label>
                             <select
                               value={fonksiyonelKod}

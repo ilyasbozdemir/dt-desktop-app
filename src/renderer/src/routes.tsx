@@ -7,6 +7,7 @@ import PersonelScreen from './screens/personel/index.screen'
 import { MevzuatScreen } from './screens/system/MevzuatScreen'
 import ChangelogScreen from './screens/system/ChangelogScreen'
 import ImportScreen from './screens/system/ImportScreen'
+import YardimScreen from './screens/system/YardimScreen'
 import AyarlarScreen from './screens/ayarlar/index.screen'
 import TemaScreen from './screens/ayarlar/TemaScreen'
 import BirimlerScreen from './screens/birimler/index.screen'
@@ -116,6 +117,12 @@ const changelogRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/changelog',
   component: ChangelogScreen
+})
+
+const yardimRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/yardim',
+  component: YardimScreen
 })
 
 const importRoute = createRoute({
@@ -358,7 +365,8 @@ const routeTree = rootRoute.addChildren([
   butceSorguRoute,
   harcamaTalimatRoute,
   harcamaPusulaRoute,
-  ciktiMerkeziRoute
+  ciktiMerkeziRoute,
+  yardimRoute
 ])
 
 export const router = createRouter({ routeTree })
