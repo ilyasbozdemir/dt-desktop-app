@@ -43,6 +43,8 @@ interface SettingsState {
   setMuhasebeBirimAdi: (val: string) => void
   setHarcamaBirimKodu: (val: string) => void
   setHarcamaBirimAdi: (val: string) => void
+  disclaimerHistory: string
+  setDisclaimerHistory: (history: string) => void
   setDisclaimerAccepted: (val: boolean) => void
   loadSettings: () => Promise<void>
 }
@@ -71,6 +73,7 @@ export const useSettingsStore = create<SettingsState>((set) => ({
   harcamaBirimAdi: '',
   ekapDonemKurali: '',
   isDisclaimerAccepted: false,
+  disclaimerHistory: '[]',
   setInstitutionName: (name) => set({ institutionName: name }),
   setInstitutionLogo: (logo) => set({ institutionLogo: logo }),
   setAdminName: (name) => set({ adminName: name }),
@@ -90,6 +93,7 @@ export const useSettingsStore = create<SettingsState>((set) => ({
   setMuhasebeBirimAdi: (val) => set({ muhasebeBirimAdi: val }),
   setHarcamaBirimKodu: (val) => set({ harcamaBirimKodu: val }),
   setHarcamaBirimAdi: (val) => set({ harcamaBirimAdi: val }),
+  setDisclaimerHistory: (history) => set({ disclaimerHistory: history }),
   setDisclaimerAccepted: (val) => set({ isDisclaimerAccepted: val }),
   loadSettings: async () => {
     try {
@@ -116,7 +120,8 @@ export const useSettingsStore = create<SettingsState>((set) => ({
         muhasebeBirimAdi: settings.muhasebeBirimAdi || '',
         harcamaBirimKodu: settings.harcamaBirimKodu || '',
         harcamaBirimAdi: settings.harcamaBirimAdi || '',
-        ekapDonemKurali: settings.ekapDonemKurali || ''
+        ekapDonemKurali: settings.ekapDonemKurali || '',
+        disclaimerHistory: settings.disclaimerHistory || '[]'
         // isDisclaimerAccepted is intentionally not loaded from DB to show it on every app launch
       })
     } catch (error) {
@@ -144,6 +149,7 @@ export const useSettingsStore = create<SettingsState>((set) => ({
         harcamaBirimKodu: '',
         harcamaBirimAdi: '',
         ekapDonemKurali: '',
+        disclaimerHistory: '[]',
         isDisclaimerAccepted: false
       })
     }

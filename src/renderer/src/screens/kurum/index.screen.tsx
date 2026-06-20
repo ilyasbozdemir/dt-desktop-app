@@ -34,21 +34,14 @@ export default function KurumScreen(): React.JSX.Element {
     setInstitutionType(type)
     if (type === 'belediye') {
       setFinansmanKodu('5')
-      setLimitType('diger')
     } else if (type === 'genel_butce') {
       setFinansmanKodu('1')
-      setLimitType('diger')
     } else if (type === 'ozel_butce') {
       setFinansmanKodu('2')
-      setLimitType('diger')
     } else if (type === 'duzenleyici') {
       setFinansmanKodu('3')
-      setLimitType('diger')
     } else if (type === 'sosyal_guvenlik') {
       setFinansmanKodu('4')
-      setLimitType('diger')
-    } else if (type === 'diger') {
-      setLimitType('diger')
     }
   }
 
@@ -496,7 +489,7 @@ export default function KurumScreen(): React.JSX.Element {
                           <div>
                             <label className="text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5 flex items-center gap-1.5">
                               DETSİS Kodu (DTVT)
-                              <a href={detsisKodu ? `https://detsis.gov.tr/ara//${detsisKodu}` : "https://www.detsis.gov.tr/"} target="_blank" rel="noreferrer" className="text-[10px] text-blue-600 hover:underline flex items-center gap-1 ml-auto" title="Devlet Teşkilatı Merkezi Kayıt Sistemi">
+                              <a href={detsisKodu ? `https://detsis.gov.tr/birim/${detsisKodu}/${detsisKodu}/${new Date().toISOString().split('T')[0]}` : "https://www.detsis.gov.tr/"} target="_blank" rel="noreferrer" className="text-[10px] text-blue-600 hover:underline flex items-center gap-1 ml-auto" title="Devlet Teşkilatı Merkezi Kayıt Sistemi">
                                 DETSİS Sorgula <ExternalLink className="w-3 h-3" />
                               </a>
                             </label>
@@ -608,7 +601,7 @@ export default function KurumScreen(): React.JSX.Element {
                                 <Info className="w-3.5 h-3.5 shrink-0 mt-0.5" />
                                 <span>
                                   DTVT (Devlet Teşkilatı Veri Tabanı) sistemi, DETSİS (Devlet Teşkilatı Merkezi Kayıt Sistemi) olarak güncellenmiştir.
-                                  Kurum kodunuzu bilmiyorsanız <a href={dtvtKodu ? `https://detsis.gov.tr/ara/${dtvtKodu}` : "https://detsis.gov.tr/"} target="_blank" rel="noopener noreferrer" className="font-bold underline hover:text-amber-700 dark:hover:text-amber-400">DETSİS'te Arama Yapın</a>.
+                                  Kurum kodunuzu bilmiyorsanız <a href={dtvtKodu ? `https://detsis.gov.tr/birim/${dtvtKodu}/${dtvtKodu}/${new Date().toISOString().split('T')[0]}` : "https://detsis.gov.tr/"} target="_blank" rel="noopener noreferrer" className="font-bold underline hover:text-amber-700 dark:hover:text-amber-400">DETSİS'te Arama Yapın</a>.
                                 </span>
                               </div>
                             </>

@@ -3,7 +3,7 @@ import { AlertTriangle, CheckCircle } from 'lucide-react'
 import { useSettingsStore } from '../../store/settingsStore'
 
 export const DisclaimerModal: React.FC = () => {
-  const { isDisclaimerAccepted, setDisclaimerAccepted } = useSettingsStore()
+  const { isDisclaimerAccepted, setDisclaimerAccepted, disclaimerHistory, setDisclaimerHistory } = useSettingsStore()
 
   if (isDisclaimerAccepted) return null
 
@@ -11,9 +11,25 @@ export const DisclaimerModal: React.FC = () => {
     try {
       // Save locally
       setDisclaimerAccepted(true)
+
+      let historyArray: string[] = []
+      try {
+        if (disclaimerHistory) {
+          historyArray = JSON.parse(disclaimerHistory)
+          if (!Array.isArray(historyArray)) historyArray = []
+        }
+      } catch (e) {
+        historyArray = []
+      }
+
+      historyArray.push(new Date().toISOString())
+      const newHistory = JSON.stringify(historyArray)
+      setDisclaimerHistory(newHistory)
+
       // Save to db
       await window.electron.ipcRenderer.invoke('db:save-settings', {
-        isDisclaimerAccepted: 'true'
+        isDisclaimerAccepted: 'true',
+        disclaimerHistory: newHistory
       })
     } catch (error) {
       console.error('Sorumluluk reddi kaydedilirken hata oluştu:', error)

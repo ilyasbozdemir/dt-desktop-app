@@ -52,16 +52,18 @@ export default function DashboardScreen(): React.JSX.Element {
     say2000iKodu,
     detsisKodu
   } = useSettingsStore()
+
+
   const { activeDosyaId } = useWorkspaceStore()
   const { stats, isLoading } = useDashboardStats()
   const { announcements, isLoading: isAnnouncementsLoading } = useAnnouncements()
   const { dosyalar } = useDosyalarHooks()
   const { settings } = useAyarlarHooks()
   const isMailConfigured = !!settings.smtp_host
-  
+
   const [showAIModal, setShowAIModal] = useState(false)
   const [selectedFileForAI, setSelectedFileForAI] = useState<any>(null)
-  
+
   // Dynamic Greeting based on time
   const greeting = (() => {
     const hours = new Date().getHours()
@@ -157,7 +159,7 @@ export default function DashboardScreen(): React.JSX.Element {
       }
       return { name: asama.asama_adi, color: colorMap[asama.rozet_rengi] || colorMap['blue'] }
     }
-    
+
     // Fallback if db not loaded
     switch (asamaSira) {
       case 1:
@@ -219,11 +221,11 @@ export default function DashboardScreen(): React.JSX.Element {
             {currentDate}
           </p>
         </div>
-        
+
         <div className="flex items-center gap-3 shrink-0 relative">
           {activeSummary && (
             <div className="relative">
-              <Button 
+              <Button
                 onClick={() => setIsActivePopoverOpen(!isActivePopoverOpen)}
                 variant="outline"
                 className="text-xs font-bold py-2 border-blue-200 dark:border-blue-900/50 hover:bg-blue-50 dark:hover:bg-blue-950/20 text-blue-600 dark:text-blue-450 flex items-center gap-1.5"
@@ -299,317 +301,317 @@ export default function DashboardScreen(): React.JSX.Element {
       <div className={cn("grid grid-cols-1 gap-4", activeDosyaId ? "md:grid-cols-2" : "md:grid-cols-2 lg:grid-cols-4")}>
         {!activeDosyaId && (
           <>
-        {/* Card 1: Total Dossiers (Genel) */}
-        <div className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between h-36 group hover:border-blue-500/30 transition-all duration-300">
-          <div className="flex items-center justify-between">
-            <div className="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-450 flex items-center justify-center shrink-0">
-              <FileText className="w-5 h-5" />
+            {/* Card 1: Total Dossiers (Genel) */}
+            <div className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between h-36 group hover:border-blue-500/30 transition-all duration-300">
+              <div className="flex items-center justify-between">
+                <div className="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-450 flex items-center justify-center shrink-0">
+                  <FileText className="w-5 h-5" />
+                </div>
+                <span className="text-[10px] font-bold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/30 px-2.5 py-0.5 rounded-full border border-blue-500/10">
+                  Genel Metrik
+                </span>
+              </div>
+              <div>
+                <div className="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-wider">Toplam Temin Dosyası (Genel)</div>
+                <div className="text-2xl font-extrabold text-slate-800 dark:text-slate-100 mt-1 flex items-baseline gap-1">
+                  {isLoading ? '-' : stats.ihaleDosyaSayisi} <span className="text-xs font-semibold text-slate-400 dark:text-slate-500">Dosya</span>
+                </div>
+              </div>
             </div>
-            <span className="text-[10px] font-bold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/30 px-2.5 py-0.5 rounded-full border border-blue-500/10">
-              Genel Metrik
-            </span>
-          </div>
-          <div>
-            <div className="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-wider">Toplam Temin Dosyası (Genel)</div>
-            <div className="text-2xl font-extrabold text-slate-800 dark:text-slate-100 mt-1 flex items-baseline gap-1">
-              {isLoading ? '-' : stats.ihaleDosyaSayisi} <span className="text-xs font-semibold text-slate-400 dark:text-slate-500">Dosya</span>
-            </div>
-          </div>
-        </div>
 
-        {/* Card 2: Total Estimated Volume (Genel) */}
-        <div className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between h-36 group hover:border-emerald-500/30 transition-all duration-300">
-          <div className="flex items-center justify-between">
-            <div className="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-450 flex items-center justify-center shrink-0">
-              <TrendingUp className="w-5 h-5" />
+            {/* Card 2: Total Estimated Volume (Genel) */}
+            <div className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between h-36 group hover:border-emerald-500/30 transition-all duration-300">
+              <div className="flex items-center justify-between">
+                <div className="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-450 flex items-center justify-center shrink-0">
+                  <TrendingUp className="w-5 h-5" />
+                </div>
+                <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/30 px-2.5 py-0.5 rounded-full border border-emerald-500/10">
+                  Genel Toplam
+                </span>
+              </div>
+              <div>
+                <div className="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-wider">Toplam Yaklaşık Maliyet (Genel)</div>
+                <div className="text-2xl font-extrabold text-slate-800 dark:text-slate-100 mt-1">
+                  {isLoading ? '-' : formatCurrency(stats.toplamYaklasikMaliyet)}
+                </div>
+              </div>
             </div>
-            <span className="text-[10px] font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/30 px-2.5 py-0.5 rounded-full border border-emerald-500/10">
-              Genel Toplam
-            </span>
-          </div>
-          <div>
-            <div className="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-wider">Toplam Yaklaşık Maliyet (Genel)</div>
-            <div className="text-2xl font-extrabold text-slate-800 dark:text-slate-100 mt-1">
-              {isLoading ? '-' : formatCurrency(stats.toplamYaklasikMaliyet)}
+            {/* Card 3: Active Files (Genel) */}
+            <div className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between h-36 group hover:border-cyan-500/30 transition-all duration-300">
+              <div className="flex items-center justify-between">
+                <div className="w-10 h-10 rounded-xl bg-cyan-50 dark:bg-cyan-900/20 text-cyan-600 dark:text-cyan-450 flex items-center justify-center shrink-0">
+                  <Clock className="w-5 h-5" />
+                </div>
+                <span className="text-[10px] font-bold text-cyan-600 dark:text-cyan-400 bg-cyan-50 dark:bg-cyan-950/30 px-2.5 py-0.5 rounded-full border border-cyan-500/10">
+                  Süreçte
+                </span>
+              </div>
+              <div>
+                <div className="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-wider">Aktif Temin Süreçleri</div>
+                <div className="text-2xl font-extrabold text-slate-800 dark:text-slate-100 mt-1 flex items-baseline gap-1">
+                  {isLoading ? '-' : stats.aktifDosyaSayisi} <span className="text-xs font-semibold text-slate-400 dark:text-slate-500">Dosya</span>
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
-        {/* Card 3: Active Files (Genel) */}
-        <div className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between h-36 group hover:border-cyan-500/30 transition-all duration-300">
-          <div className="flex items-center justify-between">
-            <div className="w-10 h-10 rounded-xl bg-cyan-50 dark:bg-cyan-900/20 text-cyan-600 dark:text-cyan-450 flex items-center justify-center shrink-0">
-              <Clock className="w-5 h-5" />
-            </div>
-            <span className="text-[10px] font-bold text-cyan-600 dark:text-cyan-400 bg-cyan-50 dark:bg-cyan-950/30 px-2.5 py-0.5 rounded-full border border-cyan-500/10">
-              Süreçte
-            </span>
-          </div>
-          <div>
-            <div className="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-wider">Aktif Temin Süreçleri</div>
-            <div className="text-2xl font-extrabold text-slate-800 dark:text-slate-100 mt-1 flex items-baseline gap-1">
-              {isLoading ? '-' : stats.aktifDosyaSayisi} <span className="text-xs font-semibold text-slate-400 dark:text-slate-500">Dosya</span>
-            </div>
-          </div>
-        </div>
 
-        {/* Card 4: Completed Files (Genel) */}
-        <div className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between h-36 group hover:border-purple-500/30 transition-all duration-300">
-          <div className="flex items-center justify-between">
-            <div className="w-10 h-10 rounded-xl bg-purple-50 dark:bg-purple-900/20 text-purple-600 dark:text-purple-450 flex items-center justify-center shrink-0">
-              <CheckCircle2 className="w-5 h-5" />
+            {/* Card 4: Completed Files (Genel) */}
+            <div className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between h-36 group hover:border-purple-500/30 transition-all duration-300">
+              <div className="flex items-center justify-between">
+                <div className="w-10 h-10 rounded-xl bg-purple-50 dark:bg-purple-900/20 text-purple-600 dark:text-purple-450 flex items-center justify-center shrink-0">
+                  <CheckCircle2 className="w-5 h-5" />
+                </div>
+                <span className="text-[10px] font-bold text-purple-600 dark:text-purple-400 bg-purple-50 dark:bg-purple-950/30 px-2.5 py-0.5 rounded-full border border-purple-500/10">
+                  Sonuçlanan
+                </span>
+              </div>
+              <div>
+                <div className="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-wider">Tamamlanan İhaleler</div>
+                <div className="text-2xl font-extrabold text-slate-800 dark:text-slate-100 mt-1 flex items-baseline gap-1">
+                  {isLoading ? '-' : stats.tamamlananDosyaSayisi} <span className="text-xs font-semibold text-slate-400 dark:text-slate-500">Dosya</span>
+                </div>
+              </div>
             </div>
-            <span className="text-[10px] font-bold text-purple-600 dark:text-purple-400 bg-purple-50 dark:bg-purple-950/30 px-2.5 py-0.5 rounded-full border border-purple-500/10">
-              Sonuçlanan
-            </span>
-          </div>
-          <div>
-            <div className="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-wider">Tamamlanan İhaleler</div>
-            <div className="text-2xl font-extrabold text-slate-800 dark:text-slate-100 mt-1 flex items-baseline gap-1">
-              {isLoading ? '-' : stats.tamamlananDosyaSayisi} <span className="text-xs font-semibold text-slate-400 dark:text-slate-500">Dosya</span>
-            </div>
-          </div>
-        </div>
           </>
         )}
 
         {activeDosyaId && (
           <>
-        {/* Card 3: Active Dossier Cost (Aktif) */}
-        <div className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between h-36 group hover:border-indigo-500/30 transition-all duration-300">
-          <div className="flex items-center justify-between">
-            <div className="w-10 h-10 rounded-xl bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-450 flex items-center justify-center shrink-0">
-              <Landmark className="w-5 h-5" />
+            {/* Card 3: Active Dossier Cost (Aktif) */}
+            <div className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between h-36 group hover:border-indigo-500/30 transition-all duration-300">
+              <div className="flex items-center justify-between">
+                <div className="w-10 h-10 rounded-xl bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-450 flex items-center justify-center shrink-0">
+                  <Landmark className="w-5 h-5" />
+                </div>
+                <span className="text-[10px] font-bold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/30 px-2.5 py-0.5 rounded-full border border-indigo-500/10">
+                  Aktif Dosya
+                </span>
+              </div>
+              <div>
+                <div className="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-wider">Aktif Dosya Maliyeti</div>
+                <div className="text-2xl font-extrabold text-slate-800 dark:text-slate-100 mt-1 truncate">
+                  {isActiveSummaryLoading ? 'Yükleniyor...' : activeSummary ? formatCurrency(activeSummary.yaklasikMaliyet) : 'Dosya Seçilmedi'}
+                </div>
+              </div>
             </div>
-            <span className="text-[10px] font-bold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/30 px-2.5 py-0.5 rounded-full border border-indigo-500/10">
-              Aktif Dosya
-            </span>
-          </div>
-          <div>
-            <div className="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-wider">Aktif Dosya Maliyeti</div>
-            <div className="text-2xl font-extrabold text-slate-800 dark:text-slate-100 mt-1 truncate">
-              {isActiveSummaryLoading ? 'Yükleniyor...' : activeSummary ? formatCurrency(activeSummary.yaklasikMaliyet) : 'Dosya Seçilmedi'}
-            </div>
-          </div>
-        </div>
 
-        {/* Card 4: Active Dossier KİK Limit Consumption (Aktif) */}
-        <div className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between h-36 group hover:border-amber-500/30 transition-all duration-300">
-          <div className="flex items-center justify-between">
-            <div className="w-10 h-10 rounded-xl bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-450 flex items-center justify-center shrink-0">
-              <Clock className="w-5 h-5" />
+            {/* Card 4: Active Dossier KİK Limit Consumption (Aktif) */}
+            <div className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between h-36 group hover:border-amber-500/30 transition-all duration-300">
+              <div className="flex items-center justify-between">
+                <div className="w-10 h-10 rounded-xl bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-450 flex items-center justify-center shrink-0">
+                  <Clock className="w-5 h-5" />
+                </div>
+                <span className="text-[10px] font-bold text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/30 px-2.5 py-0.5 rounded-full border border-amber-500/10">
+                  Yasal Limit Etkisi
+                </span>
+              </div>
+              <div>
+                <div className="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-wider">Aktif Dosya Limit Tüketim Oranı</div>
+                <div className="flex items-center justify-between mt-1.5">
+                  <span className="text-2xl font-extrabold text-slate-850 dark:text-slate-100">
+                    {activeSummary ? `%${activeSpentPercent.toFixed(1)}` : '-%'}
+                  </span>
+                  <span className="text-[9px] font-semibold text-slate-400">
+                    Limit: {formatCurrency(activeDossierLimit)}
+                  </span>
+                </div>
+                <div className="w-full bg-slate-100 dark:bg-slate-800 h-2 rounded-full overflow-hidden mt-1.5">
+                  <div
+                    className="bg-indigo-650 h-full rounded-full transition-all duration-500"
+                    style={{ width: `${activeSummary ? activeSpentPercent : 0}%` }}
+                  />
+                </div>
+              </div>
             </div>
-            <span className="text-[10px] font-bold text-amber-600 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/30 px-2.5 py-0.5 rounded-full border border-amber-500/10">
-              Yasal Limit Etkisi
-            </span>
-          </div>
-          <div>
-            <div className="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-wider">Aktif Dosya Limit Tüketim Oranı</div>
-            <div className="flex items-center justify-between mt-1.5">
-              <span className="text-2xl font-extrabold text-slate-850 dark:text-slate-100">
-                {activeSummary ? `%${activeSpentPercent.toFixed(1)}` : '-%'}
-              </span>
-              <span className="text-[9px] font-semibold text-slate-400">
-                Limit: {formatCurrency(activeDossierLimit)}
-              </span>
-            </div>
-            <div className="w-full bg-slate-100 dark:bg-slate-800 h-2 rounded-full overflow-hidden mt-1.5">
-              <div 
-                className="bg-indigo-650 h-full rounded-full transition-all duration-500" 
-                style={{ width: `${activeSummary ? activeSpentPercent : 0}%` }}
-              />
-            </div>
-          </div>
-        </div>
           </>
         )}
       </div>
-                 {/* NEW STATS & RIGHT PANEL GRID */}
+      {/* NEW STATS & RIGHT PANEL GRID */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* STATS CARDS */}
         {!activeDosyaId && (
           <div className="lg:col-span-8">
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-            {/* İhale Dosya Sayısı */}
-            <div className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between group hover:border-blue-500/30 transition-all duration-300">
-              <div className="flex items-center justify-between mb-2">
-                <div className="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-450 flex items-center justify-center shrink-0">
-                  <FileText className="w-5 h-5" />
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
+              {/* İhale Dosya Sayısı */}
+              <div className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between group hover:border-blue-500/30 transition-all duration-300">
+                <div className="flex items-center justify-between mb-2">
+                  <div className="w-10 h-10 rounded-xl bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-450 flex items-center justify-center shrink-0">
+                    <FileText className="w-5 h-5" />
+                  </div>
+                </div>
+                <div>
+                  <div className="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-wider">İhale Dosya Sayısı</div>
+                  <div className="text-3xl font-extrabold text-slate-800 dark:text-slate-100 mt-1">
+                    {isLoading ? '-' : stats.ihaleDosyaSayisi}
+                  </div>
+                  <div className="flex flex-wrap gap-1 mt-2">
+                    <span className="text-[8px] bg-blue-50 dark:bg-blue-950 px-1.5 py-0.5 rounded text-blue-650 dark:text-blue-400 font-bold">Mal: {stats.malDosyaSayisi}</span>
+                    <span className="text-[8px] bg-emerald-50 dark:bg-emerald-950 px-1.5 py-0.5 rounded text-emerald-600 dark:text-emerald-450 font-bold">Hizmet: {stats.hizmetDosyaSayisi}</span>
+                    <span className="text-[8px] bg-amber-50 dark:bg-amber-950 px-1.5 py-0.5 rounded text-amber-600 dark:text-amber-450 font-bold">Yapım: {stats.yapimDosyaSayisi}</span>
+                    {stats.danismanlikDosyaSayisi > 0 && (
+                      <span className="text-[8px] bg-purple-50 dark:bg-purple-950 px-1.5 py-0.5 rounded text-purple-600 dark:text-purple-400 font-bold">Danış: {stats.danismanlikDosyaSayisi}</span>
+                    )}
+                  </div>
                 </div>
               </div>
-              <div>
-                <div className="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-wider">İhale Dosya Sayısı</div>
-                <div className="text-3xl font-extrabold text-slate-800 dark:text-slate-100 mt-1">
-                  {isLoading ? '-' : stats.ihaleDosyaSayisi}
+
+              {/* İhale Süreç Dağılımı */}
+              <div className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between group hover:border-cyan-500/30 transition-all duration-300">
+                <div className="flex items-center justify-between mb-2">
+                  <div className="w-10 h-10 rounded-xl bg-cyan-50 dark:bg-cyan-900/20 text-cyan-600 dark:text-cyan-400 flex items-center justify-center shrink-0">
+                    <Clock className="w-5 h-5" />
+                  </div>
                 </div>
-                <div className="flex flex-wrap gap-1 mt-2">
-                  <span className="text-[8px] bg-blue-50 dark:bg-blue-950 px-1.5 py-0.5 rounded text-blue-650 dark:text-blue-400 font-bold">Mal: {stats.malDosyaSayisi}</span>
-                  <span className="text-[8px] bg-emerald-50 dark:bg-emerald-950 px-1.5 py-0.5 rounded text-emerald-600 dark:text-emerald-450 font-bold">Hizmet: {stats.hizmetDosyaSayisi}</span>
-                  <span className="text-[8px] bg-amber-50 dark:bg-amber-950 px-1.5 py-0.5 rounded text-amber-600 dark:text-amber-450 font-bold">Yapım: {stats.yapimDosyaSayisi}</span>
-                  {stats.danismanlikDosyaSayisi > 0 && (
-                    <span className="text-[8px] bg-purple-50 dark:bg-purple-950 px-1.5 py-0.5 rounded text-purple-600 dark:text-purple-400 font-bold">Danış: {stats.danismanlikDosyaSayisi}</span>
+                <div>
+                  <div className="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-wider">Aktif & Tamamlanan</div>
+                  <div className="text-3xl font-extrabold text-slate-800 dark:text-slate-100 mt-1">
+                    {isLoading ? '-' : stats.ihaleDosyaSayisi}
+                  </div>
+                  <div className="text-[9px] text-slate-500 dark:text-slate-450 mt-2 flex flex-col gap-0.5 font-semibold">
+                    <div className="flex justify-between">
+                      <span>Aktif Süreç:</span>
+                      <span className="font-bold text-blue-600 dark:text-blue-400">{stats.aktifDosyaSayisi}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span>Tamamlanan:</span>
+                      <span className="font-bold text-emerald-600 dark:text-emerald-400">{stats.tamamlananDosyaSayisi}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* İhalelere Katılan Firma Sayısı */}
+              <div className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between group hover:border-indigo-500/30 transition-all duration-300">
+                <div className="flex items-center justify-between mb-2">
+                  <div className="w-10 h-10 rounded-xl bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-450 flex items-center justify-center shrink-0">
+                    <Briefcase className="w-5 h-5" />
+                  </div>
+                </div>
+                <div>
+                  <div className="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-wider">İhalelere Katılan Firma Sayısı</div>
+                  <div className="text-3xl font-extrabold text-slate-800 dark:text-slate-100 mt-1">
+                    {isLoading ? '-' : stats.ihalelereKatilanFirmaSayisi}
+                  </div>
+                  <div className="text-[9px] text-slate-400 dark:text-slate-500 mt-2">
+                    Dosyalarda teklif veren veya davet edilen tekil firmalar.
+                  </div>
+                </div>
+              </div>
+
+              {/* İhalelere Seçilen Firma Sayısı */}
+              <div className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between group hover:border-emerald-500/30 transition-all duration-300">
+                <div className="flex items-center justify-between mb-2">
+                  <div className="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-450 flex items-center justify-center shrink-0">
+                    <Building className="w-5 h-5" />
+                  </div>
+                </div>
+                <div>
+                  <div className="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-wider">İhalelere Seçilen Firma Sayısı</div>
+                  <div className="text-3xl font-extrabold text-slate-800 dark:text-slate-100 mt-1">
+                    {isLoading ? '-' : stats.ihalelereSecilenFirmaSayisi}
+                  </div>
+                  <div className="text-[9px] text-slate-400 dark:text-slate-500 mt-2">
+                    Satın alma yapılması kararlaştırılan kazanan firma sayısı.
+                  </div>
+                </div>
+              </div>
+
+              {/* En Çok İhale Alan İstekli */}
+              <div className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between group hover:border-violet-500/30 transition-all duration-300">
+                <div className="flex items-center justify-between mb-2">
+                  <div className="w-10 h-10 rounded-xl bg-violet-50 dark:bg-violet-900/20 text-violet-600 dark:text-violet-400 flex items-center justify-center shrink-0">
+                    <Building className="w-5 h-5" />
+                  </div>
+                  <span className="text-[9px] font-bold text-violet-600 dark:text-violet-400 bg-violet-50 dark:bg-violet-950/30 px-2 py-0.5 rounded-full border border-violet-500/10">Lider Tedarikçi</span>
+                </div>
+                <div>
+                  <div className="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-wider">En Çok Tercih Edilen</div>
+                  <div className="text-xs font-black text-slate-850 dark:text-slate-100 mt-1 truncate" title={stats.enCokSecilenFirma?.unvan || 'Veri Yok'}>
+                    {stats.enCokSecilenFirma?.unvan || 'Kayıt Bulunamadı'}
+                  </div>
+                  {stats.enCokSecilenFirma && (
+                    <div className="text-[10px] text-violet-600 dark:text-violet-400 font-bold mt-1">
+                      {stats.enCokSecilenFirma.count} Dosya İhalesi
+                    </div>
                   )}
                 </div>
               </div>
-            </div>
 
-            {/* İhale Süreç Dağılımı */}
-            <div className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between group hover:border-cyan-500/30 transition-all duration-300">
-              <div className="flex items-center justify-between mb-2">
-                <div className="w-10 h-10 rounded-xl bg-cyan-50 dark:bg-cyan-900/20 text-cyan-600 dark:text-cyan-400 flex items-center justify-center shrink-0">
-                  <Clock className="w-5 h-5" />
-                </div>
-              </div>
-              <div>
-                <div className="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-wider">Aktif & Tamamlanan</div>
-                <div className="text-3xl font-extrabold text-slate-800 dark:text-slate-100 mt-1">
-                  {isLoading ? '-' : stats.ihaleDosyaSayisi}
-                </div>
-                <div className="text-[9px] text-slate-500 dark:text-slate-450 mt-2 flex flex-col gap-0.5 font-semibold">
-                  <div className="flex justify-between">
-                    <span>Aktif Süreç:</span>
-                    <span className="font-bold text-blue-600 dark:text-blue-400">{stats.aktifDosyaSayisi}</span>
+              {/* En Çok Harcama Yapan Birim */}
+              <div className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between group hover:border-pink-500/30 transition-all duration-300">
+                <div className="flex items-center justify-between mb-2">
+                  <div className="w-10 h-10 rounded-xl bg-pink-50 dark:bg-pink-900/20 text-pink-650 dark:text-pink-400 flex items-center justify-center shrink-0">
+                    <Landmark className="w-5 h-5" />
                   </div>
-                  <div className="flex justify-between">
-                    <span>Tamamlanan:</span>
-                    <span className="font-bold text-emerald-600 dark:text-emerald-400">{stats.tamamlananDosyaSayisi}</span>
+                  <span className="text-[9px] font-bold text-pink-600 dark:text-pink-450 bg-pink-50 dark:bg-pink-950/30 px-2 py-0.5 rounded-full border border-pink-500/10">Lider Birim</span>
+                </div>
+                <div>
+                  <div className="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-wider">En Çok Harcama Yapan</div>
+                  <div className="text-xs font-black text-slate-850 dark:text-slate-100 mt-1 truncate" title={stats.enCokHarcamaYapanBirim?.birim_adi || 'Veri Yok'}>
+                    {stats.enCokHarcamaYapanBirim?.birim_adi || 'Kayıt Bulunamadı'}
+                  </div>
+                  {stats.enCokHarcamaYapanBirim && (
+                    <div className="text-[10px] text-pink-650 dark:text-pink-400 font-bold mt-1">
+                      {formatCurrency(stats.enCokHarcamaYapanBirim.total)}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* İhale Edilen Malzeme Sayısı */}
+              <div className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between group hover:border-amber-500/30 transition-all duration-300">
+                <div className="flex items-center justify-between mb-2">
+                  <div className="w-10 h-10 rounded-xl bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-450 flex items-center justify-center shrink-0">
+                    <TrendingUp className="w-5 h-5" />
+                  </div>
+                </div>
+                <div>
+                  <div className="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-wider">İhale Edilen Kalem Sayısı</div>
+                  <div className="text-3xl font-extrabold text-slate-800 dark:text-slate-100 mt-1">
+                    {isLoading ? '-' : stats.ihaleEdilenMalzemeSayisi}
+                  </div>
+                  <div className="text-[9px] text-slate-400 dark:text-slate-500 mt-2">
+                    Tüm dosyalarda talep edilen toplam kalem miktarı.
                   </div>
                 </div>
               </div>
-            </div>
 
-            {/* İhalelere Katılan Firma Sayısı */}
-            <div className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between group hover:border-indigo-500/30 transition-all duration-300">
-              <div className="flex items-center justify-between mb-2">
-                <div className="w-10 h-10 rounded-xl bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-450 flex items-center justify-center shrink-0">
-                  <Briefcase className="w-5 h-5" />
-                </div>
-              </div>
-              <div>
-                <div className="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-wider">İhalelere Katılan Firma Sayısı</div>
-                <div className="text-3xl font-extrabold text-slate-800 dark:text-slate-100 mt-1">
-                  {isLoading ? '-' : stats.ihalelereKatilanFirmaSayisi}
-                </div>
-                <div className="text-[9px] text-slate-400 dark:text-slate-500 mt-2">
-                  Dosyalarda teklif veren veya davet edilen tekil firmalar.
-                </div>
-              </div>
-            </div>
-
-            {/* İhalelere Seçilen Firma Sayısı */}
-            <div className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between group hover:border-emerald-500/30 transition-all duration-300">
-              <div className="flex items-center justify-between mb-2">
-                <div className="w-10 h-10 rounded-xl bg-emerald-50 dark:bg-emerald-900/20 text-emerald-600 dark:text-emerald-450 flex items-center justify-center shrink-0">
-                  <Building className="w-5 h-5" />
-                </div>
-              </div>
-              <div>
-                <div className="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-wider">İhalelere Seçilen Firma Sayısı</div>
-                <div className="text-3xl font-extrabold text-slate-800 dark:text-slate-100 mt-1">
-                  {isLoading ? '-' : stats.ihalelereSecilenFirmaSayisi}
-                </div>
-                <div className="text-[9px] text-slate-400 dark:text-slate-500 mt-2">
-                  Satın alma yapılması kararlaştırılan kazanan firma sayısı.
-                </div>
-              </div>
-            </div>
-
-            {/* En Çok İhale Alan İstekli */}
-            <div className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between group hover:border-violet-500/30 transition-all duration-300">
-              <div className="flex items-center justify-between mb-2">
-                <div className="w-10 h-10 rounded-xl bg-violet-50 dark:bg-violet-900/20 text-violet-600 dark:text-violet-400 flex items-center justify-center shrink-0">
-                  <Building className="w-5 h-5" />
-                </div>
-                <span className="text-[9px] font-bold text-violet-600 dark:text-violet-400 bg-violet-50 dark:bg-violet-950/30 px-2 py-0.5 rounded-full border border-violet-500/10">Lider Tedarikçi</span>
-              </div>
-              <div>
-                <div className="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-wider">En Çok Tercih Edilen</div>
-                <div className="text-xs font-black text-slate-850 dark:text-slate-100 mt-1 truncate" title={stats.enCokSecilenFirma?.unvan || 'Veri Yok'}>
-                  {stats.enCokSecilenFirma?.unvan || 'Kayıt Bulunamadı'}
-                </div>
-                {stats.enCokSecilenFirma && (
-                  <div className="text-[10px] text-violet-600 dark:text-violet-400 font-bold mt-1">
-                    {stats.enCokSecilenFirma.count} Dosya İhalesi
+              {/* Kurumda Kayıtlı İstekli Firma Sayısı */}
+              <div className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between group hover:border-purple-500/30 transition-all duration-300">
+                <div className="flex items-center justify-between mb-2">
+                  <div className="w-10 h-10 rounded-xl bg-purple-50 dark:bg-purple-900/20 text-purple-600 dark:text-purple-450 flex items-center justify-center shrink-0">
+                    <Building className="w-5 h-5" />
                   </div>
-                )}
-              </div>
-            </div>
-
-            {/* En Çok Harcama Yapan Birim */}
-            <div className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between group hover:border-pink-500/30 transition-all duration-300">
-              <div className="flex items-center justify-between mb-2">
-                <div className="w-10 h-10 rounded-xl bg-pink-50 dark:bg-pink-900/20 text-pink-650 dark:text-pink-400 flex items-center justify-center shrink-0">
-                  <Landmark className="w-5 h-5" />
                 </div>
-                <span className="text-[9px] font-bold text-pink-600 dark:text-pink-450 bg-pink-50 dark:bg-pink-950/30 px-2 py-0.5 rounded-full border border-pink-500/10">Lider Birim</span>
-              </div>
-              <div>
-                <div className="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-wider">En Çok Harcama Yapan</div>
-                <div className="text-xs font-black text-slate-850 dark:text-slate-100 mt-1 truncate" title={stats.enCokHarcamaYapanBirim?.birim_adi || 'Veri Yok'}>
-                  {stats.enCokHarcamaYapanBirim?.birim_adi || 'Kayıt Bulunamadı'}
-                </div>
-                {stats.enCokHarcamaYapanBirim && (
-                  <div className="text-[10px] text-pink-650 dark:text-pink-400 font-bold mt-1">
-                    {formatCurrency(stats.enCokHarcamaYapanBirim.total)}
+                <div>
+                  <div className="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-wider">Kayıtlı Tedarikçi Havuzu</div>
+                  <div className="text-3xl font-extrabold text-slate-800 dark:text-slate-100 mt-1">
+                    {isLoading ? '-' : stats.kayitliFirmaSayisi}
                   </div>
-                )}
+                  <div className="text-[9px] text-slate-400 dark:text-slate-500 mt-2">
+                    Sistem havuzuna kayıtlı olan toplam tedarikçi firma.
+                  </div>
+                </div>
               </div>
-            </div>
 
-            {/* İhale Edilen Malzeme Sayısı */}
-            <div className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between group hover:border-amber-500/30 transition-all duration-300">
-              <div className="flex items-center justify-between mb-2">
-                <div className="w-10 h-10 rounded-xl bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-450 flex items-center justify-center shrink-0">
-                  <TrendingUp className="w-5 h-5" />
+              {/* Kurumda Kayıtlı Personel Sayısı */}
+              <div className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between group hover:border-pink-500/30 transition-all duration-300">
+                <div className="flex items-center justify-between mb-2">
+                  <div className="w-10 h-10 rounded-xl bg-pink-50 dark:bg-pink-900/20 text-pink-650 dark:text-pink-450 flex items-center justify-center shrink-0">
+                    <Users className="w-5 h-5" />
+                  </div>
                 </div>
-              </div>
-              <div>
-                <div className="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-wider">İhale Edilen Kalem Sayısı</div>
-                <div className="text-3xl font-extrabold text-slate-800 dark:text-slate-100 mt-1">
-                  {isLoading ? '-' : stats.ihaleEdilenMalzemeSayisi}
-                </div>
-                <div className="text-[9px] text-slate-400 dark:text-slate-500 mt-2">
-                  Tüm dosyalarda talep edilen toplam kalem miktarı.
-                </div>
-              </div>
-            </div>
-
-            {/* Kurumda Kayıtlı İstekli Firma Sayısı */}
-            <div className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between group hover:border-purple-500/30 transition-all duration-300">
-              <div className="flex items-center justify-between mb-2">
-                <div className="w-10 h-10 rounded-xl bg-purple-50 dark:bg-purple-900/20 text-purple-600 dark:text-purple-450 flex items-center justify-center shrink-0">
-                  <Building className="w-5 h-5" />
-                </div>
-              </div>
-              <div>
-                <div className="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-wider">Kayıtlı Tedarikçi Havuzu</div>
-                <div className="text-3xl font-extrabold text-slate-800 dark:text-slate-100 mt-1">
-                  {isLoading ? '-' : stats.kayitliFirmaSayisi}
-                </div>
-                <div className="text-[9px] text-slate-400 dark:text-slate-500 mt-2">
-                  Sistem havuzuna kayıtlı olan toplam tedarikçi firma.
-                </div>
-              </div>
-            </div>
-
-            {/* Kurumda Kayıtlı Personel Sayısı */}
-            <div className="p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between group hover:border-pink-500/30 transition-all duration-300">
-              <div className="flex items-center justify-between mb-2">
-                <div className="w-10 h-10 rounded-xl bg-pink-50 dark:bg-pink-900/20 text-pink-650 dark:text-pink-450 flex items-center justify-center shrink-0">
-                  <Users className="w-5 h-5" />
-                </div>
-              </div>
-              <div>
-                <div className="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-wider">Kayıtlı Personel Sayısı</div>
-                <div className="text-3xl font-extrabold text-slate-800 dark:text-slate-100 mt-1">
-                  {isLoading ? '-' : stats.kayitliPersonelSayisi}
-                </div>
-                <div className="text-[9px] text-slate-400 dark:text-slate-500 mt-2">
-                  Süreçlerde görev alabilecek toplam personel sayısı.
+                <div>
+                  <div className="text-[10px] text-slate-400 dark:text-slate-500 font-bold uppercase tracking-wider">Kayıtlı Personel Sayısı</div>
+                  <div className="text-3xl font-extrabold text-slate-800 dark:text-slate-100 mt-1">
+                    {isLoading ? '-' : stats.kayitliPersonelSayisi}
+                  </div>
+                  <div className="text-[9px] text-slate-400 dark:text-slate-500 mt-2">
+                    Süreçlerde görev alabilecek toplam personel sayısı.
+                  </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
         )}
 
         {/* RIGHT SIDE PANEL: IDENTITY CARD & ANNOUNCEMENTS */}
@@ -618,20 +620,20 @@ export default function DashboardScreen(): React.JSX.Element {
           <div className="bg-gradient-to-br from-blue-50/50 via-white to-indigo-50/30 dark:from-slate-900 dark:via-slate-900 dark:to-slate-850 border border-blue-100/60 dark:border-slate-800 rounded-3xl p-6 shadow-sm relative overflow-hidden group">
             <div className="absolute -right-6 -top-6 w-32 h-32 bg-blue-400/10 dark:bg-blue-500/5 rounded-full blur-3xl group-hover:bg-blue-400/20 transition-all duration-700 pointer-events-none" />
             <div className="absolute -left-6 bottom-0 w-24 h-24 bg-indigo-400/10 dark:bg-indigo-500/5 rounded-full blur-2xl pointer-events-none" />
-            
+
             <div className="flex items-center gap-2 mb-4 pb-3 border-b border-blue-100/50 dark:border-slate-800 relative z-10">
               <div className="p-1.5 bg-blue-100/80 dark:bg-blue-900/40 rounded-xl shadow-sm border border-blue-200/50 dark:border-blue-800/50">
                 <Building className="w-4 h-4 text-blue-700 dark:text-blue-400" />
               </div>
               <h3 className="text-sm font-extrabold text-slate-800 dark:text-slate-200 tracking-tight">Kurum Kimlik Kartı</h3>
             </div>
-            
+
             <div className="space-y-3 text-xs relative z-10">
               <div className="bg-white/80 dark:bg-slate-800/40 p-2.5 rounded-xl border border-blue-50 dark:border-slate-700/50 shadow-sm backdrop-blur-sm">
                 <span className="text-[9px] font-bold text-slate-450 dark:text-slate-500 block uppercase tracking-wider mb-0.5">Kurum Adı</span>
                 <span className="font-extrabold text-slate-800 dark:text-slate-100 text-[13px] leading-tight block">{institutionName || 'Belirtilmemiş'}</span>
               </div>
-              
+
               <div className="grid grid-cols-2 gap-2">
                 <div className="bg-white/60 dark:bg-slate-800/20 p-2.5 rounded-xl border border-slate-100 dark:border-slate-800/60 hover:bg-white dark:hover:bg-slate-800/40 transition-colors">
                   <span className="text-[9px] font-bold text-slate-450 dark:text-slate-500 block uppercase mb-0.5">Kurum Türü</span>
@@ -641,13 +643,10 @@ export default function DashboardScreen(): React.JSX.Element {
                   <span className="text-[9px] font-bold text-slate-450 dark:text-slate-500 block uppercase mb-0.5">Limit Grubu</span>
                   <span className="font-bold text-slate-700 dark:text-slate-300 truncate block" title={limitType === 'buyuksehir' ? 'Büyükşehir Limitleri' : 'Diğer İdare Limitleri'}>
                     {limitType === 'buyuksehir' ? 'Büyükşehir' : 'Diğer İdare'}
-                    {
-                      limitType
-                    }
                   </span>
                 </div>
               </div>
-              
+
               {eButceKodu && (
                 <div className="flex items-center gap-2 p-2 rounded-xl bg-blue-50/80 dark:bg-blue-900/20 border border-blue-100/80 dark:border-blue-800/50 mt-1 shadow-sm">
                   <div className="p-1 bg-blue-100 dark:bg-blue-900/50 rounded-md">
@@ -662,7 +661,7 @@ export default function DashboardScreen(): React.JSX.Element {
                   </div>
                 </div>
               )}
-              
+
               <div className="grid grid-cols-2 gap-2">
                 {say2000iKodu && (
                   <div className="flex items-center gap-2 p-2 rounded-xl bg-indigo-50/80 dark:bg-indigo-900/20 border border-indigo-100/80 dark:border-indigo-800/50 mt-1 shadow-sm">
@@ -685,7 +684,7 @@ export default function DashboardScreen(): React.JSX.Element {
                   <div className="bg-slate-50/80 dark:bg-slate-800/30 p-2.5 rounded-xl border border-slate-100 dark:border-slate-700/50 relative group/link">
                     <span className="text-[9px] font-bold text-slate-450 dark:text-slate-500 block uppercase mb-0.5 flex items-center justify-between">
                       DETSİS Kodu
-                      <a href={`https://www.kaysis.gov.tr/Kutuphane/Kurum/Detay/${detsisKodu}`} target="_blank" rel="noreferrer" className="text-blue-500 hover:text-blue-600 opacity-0 group-hover/link:opacity-100 transition-opacity" title="DETSİS'te Sorgula">
+                      <a href={detsisKodu ? `https://detsis.gov.tr/birim/${detsisKodu}/${detsisKodu}/${new Date().toISOString().split('T')[0]}` : "https://detsis.gov.tr/"} target="_blank" rel="noreferrer" className="text-blue-500 hover:text-blue-600 opacity-0 group-hover/link:opacity-100 transition-opacity" title="DETSİS'te Sorgula">
                         <ExternalLink className="w-2.5 h-2.5" />
                       </a>
                     </span>
@@ -707,7 +706,7 @@ export default function DashboardScreen(): React.JSX.Element {
                   </div>
                 )}
               </div>
-              
+
               {(harcamaBirimAdi || muhasebeBirimAdi) && (
                 <div className="space-y-1.5 p-2.5 rounded-xl bg-white/40 dark:bg-slate-800/10 border border-slate-100 dark:border-slate-800/50">
                   {harcamaBirimAdi && (
@@ -741,7 +740,7 @@ export default function DashboardScreen(): React.JSX.Element {
                   )}
                 </div>
               )}
-              
+
               <div className="grid grid-cols-2 gap-2 pt-1 border-t border-blue-100/50 dark:border-slate-800">
                 <Link to="/birimler" className="flex items-center justify-between p-2 rounded-xl bg-slate-50/80 dark:bg-slate-800/30 hover:bg-blue-50 hover:border-blue-100 dark:hover:bg-slate-800/80 border border-transparent transition-all group/stat">
                   <div>
@@ -759,7 +758,7 @@ export default function DashboardScreen(): React.JSX.Element {
                   </div>
                 </div>
               </div>
-              
+
               <div className="p-3 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md shadow-blue-500/20 mt-2 relative overflow-hidden group/admin">
                 <div className="absolute right-0 top-0 bottom-0 w-16 bg-white/10 skew-x-12 translate-x-8 group-hover/admin:translate-x-[-100%] transition-transform duration-1000" />
                 <span className="text-[9px] font-bold text-blue-200 block uppercase tracking-wider mb-0.5 flex items-center gap-1">
@@ -778,7 +777,7 @@ export default function DashboardScreen(): React.JSX.Element {
               <Megaphone className="w-5 h-5 text-amber-500" />
               <h3 className="text-sm font-bold text-slate-800 dark:text-slate-200">Duyurular ve İşlem Logları</h3>
             </div>
-            
+
             <div className="flex-1 overflow-y-auto pr-1 space-y-4 min-h-0 custom-scrollbar">
               {isAnnouncementsLoading ? (
                 <div className="h-full flex items-center justify-center text-xs text-slate-400 italic">
@@ -792,7 +791,7 @@ export default function DashboardScreen(): React.JSX.Element {
                 announcements.map((ann) => {
                   let DotIcon = Info
                   let colorClass = 'bg-blue-500 text-white'
-                  
+
                   if (ann.type === 'success') {
                     DotIcon = CheckCircle2
                     colorClass = 'bg-emerald-500 text-white'
@@ -850,32 +849,32 @@ export default function DashboardScreen(): React.JSX.Element {
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} strokeOpacity={0.1} />
-                <XAxis 
-                  dataKey="ay" 
-                  axisLine={false} 
-                  tickLine={false} 
-                  tick={{ fontSize: 10, fontWeight: 'bold', fill: '#94a3b8' }} 
+                <XAxis
+                  dataKey="ay"
+                  axisLine={false}
+                  tickLine={false}
+                  tick={{ fontSize: 10, fontWeight: 'bold', fill: '#94a3b8' }}
                   dy={10}
                 />
-                <YAxis 
-                  axisLine={false} 
-                  tickLine={false} 
-                  tick={{ fontSize: 10, fill: '#94a3b8' }} 
-                  tickFormatter={(val) => val > 0 ? `${(val/1000).toFixed(0)}K` : '0'} 
+                <YAxis
+                  axisLine={false}
+                  tickLine={false}
+                  tick={{ fontSize: 10, fill: '#94a3b8' }}
+                  tickFormatter={(val) => val > 0 ? `${(val / 1000).toFixed(0)}K` : '0'}
                   dx={-10}
                 />
-                <Tooltip 
+                <Tooltip
                   formatter={(value: any) => [formatCurrency(value as number), 'Harcama']}
                   labelStyle={{ color: '#0f172a', fontWeight: 'bold' }}
                   contentStyle={{ borderRadius: '12px', border: '1px solid #e2e8f0', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }}
                 />
-                <Area 
-                  type="monotone" 
-                  dataKey="tutar" 
-                  stroke="#3b82f6" 
-                  strokeWidth={3} 
-                  fillOpacity={1} 
-                  fill="url(#colorTutar)" 
+                <Area
+                  type="monotone"
+                  dataKey="tutar"
+                  stroke="#3b82f6"
+                  strokeWidth={3}
+                  fillOpacity={1}
+                  fill="url(#colorTutar)"
                   activeDot={{ r: 6, strokeWidth: 2, fill: '#fff', stroke: '#3b82f6' }}
                 />
               </AreaChart>
@@ -918,7 +917,7 @@ export default function DashboardScreen(): React.JSX.Element {
                     ))
                   }
                 </Pie>
-                <Tooltip 
+                <Tooltip
                   formatter={(value: any) => formatCurrency(value as number)}
                   contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }}
                 />
@@ -1008,7 +1007,7 @@ export default function DashboardScreen(): React.JSX.Element {
                         </span>
                       </div>
                     </td>
-                    
+
                     <td className="py-3.5 px-4">
                       <div className="flex flex-col gap-0.5">
                         <span className="text-xs font-semibold text-slate-700 dark:text-slate-350">
@@ -1034,15 +1033,14 @@ export default function DashboardScreen(): React.JSX.Element {
                         {/* Process Step Visual indicator */}
                         <div className="flex items-center gap-1.5">
                           {[1, 2, 3, 4, 5].map((step) => (
-                            <div 
-                              key={step} 
-                              className={`h-1.5 rounded-full transition-all duration-300 ${
-                                step < (file.durum_asama_id || 1) 
-                                  ? 'bg-emerald-500 w-4' 
-                                  : step === (file.durum_asama_id || 1) 
-                                    ? 'bg-blue-500 w-6 animate-pulse' 
+                            <div
+                              key={step}
+                              className={`h-1.5 rounded-full transition-all duration-300 ${step < (file.durum_asama_id || 1)
+                                  ? 'bg-emerald-500 w-4'
+                                  : step === (file.durum_asama_id || 1)
+                                    ? 'bg-blue-500 w-6 animate-pulse'
                                     : 'bg-slate-200 dark:bg-slate-850 w-2.5'
-                              }`} 
+                                }`}
                             />
                           ))}
                         </div>
@@ -1076,7 +1074,7 @@ export default function DashboardScreen(): React.JSX.Element {
           </table>
         </div>
       </div>
-      
+
       {/* AI Assistant Modal */}
       {showAIModal && selectedFileForAI && (
         <AITextGeneratorModal

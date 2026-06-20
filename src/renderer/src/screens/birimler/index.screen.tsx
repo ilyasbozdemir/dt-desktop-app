@@ -567,7 +567,7 @@ export default function BirimlerScreen(): React.ReactNode {
                     <Info className="w-3.5 h-3.5 shrink-0 mt-0.5" />
                     <span>
                       DTVT sistemi, DETSİS olarak güncellenmiştir. Birim kodunuzu bilmiyorsanız{' '}
-                      <a href={form.dtvt_kodu ? `https://detsis.gov.tr/ara/${form.dtvt_kodu}` : "https://detsis.gov.tr/"} target="_blank" rel="noopener noreferrer" className="font-bold underline hover:text-amber-700 dark:hover:text-amber-400">
+                      <a href={form.dtvt_kodu ? `https://detsis.gov.tr/birim/${form.dtvt_kodu}/${form.dtvt_kodu}/${new Date().toISOString().split('T')[0]}` : "https://detsis.gov.tr/"} target="_blank" rel="noopener noreferrer" className="font-bold underline hover:text-amber-700 dark:hover:text-amber-400">
                         DETSİS'te Arama Yapın
                       </a>.
                     </span>

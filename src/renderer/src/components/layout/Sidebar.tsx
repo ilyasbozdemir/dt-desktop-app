@@ -64,18 +64,19 @@ const menuGroups: MenuGroup[] = [
   {
     title: 'Kayıtlar & Tanımlar',
     items: [
-      { name: 'İstekli Firma Yönetimi', path: '/firmalar', icon: Building2 },
-      { name: 'Birim Yönetimi', path: '/birimler', icon: LayoutGrid },
-      { name: 'Personel Yönetimi', path: '/personel', icon: Users },
       {
-        name: 'Komisyon Yönetimi',
-        icon: Users,
+        name: 'Kurum Bilgileri',
+        icon: Building2,
         children: [
+          { name: 'Kurum Bilgileri', path: '/kurum', icon: Building2 },
+          { name: 'Birim Yönetimi', path: '/birimler', icon: LayoutGrid },
+          { name: 'Personel Yönetimi', path: '/personel', icon: Users },
+          { name: 'Ambar Tanımları', path: '/ambar', icon: Database },
           { name: 'Komisyon Yönetimi', path: '/komisyonlar', icon: Users },
           { name: 'Görev Tanımları', path: '/komisyon-gorevleri', icon: Settings }
         ]
       },
-      { name: 'Ambar Tanımları', path: '/ambar', icon: Database },
+      { name: 'İstekli Firma Yönetimi', path: '/firmalar', icon: Building2 },
       {
         name: 'Malzeme & Kodlar',
         icon: PackageSearch,
@@ -85,10 +86,7 @@ const menuGroups: MenuGroup[] = [
           { name: 'OKAS Kodları', path: '/okaskod', icon: Tag },
           { name: 'Ölçü Birimleri', path: '/olcubirimleri', icon: Ruler }
         ]
-      },
-
-
-      { name: 'Kurum Bilgileri', path: '/kurum', icon: Building2 }
+      }
     ]
   },
   {
@@ -104,8 +102,7 @@ const menuGroups: MenuGroup[] = [
           { name: 'Genel Ayarlar', path: '/ayarlar', icon: Settings },
           { name: 'Mevzuat ve Parametreler', path: '/mevzuat', icon: Scale },
           { name: 'Toplu İçe Aktarma', path: '/import', icon: Database },
-          { name: 'Şablon Yönetimi', path: '/sablonlar', icon: FileText },
-
+          { name: 'Şablon Yönetimi', path: '/sablonlar', icon: FileText }
         ]
       }
     ]
