@@ -185,75 +185,74 @@
     <!-- CONTENT BODY (Güvenli Alan) -->
     <div class="content-body">
       <div class="meta-row">
-        <div>
-          <table class="meta-table">
-            <tr>
-              <td class="meta-label">Sayı</td>
-              <td>: {{evrakSayisi}}</td>
-            </tr>
-            <tr>
-              <td class="meta-label">Konu</td>
-              <td>: Lüzum Müzekkeresi</td>
-            </tr>
-          </table>
-        </div>
-        <div>
-          <strong>Tarih:</strong> {{tarih}}
-        </div>
-      </div>
-      <br><br>
-      <div class="makam">
-        {{sunulacakMakamAdi}}
-      </div>
-      <div class="konu-metni">
-        {{ihtiyacYeri}} ihtiyacı olan aşağıda yazılı mal/hizmet kalemlerinin temin edilmesi gerekmektedir.<br>
-        Söz konusu ihtiyacın 4734 sayılı Kamu İhale Kanunu'nun ilgili maddesine göre temini için gereğini arz ederim.
-      </div>
-
-      <div class="hazirlayan">
-        {{hazirlayanPersonelAdi}}<br>
-        {{hazirlayanPersonelUnvan}}
-      </div>
-
-      <table class="content-table">
-        <thead>
+      <div>
+        <table class="meta-table">
           <tr>
-            <th>Kodu</th>
-            <th>Malzeme Adı</th>
-            <th>Özelliği</th>
-            <th>Birimi</th>
-            <th>KDV Oranı</th>
-            <th>Miktar</th>
+            <td class="meta-label">Sayı</td>
+            <td>: {{evrakSayisi}}</td>
           </tr>
-        </thead>
-        <tbody>
-          {{#ihtiyacKalemleri}}
           <tr>
-            <td>{{kodu}}</td>
-            <td>{{malzemeAdi}}</td>
-            <td>{{ozelligi}}</td>
-            <td>{{birimi}}</td>
-            <td>{{kdvOrani}}</td>
-            <td>{{miktar}}</td>
+            <td class="meta-label">Konu</td>
+            <td>: {{dosyaKonusu}}</td>
           </tr>
-          {{/ihtiyacKalemleri}}
-          {{^ihtiyacKalemleri}}
-          <tr>
-            <td colspan="6" style="text-align: center;">Kalem bulunamadı</td>
-          </tr>
-          {{/ihtiyacKalemleri}}
-        </tbody>
-      </table>
-
-      {{#olurYazisi}}
-      <div class="approval" data-behavior="keep-together">
-        <strong>OLUR</strong><br>
-        {{dosyaTarihi}}<br><br><br>
-        {{onaylayanPersonelAdi}}<br>
-        {{onaylayanPersonelUnvan}}<br>
-        Harcama Yetkilisi
+        </table>
       </div>
-      {{/olurYazisi}}
+      <div>
+        <strong>Tarih:</strong> {{tarih}}
+      </div>
+    </div>
+    <br><br>
+    <div class="makam">
+      {{sunulacakMakamAdi}}
+    </div>
+    <div class="konu-metni">
+      {{ihtiyacYeri}} ihtiyacı olan aşağıda yazılı mal/hizmet kalemlerinin temin edilmesi gerekmektedir.<br>
+      Söz konusu ihtiyacın 4734 sayılı Kamu İhale Kanunu'nun ilgili maddesine göre temini için gereğini arz ederim.
+    </div>
+
+    <div class="hazirlayan">
+      {{hazirlayanPersonelAdi}}<br>
+      {{hazirlayanPersonelUnvan}}
+    </div>
+
+    <table class="content-table">
+      <thead>
+        <tr>
+          <th>Kodu</th>
+          <th>Malzeme Adı</th>
+          <th>Özelliği</th>
+          <th>Birimi</th>
+          <th>KDV Oranı</th>
+          <th>Miktar</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{#ihtiyacKalemleri}}
+        <tr>
+          <td>{{kodu}}</td>
+          <td>{{malzemeAdi}}</td>
+          <td>{{ozelligi}}</td>
+          <td>{{birimi}}</td>
+          <td>{{kdvOrani}}</td>
+          <td>{{miktar}}</td>
+        </tr>
+        {{/ihtiyacKalemleri}}
+        {{^ihtiyacKalemleri}}
+        <tr>
+          <td colspan="6" style="text-align: center;">Kalem bulunamadı</td>
+        </tr>
+        {{/ihtiyacKalemleri}}
+      </tbody>
+    </table>
+
+    {{#olurYazisi}}
+    <div class="approval" data-behavior="keep-together">
+      <strong>OLUR</strong><br>
+      {{dosyaTarihi}}<br><br>
+      {{onaylayanPersonelAdi}}<br>
+      {{onaylayanPersonelUnvan}}
+    </div>
+    {{/olurYazisi}}
     </div> <!-- END CONTENT BODY -->
 
     <!-- KURUM İLETİŞİM -->

@@ -330,7 +330,7 @@ export function SablonEditor({ sablon, onBack }: { sablon?: Sablon, onBack: () =
           }`}
         >
           <FileText className="w-4 h-4" />
-          Gerçek PDF Önizleme
+          PDF Önizleme
         </button>
       </div>
 
