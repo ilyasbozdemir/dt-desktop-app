@@ -45,6 +45,17 @@ export function CiktiMerkeziScreen(): React.JSX.Element {
           [activeDosyaId]
         )
 
+        const settings = await window.electron.ipcRenderer.invoke('db:get-settings')
+        const instType = settings?.institutionType || ''
+        const subInstType = settings?.subInstitutionType || ''
+        
+        let kurumumuzText = 'Kurumumuz'
+        if (instType === 'belediye') {
+          if (subInstType === 'belediye') kurumumuzText = 'Belediyemiz'
+          else if (subInstType === 'il_ozel') kurumumuzText = 'İl Özel İdaremiz'
+          else if (subInstType === 'koy') kurumumuzText = 'Muhtarlığımız'
+        }
+
         const today = new Intl.DateTimeFormat('tr-TR', { timeZone: 'Europe/Istanbul', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date())
 
         let context: any = {
@@ -54,6 +65,7 @@ export function CiktiMerkeziScreen(): React.JSX.Element {
           evrakSayisi: dosyaRes.data?.[0]?.temin_no || 'Belirtilmedi',
           dosyaKonusu: dosyaRes.data?.[0]?.konu || 'Konu Belirtilmedi',
           sayiYazıyla: SAYI_YAZI_MAP,
+          kurumumuz: kurumumuzText,
           ihtiyacKalemleri: kalemlerRes.data?.map((k: any, i: number) => ({
             siraNo: i + 1,
             kodu: k.tasinir_kodu || k.okas_kodu || '-',

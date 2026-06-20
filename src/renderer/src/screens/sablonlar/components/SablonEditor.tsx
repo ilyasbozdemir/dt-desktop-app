@@ -13,6 +13,7 @@ import {
 } from 'lucide-react'
 import { Button } from '../../../components/ui/Button'
 import { Sablon, useSaveSablon } from '../sablonlar.hooks'
+import { useSettingsStore } from '../../../store/settingsStore'
 
 import { AiTemplateGeneratorModal } from './AiTemplateGeneratorModal'
 import { A4Editor } from '../../../components/editor/A4Editor'
@@ -20,6 +21,7 @@ import { PreviewTab } from './tabs/PreviewTab'
 import { PdfTab } from './tabs/PdfTab'
 
 export function SablonEditor({ sablon, onBack }: { sablon?: Sablon, onBack: () => void }): React.ReactElement {
+  const { institutionType, subInstitutionType } = useSettingsStore()
   const [ad, setAd] = useState(sablon?.ad || '')
   const [dosyaAdi, setDosyaAdi] = useState(sablon?.dosya_adi || '')
   const [aciklama, setAciklama] = useState(sablon?.aciklama || '')
@@ -56,13 +58,20 @@ export function SablonEditor({ sablon, onBack }: { sablon?: Sablon, onBack: () =
   const saveSablon = useSaveSablon()
 
   const parsedData = React.useMemo(() => {
+    let kurumumuzText = 'Kurumumuz'
+    if (institutionType === 'belediye') {
+      if (subInstitutionType === 'belediye') kurumumuzText = 'Belediyemiz'
+      else if (subInstitutionType === 'il_ozel') kurumumuzText = 'İl Özel İdaremiz'
+      else if (subInstitutionType === 'koy') kurumumuzText = 'Muhtarlığımız'
+    }
+
     try {
       const parsed = JSON.parse(testJson)
-      return { sayiYazıyla: SAYI_YAZI_MAP, ...parsed }
+      return { sayiYazıyla: SAYI_YAZI_MAP, kurumumuz: kurumumuzText, ...parsed }
     } catch {
-      return { sayiYazıyla: SAYI_YAZI_MAP }
+      return { sayiYazıyla: SAYI_YAZI_MAP, kurumumuz: kurumumuzText }
     }
-  }, [testJson])
+  }, [testJson, institutionType, subInstitutionType])
 
   // Calculate final HTML synchronously so iframe instantly updates via srcDoc
   const finalHtmlForPreview = (() => {

@@ -16,12 +16,14 @@ interface SettingsState {
   limitType: string
   finansmanKodu: string
   institutionType: string
+  subInstitutionType: string
   kurumsalKod: string
   fonksiyonelKod: string
   muhasebeBirimKodu: string
   muhasebeBirimAdi: string
   harcamaBirimKodu: string
   harcamaBirimAdi: string
+  setSubInstitutionType: (type: string) => void
   ekapDonemKurali: string
   isDisclaimerAccepted: boolean
   setInstitutionName: (name: string) => void
@@ -65,6 +67,7 @@ export const useSettingsStore = create<SettingsState>((set) => ({
   limitType: 'diger',
   finansmanKodu: '5',
   institutionType: '',
+  subInstitutionType: 'belediye',
   kurumsalKod: '',
   fonksiyonelKod: '',
   muhasebeBirimKodu: '',
@@ -87,6 +90,7 @@ export const useSettingsStore = create<SettingsState>((set) => ({
   setLimitType: (limitType) => set({ limitType }),
   setFinansmanKodu: (finansmanKodu) => set({ finansmanKodu }),
   setInstitutionType: (type) => set({ institutionType: type }),
+  setSubInstitutionType: (type) => set({ subInstitutionType: type }),
   setKurumsalKod: (val) => set({ kurumsalKod: val }),
   setFonksiyonelKod: (val) => set({ fonksiyonelKod: val }),
   setMuhasebeBirimKodu: (val) => set({ muhasebeBirimKodu: val }),
@@ -114,6 +118,7 @@ export const useSettingsStore = create<SettingsState>((set) => ({
         limitType: settings.limitType || 'diger',
         finansmanKodu: settings.finansmanKodu || '5',
         institutionType: settings.institutionType || '',
+        subInstitutionType: settings.subInstitutionType || 'belediye',
         kurumsalKod: settings.kurumsalKod || '',
         fonksiyonelKod: settings.fonksiyonelKod || '',
         muhasebeBirimKodu: settings.muhasebeBirimKodu || '',
@@ -142,6 +147,7 @@ export const useSettingsStore = create<SettingsState>((set) => ({
         limitType: 'diger',
         finansmanKodu: '5',
         institutionType: '',
+        subInstitutionType: 'belediye',
         kurumsalKod: '',
         fonksiyonelKod: '',
         muhasebeBirimKodu: '',
