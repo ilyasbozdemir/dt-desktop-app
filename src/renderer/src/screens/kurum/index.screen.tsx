@@ -381,12 +381,28 @@ export default function KurumScreen(): React.JSX.Element {
                           title="Limit Tipini Seçin"
                           className="w-full bg-slate-55 dark:bg-slate-955 border border-slate-200 dark:border-slate-800 text-xs rounded-xl py-2.5 px-3 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-blue-500"
                         >
-                          <option value="diger">Diğer İdareler (İlçe, Belde, İl ve Diğer Kurumlar)</option>
-                          <option value="buyuksehir">Büyükşehir Belediyesi Sınırları Dahilindeki İdareler</option>
+                          <option value="buyuksehir">Büyükşehir Belediyesi Sınırları Dahilinde Bulunan İdareler</option>
+                          <option value="diger">Büyükşehir Belediyesi Sınırları Dışında Kalan (Diğer) İdareler</option>
                         </select>
-                        <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-1 leading-normal">
+                        <p className="text-[10px] text-slate-400 dark:text-slate-500 mt-1.5 leading-normal">
                           Bu seçim, doğrudan temin dosyası oluşturulurken tahmini bedel limit aşımı kontrolünü ve Gösterge Paneli bütçe uyarılarını belirler.
                         </p>
+                        
+                        {limitType === 'buyuksehir' ? (
+                          <div className="mt-2 text-[10px] text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-950/30 px-3 py-2 rounded-lg border border-blue-100 dark:border-blue-900/50 flex items-start gap-1.5 leading-relaxed font-medium">
+                            <Info className="w-3.5 h-3.5 shrink-0 mt-0.5" />
+                            <span>
+                              Büyükşehir Belediyesi sınırları içerisinde yer alan Valilikler, Kaymakamlıklar, İlçe Belediyeleri, Üniversiteler ve diğer tüm kamu kurumları bu statüde değerlendirilip <strong>yüksek limite</strong> tabidir.
+                            </span>
+                          </div>
+                        ) : (
+                          <div className="mt-2 text-[10px] text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/30 px-3 py-2 rounded-lg border border-emerald-100 dark:border-emerald-900/50 flex items-start gap-1.5 leading-relaxed font-medium">
+                            <Info className="w-3.5 h-3.5 shrink-0 mt-0.5" />
+                            <span>
+                              Büyükşehir statüsü olmayan İller, bunlara bağlı İlçeler, Belde Belediyeleri ve diğer tüm mahalli/genel idareler 4734 Sayılı Kanuna göre "Diğer İdareler" statüsünde olup <strong>standart limite</strong> tabidir.
+                            </span>
+                          </div>
+                        )}
                       </div>
 
                       <div className="md:col-span-2">
