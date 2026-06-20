@@ -543,51 +543,113 @@ export default function KurumScreen(): React.JSX.Element {
                           </div>
 
                           {/* Muhasebe Birimi */}
-                          <div>
-                            <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5">
-                              Muhasebe Birimi (Birim Kodu & Adı)
+                          <div className="md:col-span-2 space-y-3 p-4 bg-slate-50/50 dark:bg-slate-950/20 border border-slate-200/60 dark:border-slate-800/60 rounded-2xl">
+                            <label className="block text-xs font-bold text-slate-700 dark:text-slate-350">
+                              Muhasebe Birimi Bilgileri <span className="text-[10px] font-normal text-slate-400">(EKAP veri aktarımında bu bilgiler eşleştirilir)</span>
                             </label>
-                            <select
-                              value={muhasebeBirimKodu}
-                              onChange={e => {
-                                const val = e.target.value;
-                                setMuhasebeBirimKodu(val);
-                                const selected = sozlukData.find(d => d.tur === 'muhasebe_birimi' && d.kod === val);
-                                setMuhasebeBirimAdi(selected ? selected.aciklama : '');
-                              }}
-                              className="w-full bg-slate-55 dark:bg-slate-955 border border-slate-200 dark:border-slate-800 text-xs rounded-xl py-2 px-3 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-blue-500"
-                            >
-                              <option value="">Seçiniz...</option>
-                              {sozlukData.filter(d => d.tur === 'muhasebe_birimi').map(item => (
-                                <option key={item.kod} value={item.kod}>
-                                  {item.kod} — {item.aciklama}
-                                </option>
-                              ))}
-                            </select>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                              <div>
+                                <label className="block text-[10px] font-semibold text-slate-500 dark:text-slate-400 mb-1">
+                                  Muhasebe Birim Kodu
+                                </label>
+                                <div className="flex gap-2">
+                                  <Input
+                                    value={muhasebeBirimKodu}
+                                    onChange={(e) => setMuhasebeBirimKodu(e.target.value)}
+                                    placeholder="Örn: 38220"
+                                    className="bg-slate-55 dark:bg-slate-955 border-slate-200 dark:border-slate-800 text-xs flex-1"
+                                  />
+                                  {sozlukData.filter(d => d.tur === 'muhasebe_birimi').length > 0 && (
+                                    <select
+                                      value=""
+                                      onChange={(e) => {
+                                        const val = e.target.value;
+                                        if (val) {
+                                          setMuhasebeBirimKodu(val);
+                                          const selected = sozlukData.find(d => d.tur === 'muhasebe_birimi' && d.kod === val);
+                                          setMuhasebeBirimAdi(selected ? selected.aciklama : '');
+                                        }
+                                      }}
+                                      title="Listeden Seç"
+                                      className="bg-slate-55 dark:bg-slate-955 border border-slate-200 dark:border-slate-800 text-xs rounded-xl px-2 focus:outline-none focus:ring-1 focus:ring-blue-500 max-w-[120px]"
+                                    >
+                                      <option value="">Seç...</option>
+                                      {sozlukData.filter(d => d.tur === 'muhasebe_birimi').map(item => (
+                                        <option key={item.kod} value={item.kod}>
+                                          {item.kod} — {item.aciklama}
+                                        </option>
+                                      ))}
+                                    </select>
+                                  )}
+                                </div>
+                              </div>
+                              <div>
+                                <label className="block text-[10px] font-semibold text-slate-500 dark:text-slate-400 mb-1">
+                                  Muhasebe Birim Adı
+                                </label>
+                                <Input
+                                  value={muhasebeBirimAdi}
+                                  onChange={(e) => setMuhasebeBirimAdi(e.target.value)}
+                                  placeholder="Muhasebe Birimi Adı"
+                                  className="bg-slate-55 dark:bg-slate-955 border-slate-200 dark:border-slate-800 text-xs"
+                                />
+                              </div>
+                            </div>
                           </div>
 
                           {/* Harcama Birimi */}
-                          <div>
-                            <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5">
-                              Harcama Birimi (Birim Kodu & Adı)
+                          <div className="md:col-span-2 space-y-3 p-4 bg-slate-50/50 dark:bg-slate-950/20 border border-slate-200/60 dark:border-slate-800/60 rounded-2xl">
+                            <label className="block text-xs font-bold text-slate-700 dark:text-slate-350">
+                              Harcama Birimi Bilgileri <span className="text-[10px] font-normal text-slate-400">(EKAP veri aktarımında bu bilgiler eşleştirilir)</span>
                             </label>
-                            <select
-                              value={harcamaBirimKodu}
-                              onChange={e => {
-                                const val = e.target.value;
-                                setHarcamaBirimKodu(val);
-                                const selected = sozlukData.find(d => d.tur === 'harcama_birimi' && d.kod === val);
-                                setHarcamaBirimAdi(selected ? selected.aciklama : '');
-                              }}
-                              className="w-full bg-slate-55 dark:bg-slate-955 border border-slate-200 dark:border-slate-800 text-xs rounded-xl py-2 px-3 text-slate-800 dark:text-slate-200 focus:outline-none focus:ring-1 focus:ring-blue-500"
-                            >
-                              <option value="">Seçiniz...</option>
-                              {sozlukData.filter(d => d.tur === 'harcama_birimi').map(item => (
-                                <option key={item.kod} value={item.kod}>
-                                  {item.kod} — {item.aciklama}
-                                </option>
-                              ))}
-                            </select>
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                              <div>
+                                <label className="block text-[10px] font-semibold text-slate-500 dark:text-slate-400 mb-1">
+                                  Harcama Birim Kodu
+                                </label>
+                                <div className="flex gap-2">
+                                  <Input
+                                    value={harcamaBirimKodu}
+                                    onChange={(e) => setHarcamaBirimKodu(e.target.value)}
+                                    placeholder="Örn: 38.22.00.01"
+                                    className="bg-slate-55 dark:bg-slate-955 border-slate-200 dark:border-slate-800 text-xs flex-1"
+                                  />
+                                  {sozlukData.filter(d => d.tur === 'harcama_birimi').length > 0 && (
+                                    <select
+                                      value=""
+                                      onChange={(e) => {
+                                        const val = e.target.value;
+                                        if (val) {
+                                          setHarcamaBirimKodu(val);
+                                          const selected = sozlukData.find(d => d.tur === 'harcama_birimi' && d.kod === val);
+                                          setHarcamaBirimAdi(selected ? selected.aciklama : '');
+                                        }
+                                      }}
+                                      title="Listeden Seç"
+                                      className="bg-slate-55 dark:bg-slate-955 border border-slate-200 dark:border-slate-800 text-xs rounded-xl px-2 focus:outline-none focus:ring-1 focus:ring-blue-500 max-w-[120px]"
+                                    >
+                                      <option value="">Seç...</option>
+                                      {sozlukData.filter(d => d.tur === 'harcama_birimi').map(item => (
+                                        <option key={item.kod} value={item.kod}>
+                                          {item.kod} — {item.aciklama}
+                                        </option>
+                                      ))}
+                                    </select>
+                                  )}
+                                </div>
+                              </div>
+                              <div>
+                                <label className="block text-[10px] font-semibold text-slate-500 dark:text-slate-400 mb-1">
+                                  Harcama Birim Adı
+                                </label>
+                                <Input
+                                  value={harcamaBirimAdi}
+                                  onChange={(e) => setHarcamaBirimAdi(e.target.value)}
+                                  placeholder="Harcama Birimi Adı"
+                                  className="bg-slate-55 dark:bg-slate-955 border-slate-200 dark:border-slate-800 text-xs"
+                                />
+                              </div>
+                            </div>
                           </div>
 
                           {/* DETSİS (Eski DTVT) Kodu */}

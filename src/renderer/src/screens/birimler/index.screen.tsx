@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useBirimlerHooks, BirimInput, usePersonelList } from './birimler.hooks'
 import { useAyarlarHooks } from '../ayarlar/ayarlar.hooks'
 import { Button } from '../../components/ui/Button'
@@ -14,6 +14,10 @@ const emptyBirim: BirimInput = {
   say2000i: '',
   dtvt_kodu: '',
   detsis_kodu: '',
+  muhasebe_kodu: '',
+  muhasebe_adi: '',
+  harcama_kodu: '',
+  harcama_adi: '',
   ayrintili_bilgi_personel: '',
   ilgili_personel_id: null
 }
@@ -45,6 +49,17 @@ export default function BirimlerScreen(): React.ReactNode {
   const [viewingBirim, setViewingBirim] = useState<any | null>(null)
   
   const [ihtiyacYeriList, setIhtiyacYeriList] = useState<string[]>([''])
+  const [sozlukData, setSozlukData] = useState<{ tur: string; kod: string; aciklama: string }[]>([])
+
+  useEffect(() => {
+    window.electron.ipcRenderer.invoke('db:query', 'SELECT * FROM TANIM_KodSozlugu WHERE aktif_mi = 1')
+      .then(res => {
+        if (res.success && res.data) {
+          setSozlukData(res.data)
+        }
+      })
+      .catch(console.error)
+  }, [])
   
   const isMuhasebe = form.birim_adi.toLowerCase().includes('muhasebe') || form.birim_adi.toLowerCase().includes('mali') || form.birim_adi.toLowerCase().includes('harcama')
   
@@ -102,6 +117,10 @@ export default function BirimlerScreen(): React.ReactNode {
       say2000i: birim.say2000i || '',
       dtvt_kodu: birim.dtvt_kodu || '',
       detsis_kodu: birim.detsis_kodu || '',
+      muhasebe_kodu: birim.muhasebe_kodu || '',
+      muhasebe_adi: birim.muhasebe_adi || '',
+      harcama_kodu: birim.harcama_kodu || '',
+      harcama_adi: birim.harcama_adi || '',
       ayrintili_bilgi_personel: birim.ayrintili_bilgi_personel || '',
       ilgili_personel_id: birim.ilgili_personel_id || null
     })
@@ -176,12 +195,36 @@ export default function BirimlerScreen(): React.ReactNode {
               <span className="font-mono text-base text-slate-800 dark:text-slate-200 font-semibold">{viewingBirim.say2000i || '-'}</span>
             </div>
             
-            <div className="p-4 bg-slate-50 dark:bg-slate-900/50 rounded-xl border border-slate-100 dark:border-slate-800">
+            <div className="p-4 bg-slate-55 dark:bg-slate-900/50 rounded-xl border border-slate-100 dark:border-slate-800">
               <span className="flex items-center gap-1.5 text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
                 <Hash className="w-4 h-4 text-slate-400" /> DETSİS / DTVT Kodu
               </span>
               <span className="font-mono text-base text-slate-800 dark:text-slate-200 font-semibold">{viewingBirim.detsis_kodu || viewingBirim.dtvt_kodu || '-'}</span>
             </div>
+
+            {viewingBirim.muhasebe_kodu && (
+              <div className="p-4 bg-slate-55 dark:bg-slate-900/50 rounded-xl border border-slate-100 dark:border-slate-800">
+                <span className="flex items-center gap-1.5 text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
+                  <Hash className="w-4 h-4 text-slate-400" /> Muhasebe Birim Kodu &amp; Adı
+                </span>
+                <div className="flex flex-col">
+                  <span className="font-mono text-base text-slate-800 dark:text-slate-200 font-semibold">{viewingBirim.muhasebe_kodu}</span>
+                  <span className="text-xs text-slate-500 dark:text-slate-400 mt-1">{viewingBirim.muhasebe_adi || '-'}</span>
+                </div>
+              </div>
+            )}
+
+            {viewingBirim.harcama_kodu && (
+              <div className="p-4 bg-slate-55 dark:bg-slate-900/50 rounded-xl border border-slate-100 dark:border-slate-800">
+                <span className="flex items-center gap-1.5 text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
+                  <Hash className="w-4 h-4 text-slate-400" /> Harcama Birim Kodu &amp; Adı
+                </span>
+                <div className="flex flex-col">
+                  <span className="font-mono text-base text-slate-800 dark:text-slate-200 font-semibold">{viewingBirim.harcama_kodu}</span>
+                  <span className="text-xs text-slate-500 dark:text-slate-400 mt-1">{viewingBirim.harcama_adi || '-'}</span>
+                </div>
+              </div>
+            )}
 
             <div className="p-4 bg-slate-50 dark:bg-slate-900/50 rounded-xl border border-slate-100 dark:border-slate-800">
               <span className="flex items-center gap-1.5 text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">
@@ -342,6 +385,26 @@ export default function BirimlerScreen(): React.ReactNode {
                         </div>
                       </div>
                     )}
+                    {birim.muhasebe_kodu && (
+                      <div className="flex items-start gap-2 text-[11px] text-slate-600 dark:text-slate-400 col-span-full">
+                        <Hash className="w-3.5 h-3.5 shrink-0 text-slate-400 mt-0.5" />
+                        <div>
+                          <span className="font-semibold text-slate-700 dark:text-slate-300 mr-1">Muhasebe:</span>
+                          <span className="font-mono text-slate-800 dark:text-slate-200">{birim.muhasebe_kodu}</span>
+                          {birim.muhasebe_adi && <span className="text-slate-500 dark:text-slate-400 ml-1">({birim.muhasebe_adi})</span>}
+                        </div>
+                      </div>
+                    )}
+                    {birim.harcama_kodu && (
+                      <div className="flex items-start gap-2 text-[11px] text-slate-600 dark:text-slate-400 col-span-full">
+                        <Hash className="w-3.5 h-3.5 shrink-0 text-slate-400 mt-0.5" />
+                        <div>
+                          <span className="font-semibold text-slate-700 dark:text-slate-300 mr-1">Harcama:</span>
+                          <span className="font-mono text-slate-800 dark:text-slate-200">{birim.harcama_kodu}</span>
+                          {birim.harcama_adi && <span className="text-slate-500 dark:text-slate-400 ml-1">({birim.harcama_adi})</span>}
+                        </div>
+                      </div>
+                    )}
                     {birim.antet_ek_satir && (
                       <div className="flex items-start gap-2 text-[11px] text-slate-600 dark:text-slate-400">
                         <Type className="w-3.5 h-3.5 shrink-0 text-slate-400 mt-0.5" />
@@ -454,6 +517,115 @@ export default function BirimlerScreen(): React.ReactNode {
 
           {showExtraFields && (
             <div className="space-y-4 pt-2 border-t border-slate-100 dark:border-slate-800 animate-in fade-in slide-in-from-top-2 duration-300">
+              {/* Muhasebe Birimi Bilgileri */}
+              <div className="space-y-3 p-4 bg-slate-50/50 dark:bg-slate-950/20 border border-slate-200/60 dark:border-slate-800/60 rounded-2xl">
+                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300">
+                  Muhasebe Birimi Bilgileri <span className="text-[10px] font-normal text-slate-400">(EKAP veri aktarımında bu bilgiler eşleştirilir)</span>
+                </label>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-[10px] font-semibold text-slate-500 dark:text-slate-400 mb-1">
+                      Muhasebe Birim Kodu
+                    </label>
+                    <div className="flex gap-2">
+                      <Input
+                        value={form.muhasebe_kodu || ''}
+                        onChange={(e) => handleChange('muhasebe_kodu', e.target.value)}
+                        placeholder="Örn: 38220"
+                        className="bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-xs flex-1"
+                      />
+                      {sozlukData.filter(d => d.tur === 'muhasebe_birimi').length > 0 && (
+                        <select
+                          value=""
+                          onChange={(e) => {
+                            const val = e.target.value;
+                            if (val) {
+                              handleChange('muhasebe_kodu', val);
+                              const selected = sozlukData.find(d => d.tur === 'muhasebe_birimi' && d.kod === val);
+                              handleChange('muhasebe_adi', selected ? selected.aciklama : '');
+                            }
+                          }}
+                          title="Listeden Seç"
+                          className="bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 text-xs rounded-xl px-2 focus:outline-none focus:ring-1 focus:ring-blue-500 max-w-[120px]"
+                        >
+                          <option value="">Seç...</option>
+                          {sozlukData.filter(d => d.tur === 'muhasebe_birimi').map(item => (
+                            <option key={item.kod} value={item.kod}>
+                              {item.kod} — {item.aciklama}
+                            </option>
+                          ))}
+                        </select>
+                      )}
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-semibold text-slate-500 dark:text-slate-400 mb-1">
+                      Muhasebe Birim Adı
+                    </label>
+                    <Input
+                      value={form.muhasebe_adi || ''}
+                      onChange={(e) => handleChange('muhasebe_adi', e.target.value)}
+                      placeholder="Muhasebe Birimi Adı"
+                      className="bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-xs"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Harcama Birimi Bilgileri */}
+              <div className="space-y-3 p-4 bg-slate-50/50 dark:bg-slate-950/20 border border-slate-200/60 dark:border-slate-800/60 rounded-2xl">
+                <label className="block text-xs font-bold text-slate-700 dark:text-slate-300">
+                  Harcama Birimi Bilgileri <span className="text-[10px] font-normal text-slate-400">(EKAP veri aktarımında bu bilgiler eşleştirilir)</span>
+                </label>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-[10px] font-semibold text-slate-500 dark:text-slate-400 mb-1">
+                      Harcama Birim Kodu
+                    </label>
+                    <div className="flex gap-2">
+                      <Input
+                        value={form.harcama_kodu || ''}
+                        onChange={(e) => handleChange('harcama_kodu', e.target.value)}
+                        placeholder="Örn: 38.22.00.01"
+                        className="bg-slate-50 dark:bg-slate-955 border-slate-200 dark:border-slate-800 text-xs flex-1"
+                      />
+                      {sozlukData.filter(d => d.tur === 'harcama_birimi').length > 0 && (
+                        <select
+                          value=""
+                          onChange={(e) => {
+                            const val = e.target.value;
+                            if (val) {
+                              handleChange('harcama_kodu', val);
+                              const selected = sozlukData.find(d => d.tur === 'harcama_birimi' && d.kod === val);
+                              handleChange('harcama_adi', selected ? selected.aciklama : '');
+                            }
+                          }}
+                          title="Listeden Seç"
+                          className="bg-slate-50 dark:bg-slate-955 border border-slate-200 dark:border-slate-800 text-xs rounded-xl px-2 focus:outline-none focus:ring-1 focus:ring-blue-500 max-w-[120px]"
+                        >
+                          <option value="">Seç...</option>
+                          {sozlukData.filter(d => d.tur === 'harcama_birimi').map(item => (
+                            <option key={item.kod} value={item.kod}>
+                              {item.kod} — {item.aciklama}
+                            </option>
+                          ))}
+                        </select>
+                      )}
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-[10px] font-semibold text-slate-500 dark:text-slate-400 mb-1">
+                      Harcama Birim Adı
+                    </label>
+                    <Input
+                      value={form.harcama_adi || ''}
+                      onChange={(e) => handleChange('harcama_adi', e.target.value)}
+                      placeholder="Harcama Birimi Adı"
+                      className="bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-xs"
+                    />
+                  </div>
+                </div>
+              </div>
               {!isMuhasebe && (
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
