@@ -1,8 +1,19 @@
 import React, { useState } from 'react'
-import { FileText, Download, ExternalLink, HelpCircle, FileSpreadsheet } from 'lucide-react'
+import { FileText, Download, ExternalLink, HelpCircle, FileSpreadsheet, BookOpen, Layers, Cpu, Layout, Info } from 'lucide-react'
 import { ExcelViewer } from '../../components/ui/ExcelViewer'
 
 const DOCUMENTS = [
+  {
+    category: 'Sistem Kılavuzu & Tanıtım',
+    items: [
+      {
+        id: 'uygulamamizi_yakindan_taniyalim',
+        title: 'Uygulamamızı Yakından Tanıyalım',
+        description: 'Uygulama genel yapısı, şablon mekanizması, sayfa yerleşimleri (A4/yarım sayfa) ve dosya/veri mimarisi hakkında detaylı rehber.',
+        file: 'system_guide'
+      }
+    ]
+  },
   {
     category: 'Resmi Yazışma ve Kullanıcı Kılavuzları',
     items: [
@@ -154,6 +165,97 @@ const DogrudanTeminSurecAkisi = () => {
   );
 };
 
+const UygulamaRehberi = () => {
+  return (
+    <div className="p-6 overflow-y-auto h-full max-h-full custom-scrollbar bg-slate-50 dark:bg-slate-900/40">
+      <div className="max-w-4xl mx-auto space-y-6">
+        <div className="text-center pb-4 border-b border-slate-200 dark:border-slate-800">
+          <h2 className="text-lg font-bold text-slate-800 dark:text-slate-100 flex items-center justify-center gap-2">
+            <Cpu className="w-5 h-5 text-blue-600" />
+            Uygulamamızı Yakından Tanıyalım (Sistem Kılavuzu)
+          </h2>
+          <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+            Uygulamanın genel kullanım akışı, sayfa yazdırma mantığı ve şablon özelleştirme rehberi
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Card 1: Genel Kullanım Akışı */}
+          <div className="bg-white dark:bg-slate-955 p-5 rounded-xl border border-slate-200 dark:border-slate-800 shadow-xs hover:shadow-sm transition-shadow">
+            <h3 className="text-sm font-bold text-slate-800 dark:text-slate-200 mb-3 flex items-center gap-2">
+              <Layers className="w-4 h-4 text-blue-500" />
+              1. Genel Kullanım Akışı ve Hızlı Çıktı
+            </h3>
+            <p className="text-xs text-slate-650 dark:text-slate-400 leading-relaxed mb-3">
+              Uygulamanın temel amacı satın alma dosyalarınızı tek merkezden hızlıca hazırlamaktır. En verimli süreç akışı şu şekildedir:
+            </p>
+            <ul className="text-xs text-slate-600 dark:text-slate-400 list-disc list-inside space-y-1.5 font-normal">
+              <li><strong>Kurum Bilgileri:</strong> İlk olarak kurum bilgilerinizi doldurun. Bu veriler tüm belgelerde otomatik olarak kullanılır.</li>
+              <li><strong>Doğrudan Temin Dosyaları:</strong> Süreç dosyalarınızı oluşturup malzeme, komisyon, yaklaşık maliyet gibi detayları girin.</li>
+              <li><strong>Otomatik Çıktı:</strong> Dosyanızı doldurduğunuzda, tüm süreç evraklarını <strong>Çıktı Merkezi</strong> üzerinden tek tuşla otomatik, hızlı ve resmi formatta yazdırabilirsiniz.</li>
+            </ul>
+          </div>
+
+          {/* Card 2: Şablon Yönetimi (Geliştirici Rehberi) */}
+          <div className="bg-white dark:bg-slate-955 p-5 rounded-xl border border-slate-200 dark:border-slate-800 shadow-xs hover:shadow-sm transition-shadow">
+            <h3 className="text-sm font-bold text-slate-800 dark:text-slate-200 mb-3 flex items-center gap-2">
+              <BookOpen className="w-4 h-4 text-emerald-500" />
+              2. Şablon Yönetimi (Geliştirici Rehberi)
+            </h3>
+            <p className="text-xs text-slate-650 dark:text-slate-400 leading-relaxed mb-3">
+              Yazdırılabilir resmi belgeler dinamik HTML şablonları üzerinden üretilir. Geliştirici veya teknik kullanıcı iseniz:
+            </p>
+            <ul className="text-xs text-slate-600 dark:text-slate-400 list-disc list-inside space-y-1.5 font-normal">
+              <li><strong>Şablon Düzenleme:</strong> Uygulama menüsündeki <strong>Şablonlar</strong> ekranından kod bazında HTML ve JSON yapılarını doğrudan özelleştirebilir ve düzenleyebilirsiniz.</li>
+              <li><strong>Mustache Motoru:</strong> HTML şablonlarında <code>{"{{deger}}"}</code> Mustache yapısı kullanılır, dinamik veriler buraya yerleşir.</li>
+              <li><strong>Şablon Konumu:</strong> Proje dizinindeki <code>resources/templates/</code> klasöründe yer alan kaynak kodlara müdahale edebilirsiniz.</li>
+            </ul>
+          </div>
+
+          {/* Card 3: Çift Nüsha (Half-Page) Hassasiyeti */}
+          <div className="bg-white dark:bg-slate-955 p-5 rounded-xl border border-slate-200 dark:border-slate-800 shadow-xs hover:shadow-sm transition-shadow">
+            <h3 className="text-sm font-bold text-slate-800 dark:text-slate-200 mb-3 flex items-center gap-2">
+              <Layout className="w-4 h-4 text-violet-500" />
+              3. Çift Nüsha (A4/2) & Dinamik Sayfa Mantığı
+            </h3>
+            <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed mb-3">
+              Teslim Tesellüm gibi belgelerde kağıt tasarrufu için A4 sayfasının üst ve alt yarısında iki kopya (`half-page`) yer alır:
+            </p>
+            <ul className="text-xs text-slate-600 dark:text-slate-400 list-disc list-inside space-y-1.5 font-normal">
+              <li><strong>Yarım Sayfa Modu:</strong> Kalem sayısı azsa (≤ 5) iki nüsha tek bir A4 kağıdına sığdırılır, araya kesikli çizgi konulur.</li>
+              <li><strong>Dinamik Tam Sayfa (Full-Page):</strong> Eğer malzeme satırı sayısı 5&apos;ten fazla ise şablondaki DOM scripti otomatik olarak <code>full-page-mode</code> sınıfını ekler.</li>
+              <li>Bu modda iki nüsha da dikey A4 boyutuna genişletilir ve sayfa sonu (`break-after: page`) verilerek ardışık iki tam A4 sayfası olarak yazdırılır.</li>
+            </ul>
+          </div>
+
+          {/* Card 4: Veri Entegrasyonu ve Nesne Yapısı */}
+          <div className="bg-white dark:bg-slate-955 p-5 rounded-xl border border-slate-200 dark:border-slate-800 shadow-xs hover:shadow-sm transition-shadow">
+            <h3 className="text-sm font-bold text-slate-800 dark:text-slate-200 mb-3 flex items-center gap-2">
+              <Info className="w-4 h-4 text-amber-500" />
+              4. Kararlı Veri & Dotted Fallback Kuralı
+            </h3>
+            <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed mb-3">
+              Kullanıcının bazı alanları (örneğin dosya numarası) boş bırakması ihtimaline karşı resmi evraklarda şu kurallar uygulanır:
+            </p>
+            <ul className="text-xs text-slate-600 dark:text-slate-400 list-disc list-inside space-y-1.5 font-normal">
+              <li><strong>Obje Ayrıştırma:</strong> <code>dosyaNumarasi</code> bir bütün string yerine <code>{"{ yili: \"2026\", sayisi: \"123\" }"}</code> şeklinde bir nesne olarak saklanır.</li>
+              <li><strong>Mustache Fallback:</strong> Sayı değeri girilmediğinde şablonun bozulmaması için <code>{"{{yili}}/{{#sayisi}}{{sayisi}}{{/sayisi}}{{^sayisi}}....{{/sayisi}}"}</code> yapısı kullanılır.</li>
+              <li><strong>Çıktı Güvenliği:</strong> Böylece eksik verilerde çıktı <code>2026/....</code> veya tamamen boş ise <code>..../....</code> şeklinde gösterilerek resmi evrak formatı korunur.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div className="bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-900 rounded-xl p-4 text-xs text-blue-800 dark:text-blue-300 leading-relaxed flex gap-3">
+          <Info className="w-5 h-5 text-blue-600 dark:text-blue-400 shrink-0 mt-0.5" />
+          <div>
+            <strong>Geliştirici & Model Notu:</strong> Şablonları güncellerken veya yeni alanlar eklerken bu yerleşim kurallarına ve boş veri yedekleme (fallback) yapılarına sadık kalmaya özen gösterin.
+          </div>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 export default function YardimScreen(): React.JSX.Element {
   const [activeDoc, setActiveDoc] = useState(() => {
     const searchParams = new URLSearchParams(window.location.search)
@@ -225,7 +327,9 @@ export default function YardimScreen(): React.JSX.Element {
         <div className="flex-1 flex flex-col bg-slate-100 dark:bg-slate-900 overflow-hidden relative">
           <div className="flex-none p-3 bg-white dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 flex justify-between items-center shadow-sm z-10">
             <h2 className="text-sm font-bold text-slate-700 dark:text-slate-200 flex items-center gap-2">
-              {activeDoc.file.endsWith('.xls') || activeDoc.file.endsWith('.xlsx') ? (
+              {activeDoc.id === 'uygulamamizi_yakindan_taniyalim' ? (
+                <Cpu className="w-4 h-4 text-blue-500" />
+              ) : activeDoc.file.endsWith('.xls') || activeDoc.file.endsWith('.xlsx') ? (
                 <FileSpreadsheet className="w-4 h-4 text-green-500" />
               ) : (
                 <FileText className="w-4 h-4 text-blue-500" />
@@ -233,29 +337,35 @@ export default function YardimScreen(): React.JSX.Element {
               {activeDoc.title}
             </h2>
             <div className="flex items-center gap-2">
-              <a
-                href={activeDoc.file}
-                target="_blank"
-                rel="noreferrer"
-                className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200 dark:text-slate-300 dark:bg-slate-800 dark:hover:bg-slate-700 rounded-lg transition-colors"
-                title="Yeni Sekmede Aç / Dışarıda Görüntüle"
-              >
-                <ExternalLink className="w-3.5 h-3.5" />
-                Dışarıda Aç
-              </a>
-              <a
-                href={activeDoc.file}
-                download
-                className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-blue-600 bg-blue-50 hover:bg-blue-100 dark:text-blue-400 dark:bg-blue-900/30 dark:hover:bg-blue-900/50 rounded-lg transition-colors shadow-sm"
-              >
-                <Download className="w-3.5 h-3.5" />
-                İndir
-              </a>
+              {activeDoc.id !== 'uygulamamizi_yakindan_taniyalim' && (
+                <>
+                  <a
+                    href={activeDoc.file}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-slate-600 bg-slate-100 hover:bg-slate-200 dark:text-slate-300 dark:bg-slate-800 dark:hover:bg-slate-700 rounded-lg transition-colors"
+                    title="Yeni Sekmede Aç / Dışarıda Görüntüle"
+                  >
+                    <ExternalLink className="w-3.5 h-3.5" />
+                    Dışarıda Aç
+                  </a>
+                  <a
+                    href={activeDoc.file}
+                    download
+                    className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold text-blue-600 bg-blue-50 hover:bg-blue-100 dark:text-blue-400 dark:bg-blue-900/30 dark:hover:bg-blue-900/50 rounded-lg transition-colors shadow-sm"
+                  >
+                    <Download className="w-3.5 h-3.5" />
+                    İndir
+                  </a>
+                </>
+              )}
             </div>
           </div>
           
           <div className="flex-1 w-full h-full relative z-0 overflow-hidden bg-white dark:bg-slate-955">
-            {activeDoc.id === 'dogrudan_temin_islem_sureci' ? (
+            {activeDoc.id === 'uygulamamizi_yakindan_taniyalim' ? (
+              <UygulamaRehberi />
+            ) : activeDoc.id === 'dogrudan_temin_islem_sureci' ? (
               <DogrudanTeminSurecAkisi />
             ) : activeDoc.file.endsWith('.pdf') ? (
               <div className="p-4 w-full h-full">
