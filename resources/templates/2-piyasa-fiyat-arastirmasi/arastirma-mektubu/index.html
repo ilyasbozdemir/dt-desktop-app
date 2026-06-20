@@ -107,43 +107,18 @@
       font-weight: bold;
       text-align: center;
     }
-    .toplam-container {
-      display: flex;
-      justify-content: space-between;
-      align-items: flex-start;
-      margin-top: -1px;
-      font-size: 10pt;
-      page-break-inside: avoid;
-      break-inside: avoid;
-    }
-    .para-birimi {
-      padding: 8px 0;
-      font-style: italic;
-    }
-    .toplam-tablo {
-      border-collapse: collapse;
-      margin-left: auto;
-    }
-    .toplam-tablo td {
-      border: 1px solid #000;
-      padding: 8px 12px;
-      font-weight: bold;
-    }
-    .toplam-label {
-      width: 100px;
-      text-align: center;
-    }
-    .toplam-deger {
-      width: 150px;
-    }
     .firma-imza-container {
+      display: flex;
+      justify-content: flex-end;
       margin-top: 30px;
-      text-align: right;
-      font-size: 11pt;
-      line-height: 1.6;
       page-break-inside: avoid;
       break-inside: avoid;
-      padding-right: 40px;
+    }
+    .firma-imza-box {
+      text-align: left;
+      width: 150px;
+      font-size: 11pt;
+      line-height: 1.8;
     }
   </style>
 </head>
@@ -249,25 +224,22 @@
             <td colspan="7" style="text-align: center; font-style: italic;">Kalem bulunamadı</td>
           </tr>
           {{/ihtiyacKalemleri}}
+          <!-- TOPLAM SATIRI -->
+          <tr>
+            <td colspan="5" style="border: none; text-align: left; padding: 8px 0; font-style: italic;">Para birimi: TL</td>
+            <td style="text-align: center; font-weight: bold; border: 1px solid #000; padding: 6px;">Toplam</td>
+            <td style="border: 1px solid #000; height: 35px;"></td>
+          </tr>
         </tbody>
       </table>
 
-      <!-- TOPLAM ALANI -->
-      <div class="toplam-container">
-        <div class="para-birimi">Para birimi: TL</div>
-        <table class="toplam-tablo">
-          <tr>
-            <td class="toplam-label">Toplam</td>
-            <td class="toplam-deger"></td>
-          </tr>
-        </table>
-      </div>
-
       <!-- FİRMA YETKİLİSİ İMZA ALANI -->
       <div class="firma-imza-container">
-        Tarih: .…../.…../20…<br>
-        Kaşe:<br><br>
-        İmza:
+        <div class="firma-imza-box">
+          Tarih: .…../.…../20…<br>
+          Kaşe:<br><br>
+          İmza:
+        </div>
       </div>
 
     </div> <!-- END CONTENT BODY -->
