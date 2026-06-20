@@ -108,7 +108,7 @@ export default function AyarlarScreen(): React.ReactNode {
 
   useEffect(() => {
     if (activeTab === 'developer') {
-      fetch('https://api.github.com/repos/ilyasbozdemir/dt-desktop-app/releases')
+      fetch('https://api.github.com/repos/ilyasbozdemir/dt-asistan-desktop-app/releases')
         .then(res => res.json())
         .then(data => {
           if (Array.isArray(data)) {

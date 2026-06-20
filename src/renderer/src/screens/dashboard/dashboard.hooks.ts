@@ -341,7 +341,7 @@ export function useAnnouncements() {
       let remoteData: Announcement[] = []
       try {
         // Fetch from GitHub raw URL
-        const response = await fetch('https://raw.githubusercontent.com/ilyas-bozdemir/dt-desktop-app/main/docs/announcements.json')
+        const response = await fetch('https://raw.githubusercontent.com/ilyas-bozdemir/dt-asistan-desktop-app/main/docs/announcements.json')
         if (response.ok) {
           const data = await response.json()
           if (Array.isArray(data)) {

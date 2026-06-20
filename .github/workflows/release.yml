@@ -5,7 +5,7 @@ on:
     types: [published]
   push:
     tags:
-      - 'v*'
+      - "v*"
 
 permissions:
   contents: write
@@ -54,7 +54,7 @@ jobs:
             dist/latest.yml
           draft: false
           prerelease: false
-          name: 'dt-desktop-app ${{ github.ref_name }}'
-          body: 'Doğrudan Temin Masaüstü Yönetim uygulaması sürümü.'
+          name: "dt-asistan-desktop-app ${{ github.ref_name }}"
+          body: "Doğrudan Temin Masaüstü Yönetim uygulaması sürümü."
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

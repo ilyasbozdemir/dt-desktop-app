@@ -65,5 +65,5 @@ npmRebuild: false
 publish:
   provider: github
   owner: ilyasbozdemir
-  repo: dt-desktop-app
-  updaterCacheDirName: dt-desktop-app-updater
+  repo: dt-asistan-desktop-app
+  updaterCacheDirName: dt-asistan-desktop-app-updater

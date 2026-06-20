@@ -85,7 +85,7 @@ export default function MalzemelerScreen(): React.JSX.Element {
                 💡 <strong>İpucu:</strong> Güncel Taşınır Kodları listesine ulaşmak için <a href="https://muhasebat.hmb.gov.tr/tasinir-kod-listesi" target="_blank" rel="noreferrer" className="underline font-semibold hover:text-blue-800 dark:hover:text-blue-200">Muhasebat Genel Müdürlüğü</a> sayfasını ziyaret edebilirsiniz.
               </p>
               <p>
-                📣 Uygulama altyapımız bu kodları tamamen desteklemektedir. Hazır malzeme listesi ve kodlarının varsayılan olarak eklenmesi için <a href="https://github.com/ilyasbozdemir/dt-desktop-app" target="_blank" rel="noreferrer" className="underline font-semibold hover:text-blue-800 dark:hover:text-blue-200">GitHub sayfamızdan Issue açarak</a> bize veritabanı taleplerinizi iletebilirsiniz.
+                📣 Uygulama altyapımız bu kodları tamamen desteklemektedir. Hazır malzeme listesi ve kodlarının varsayılan olarak eklenmesi için <a href="https://github.com/ilyasbozdemir/dt-asistan-desktop-app" target="_blank" rel="noreferrer" className="underline font-semibold hover:text-blue-800 dark:hover:text-blue-200">GitHub sayfamızdan Issue açarak</a> bize veritabanı taleplerinizi iletebilirsiniz.
               </p>
             </div>
           </div>

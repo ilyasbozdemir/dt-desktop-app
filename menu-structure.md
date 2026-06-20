@@ -1,6 +1,7 @@
-# Doğrudan Temin Masaüstü Uygulaması (dt-desktop-app) - Menü Yapısı (Taslak)
+# Doğrudan Temin Masaüstü Uygulaması (dt-asistan-desktop-app) - Menü Yapısı (Taslak)
 
-Bu dosya uygulamanın sol menü/navigasyon yapısının taslağını içerir. Yeni arayüz geliştirilirken bu hiyerarşi temel alınacaktır.
+Bu dosya uygulamanın sol menü/navigasyon yapısının taslağını içerir. Yeni arayüz
+geliştirilirken bu hiyerarşi temel alınacaktır.
 
 ## Veri Dosyaları (Hub)
 

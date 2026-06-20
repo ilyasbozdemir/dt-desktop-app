@@ -5,9 +5,9 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/ilyasbozdemir/dt-desktop-app/actions"><img src="https://img.shields.io/github/actions/workflow/status/ilyasbozdemir/dt-desktop-app/release.yml?style=flat-square&logo=github&label=Build%20Status" alt="Build Status"></a>
-  <a href="https://github.com/ilyasbozdemir/dt-desktop-app/releases/latest"><img src="https://img.shields.io/github/v/release/ilyasbozdemir/dt-desktop-app?style=flat-square&logo=github&label=Latest%20Release" alt="Latest Release"></a>
-  <a href="https://github.com/ilyasbozdemir/dt-desktop-app/releases"><img src="https://img.shields.io/github/downloads/ilyasbozdemir/dt-desktop-app/total?style=flat-square&logo=github&color=blue" alt="Downloads"></a>
+  <a href="https://github.com/ilyasbozdemir/dt-asistan-desktop-app/actions"><img src="https://img.shields.io/github/actions/workflow/status/ilyasbozdemir/dt-asistan-desktop-app/release.yml?style=flat-square&logo=github&label=Build%20Status" alt="Build Status"></a>
+  <a href="https://github.com/ilyasbozdemir/dt-asistan-desktop-app/releases/latest"><img src="https://img.shields.io/github/v/release/ilyasbozdemir/dt-asistan-desktop-app?style=flat-square&logo=github&label=Latest%20Release" alt="Latest Release"></a>
+  <a href="https://github.com/ilyasbozdemir/dt-asistan-desktop-app/releases"><img src="https://img.shields.io/github/downloads/ilyasbozdemir/dt-asistan-desktop-app/total?style=flat-square&logo=github&color=blue" alt="Downloads"></a>
 </p>
 
 **4734 Sayılı Kamu İhale Kanunu Madde 22 kapsamında doğrudan temin yoluyla
@@ -166,7 +166,7 @@ Bu proje [GNU Affero General Public License v3.0](./LICENSE) lisansı ile
 lisanslanmıştır.
 
 ```
-dt-desktop-app - Doğrudan Temin Masaüstü Yönetim uygulaması
+dt-asistan-desktop-app - Doğrudan Temin Masaüstü Yönetim uygulaması
 Copyright (C) 2026  İlyas Bozdemir
 ```
 

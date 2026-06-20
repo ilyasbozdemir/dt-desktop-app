@@ -1,5 +1,5 @@
 {
-  "name": "dt-desktop-app",
+  "name": "dt-asistan-desktop-app",
   "version": "1.0.0-alpha.58",
   "description": "Doğrudan Temin ve Satın Alma Süreçleri Yönetim Sistemi",
   "main": "./out/main/index.js",
