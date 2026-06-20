@@ -161,17 +161,39 @@ function seedTemplates(db: Database.Database): void {
         }
       }
 
+      const jsonFilePath = filePath + '.json'
+      let testJsonContent: string | null = null
+      if (fs.existsSync(jsonFilePath)) {
+        testJsonContent = fs.readFileSync(jsonFilePath, 'utf-8')
+      }
+
+      const relativeHtmlPath = path.relative(targetDir, filePath)
+      const relativeJsonPath = fs.existsSync(jsonFilePath) ? path.relative(targetDir, jsonFilePath) : null
+
       const existing = db.prepare('SELECT * FROM TANIM_Sablon WHERE dosya_adi = ?').get(dosya_adi) as any
       if (!existing) {
         db.prepare(`
-          INSERT INTO TANIM_Sablon (ad, dosya_adi, dosya_turu, icerik, aciklama, aktif_mi, kategori)
-          VALUES (?, ?, 'html', ?, ?, 1, ?)
-        `).run(ad, dosya_adi, content, 'Sistem varsayılan şablonu', kategori)
+          INSERT INTO TANIM_Sablon (ad, dosya_adi, dosya_turu, icerik, aciklama, aktif_mi, kategori, test_verisi, html_yolu, json_yolu)
+          VALUES (?, ?, 'html', ?, ?, 1, ?, ?, ?, ?)
+        `).run(ad, dosya_adi, content, 'Sistem varsayılan şablonu', kategori, testJsonContent, relativeHtmlPath, relativeJsonPath)
         console.log(`[Seed] Seeded default template: ${dosya_adi} in category: ${kategori}`)
       } else {
-        // Güncelle: İçerik veya kategori değişmiş olabilir
-        db.prepare('UPDATE TANIM_Sablon SET kategori = ?, icerik = ? WHERE id = ?').run(kategori, content, existing.id)
-        console.log(`[Seed] Updated template: ${dosya_adi}`)
+        // Güncelle: Sadece sistem şablonu (versiyon = 1) ise diskteki güncel dosyadan güncelle
+        if (existing.versiyon === 1) {
+          db.prepare(`
+            UPDATE TANIM_Sablon 
+            SET kategori = ?, icerik = ?, test_verisi = ?, html_yolu = ?, json_yolu = ? 
+            WHERE id = ?
+          `).run(kategori, content, testJsonContent, relativeHtmlPath, relativeJsonPath, existing.id)
+          console.log(`[Seed] Updated default template: ${dosya_adi}`)
+        } else {
+          // Kullanıcı özelleştirmişse (versiyon > 1) üzerine yazma, sadece yolları ekle
+          db.prepare(`
+            UPDATE TANIM_Sablon 
+            SET html_yolu = COALESCE(html_yolu, ?), json_yolu = COALESCE(json_yolu, ?) 
+            WHERE id = ?
+          `).run(relativeHtmlPath, relativeJsonPath, existing.id)
+        }
       }
     }
   } catch (err: any) {
