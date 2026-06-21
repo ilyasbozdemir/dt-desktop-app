@@ -87,6 +87,24 @@ const DOCUMENTS = [
         title: 'Mali Mevzuat Dokümanı (5816_2)',
         description: 'Maliye ve Muhasebat ilgili mevzuat PDF dokümanı.',
         file: '/docs/muhasebat/5816_2.pdf'
+      },
+      {
+        id: 'giderlerin_ekonomik_siniflandirilmasi_tablosu',
+        title: 'Giderlerin Ekonomik Sınıflandırılması Tablosu',
+        description: 'Bütçe giderlerinin ekonomik sınıflandırma (03, 03.2 vb.) detayları tablosu.',
+        file: '/docs/muhasebat/giderlerin_ekonomik_siniflandirilmasi_tablosu.pdf'
+      },
+      {
+        id: 'butce_giderleri_ve_odenekler_tablosu',
+        title: 'Bütçe Giderleri ve Ödenekler Tablosu',
+        description: 'Bütçe giderleri, ödenek türleri ve harcama tertipleri tablosu.',
+        file: '/docs/muhasebat/butce_giderleri_ve_odenekler_tablosu.pdf'
+      },
+      {
+        id: 'mahalli_idarelerde_gelir_gider_ve_butce_hesaplarinin_karsilastirilmasi',
+        title: 'Mahalli İdareler Gelir Gider ve Bütçe Karşılaştırması',
+        description: 'Mahalli idarelerde bütçe hesapları ve karşılaştırmalı kılavuz.',
+        file: '/docs/muhasebat/mahalli_idarelerde_gelir_gider_ve_butce_hesaplarinin_karsilastirilmasi.pdf'
       }
     ]
   }

@@ -177,10 +177,30 @@ export function CiktiMerkeziScreen(): React.JSX.Element {
         const idareAdi = rawHarcamaBirimi ? `${institutionName} - ${rawHarcamaBirimi}` : institutionName
 
         const rawTur = dosyaRes.data?.[0]?.tur || 'mal'
-        let alimTuruText = 'mal alımı'
-        if (rawTur === 'hizmet') alimTuruText = 'hizmet alımı'
-        else if (rawTur === 'yapim_isi' || rawTur === 'yapim') alimTuruText = 'yapım işi'
-        else if (rawTur === 'danismanlik') alimTuruText = 'danışmanlık hizmet alımı'
+        let alimTuruText = 'Mal Alımı'
+        if (rawTur === 'hizmet') alimTuruText = 'Hizmet Alımı'
+        else if (rawTur === 'yapim_isi' || rawTur === 'yapim') alimTuruText = 'Yapım İşi'
+        else if (rawTur === 'danismanlik') alimTuruText = 'Danışmanlık Hizmet Alımı'
+
+        const rawButceKodu = dosyaRes.data?.[0]?.butce_kodu || ''
+        const butceTertibiArray = rawButceKodu
+          .split(/[\n,;]+/)
+          .map((item: string) => item.trim())
+          .filter((item: string) => item.length > 0)
+          .map((item: string) => {
+            let cleanItem = item
+            if (cleanItem.startsWith('630.')) {
+              cleanItem = cleanItem.substring(4)
+            } else if (cleanItem.startsWith('630')) {
+              cleanItem = cleanItem.substring(3)
+            }
+            return cleanItem
+          })
+
+        const dbYaklasikMaliyet = dosyaRes.data?.[0]?.yaklasik_maliyet || 0
+        const yaklasikMaliyetText = dbYaklasikMaliyet > 0 ? formatTR(dbYaklasikMaliyet) : '0,00'
+
+        const teminSekliText = dosyaRes.data?.[0]?.ihale_sekli || '4734 sayılı Kanun\'un 22/d maddesi gereğince Doğrudan Temin'
 
         let context: any = {
           tarih: today,
@@ -205,6 +225,25 @@ export function CiktiMerkeziScreen(): React.JSX.Element {
           idareAdi: idareAdi,
           baskanAdi: dosyaRes.data?.[0]?.onaylayan_ad_soyad || 'Harcama Yetkilisi Belirtilmedi',
           baskanUnvan: dosyaRes.data?.[0]?.onaylayan_unvan || 'Harcama Yetkilisi',
+          teminNo: dosyaRes.data?.[0]?.temin_no || 'Belirtilmedi',
+          teminSekli: teminSekliText,
+          yaklasikMaliyet: yaklasikMaliyetText,
+          odenekTutari: settings?.kullanilabilirOdenek || '500.000,00 TL',
+          projeNo: dosyaRes.data?.[0]?.yatirim_proje_no || 'Yok',
+          butceTertibi: butceTertibiArray,
+          butceKodu: rawButceKodu || 'Belirtilmedi',
+          avansSartlari: dosyaRes.data?.[0]?.avans_verilecek_mi === 1 ? 'Avans verilecektir.' : 'Avans verilmeyecek',
+          fiyatFarkiSartlari: dosyaRes.data?.[0]?.fiyat_farki_dayanagi || 'Fiyat Farkı Ödenmeyecek',
+          dokumanHazirlik: 'Hazırlanmayacaktır.',
+          isinAciklamasi: dosyaRes.data?.[0]?.isin_aciklamasi || dosyaRes.data?.[0]?.konu || 'Belirtilmedi',
+          onaylayanPersonelAdi: dosyaRes.data?.[0]?.onaylayan_ad_soyad || 'Harcama Yetkilisi Belirtilmedi',
+          onaylayanPersonelUnvan: dosyaRes.data?.[0]?.onaylayan_unvan || 'Harcama Yetkilisi',
+          onaylayanlar: [
+            {
+              onaylayanPersonelAdi: dosyaRes.data?.[0]?.onaylayan_ad_soyad || 'Harcama Yetkilisi Belirtilmedi',
+              onaylayanPersonelUnvan: dosyaRes.data?.[0]?.onaylayan_unvan || 'Harcama Yetkilisi'
+            }
+          ],
           komisyon: commission.map((c: any) => ({
             adSoyad: c.ad_soyad,
             unvan: c.unvan,
