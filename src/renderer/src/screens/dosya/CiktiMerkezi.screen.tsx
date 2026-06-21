@@ -4,7 +4,7 @@ import { Printer, Download, FileText, CheckSquare, Square, Layers, Loader2 } fro
 import { useWorkspaceStore } from '../../store/workspaceStore'
 import Mustache from 'mustache'
 import { Sablon } from '../sablonlar/sablonlar.hooks'
-import { SAYI_YAZI_MAP } from '../../constants/sayiEslesmeleri'
+import { SAYI_YAZI_MAP, sayiyiYaziyaCevir } from '../../constants/sayiEslesmeleri'
 import { getInstitutionSuffixes } from '../../utils/kurumHelper'
 
 export function CiktiMerkeziScreen(): React.JSX.Element {
@@ -59,6 +59,9 @@ export function CiktiMerkeziScreen(): React.JSX.Element {
 
         const today = new Intl.DateTimeFormat('tr-TR', { timeZone: 'Europe/Istanbul', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date())
 
+        const kalemSayisi = kalemlerRes.data?.length || 0
+        const kalemSayisiYazi = sayiyiYaziyaCevir(kalemSayisi)
+
         let context: any = {
           tarih: today,
           dosyaTarihi: dosyaRes.data?.[0]?.tarih || today,
@@ -70,6 +73,8 @@ export function CiktiMerkeziScreen(): React.JSX.Element {
           kurumunuz: suffixes.kurumunuz,
           kurumu: suffixes.kurumu,
           kurumlari: suffixes.kurumlari,
+          kalemSayisi,
+          kalemSayisiYazi,
           ihtiyacKalemleri: kalemlerRes.data?.map((k: any, i: number) => ({
             siraNo: i + 1,
             kodu: k.tasinir_kodu || k.okas_kodu || '-',

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 
 import Mustache from 'mustache'
-import { SAYI_YAZI_MAP } from '../../../constants/sayiEslesmeleri'
+import { SAYI_YAZI_MAP, sayiyiYaziyaCevir } from '../../../constants/sayiEslesmeleri'
 import {
   FileText,
   Download,
@@ -76,12 +76,16 @@ export function SablonEditor({ sablon, onBack }: { sablon?: Sablon, onBack: () =
 
     try {
       const parsed = JSON.parse(testJson)
+      const kSayisi = parsed.kalemSayisi || parsed.ihtiyacKalemleri?.length || 0
+      const kSayisiYazi = parsed.kalemSayisiYazi || sayiyiYaziyaCevir(kSayisi)
       return {
         sayiYazıyla: SAYI_YAZI_MAP,
         kurumumuz: suffixes.kurumumuz,
         kurumunuz: suffixes.kurumunuz,
         kurumu: suffixes.kurumu,
         kurumlari: suffixes.kurumlari,
+        kalemSayisi: kSayisi,
+        kalemSayisiYazi: kSayisiYazi,
         ...parsed
       }
     } catch {
@@ -90,7 +94,9 @@ export function SablonEditor({ sablon, onBack }: { sablon?: Sablon, onBack: () =
         kurumumuz: suffixes.kurumumuz,
         kurumunuz: suffixes.kurumunuz,
         kurumu: suffixes.kurumu,
-        kurumlari: suffixes.kurumlari
+        kurumlari: suffixes.kurumlari,
+        kalemSayisi: 0,
+        kalemSayisiYazi: 'sıfır'
       }
     }
   }, [

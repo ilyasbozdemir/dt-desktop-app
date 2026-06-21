@@ -19,6 +19,7 @@
   - Zengin kart görünümü (birim, talep no, ekonomik kod, durum badge, tekrar_no)
   - Sağ detay paneli (bütçe & muhasebe, ihale & sözleşme, notlar)
 - "Kurum İçi Temin Numarası" → "Doğrudan Temin Numarası" düzeltildi
+- **JSON Şeması Desteği (Alpha)**: Geleneksel Mustache şablonları yerine dinamik sayfa ayarlarını (`page`, `margin`, `antet`) ve gövde bloklarını (`body`, `paragraph`, `list`) destekleyen yeni veri tabanlı mimari için alpha düzeyinde çalışmalar başlatıldı (`ISSUE_JSON_schema_support.md` oluşturuldu).
 
 ---
 

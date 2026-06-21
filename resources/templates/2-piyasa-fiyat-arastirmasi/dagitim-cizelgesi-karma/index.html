@@ -2,7 +2,7 @@
 <html lang="tr">
 <head>
   <meta charset="UTF-8">
-  <title>Dağıtım Çizelgesi</title>
+  <title>Dağıtım Çizelgesi (Karma)</title>
   <style>
     @page { size: A4; margin: 2cm 1.5cm; }
     body {
@@ -133,10 +133,10 @@
         <thead>
           <tr>
             <th style="width: 8%;">SIRA</th>
-            <th style="width: 23%;">İMZA-KAŞE<br>FORM VERİLEN YER</th>
-            <th style="width: 23%;">FORMUN<br>VERİLİŞ TARİHİ</th>
-            <th style="width: 23%;">FORMUN<br>ALINIŞ TARİHİ</th>
-            <th style="width: 23%;">İMZA–KAŞE<br>FORM ALINAN YER</th>
+            <th style="width: 23%;">İMZA-KAŞE<br>PİYASA ARAŞTIRMA EVRAKI</th>
+            <th style="width: 23%;">EVRAK<br>VERİLİŞ TARİHİ</th>
+            <th style="width: 23%;">EVRAK<br>ALINIŞ TARİHİ</th>
+            <th style="width: 23%;">İMZA–KAŞE<br>TEKLİF MEKTUBU EVRAKI</th>
           </tr>
         </thead>
         <tbody>
@@ -158,33 +158,8 @@
       </table>
 
       <div class="instruction-text">
-        Kurumumuzun ihtiyacı olan {{kalemSayisi}} ({{kalemSayisiYazi}}) kalem malzeme için piyasa araştırma mektubu dağıtımında görevlendirildiniz.
+        Kurumumuzun ihtiyacı olan {{kalemSayisi}} ({{kalemSayisiYazi}}) kalem malzeme için piyasa araştırma ve/veya Teklif Mektubunu teslim aldım.
       </div>
-      <div class="instruction-text" style="margin-top: 5px;">
-        Gereğini rica ederim.
-      </div>
-
-      <!-- HARCAMA YETKİLİSİ / BAŞKAN İMZASI -->
-      <div style="float: right; width: 250px; text-align: center; margin-top: 30px; margin-right: 20px;" class="paged-keep-together">
-        <div>{{vtarih}}</div>
-        <div style="margin-top: 15px; font-weight: bold;">{{baskanAdi}}</div>
-        <div>{{baskanUnvan}}</div>
-      </div>
-
-      <div style="height: 50px; clear: both;"></div>
-
-      <!-- KOMİSYON İMZALARI -->
-      <table align="center" style="border-collapse: collapse; margin-top: 20px; width: 100%;" class="paged-keep-together">
-        <tr>
-          {{#komisyon}}
-          <td align="center" valign="top" style="padding: 10px; width: 33%; font-size: 11pt; line-height: 1.4;">
-            <strong>{{gorev}}</strong><br>
-            {{adSoyad}}<br>
-            {{unvan}}
-          </td>
-          {{/komisyon}}
-        </tr>
-      </table>
 
     </div>
   </div>
