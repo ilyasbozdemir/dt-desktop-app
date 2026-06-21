@@ -1,0 +1,57 @@
+{
+  "antetSatirlari": ["KONYA BÜYÜKŞEHİR BELEDİYE BAŞKANLIĞI", "Fen İşleri Dairesi Başkanlığı"],
+  "kurumUst": "KONYA BÜYÜKŞEHİR BELEDİYE BAŞKANLIĞI",
+  "kurumAdi": "KONYA BÜYÜKŞEHİR BELEDİYESİ",
+  "mudurluk": "Fen İşleri Dairesi Başkanlığı",
+  "kurumumuz": "Belediyemiz",
+  "evrakSayisi": "56383307",
+  "tarih": "06/05/2026",
+  "dosyaTarihi": "06/05/2026",
+  "isAdi": "Yeni Mahalle Mahallesinde yapımı devam etmekte olan Düğün Salonunun Çatı yapımında kullanılmak üzere malzeme alımı 3 işi",
+  "hazirlayanPersonelAdi": "Ahmet YILMAZ",
+  "hazirlayanPersonelUnvan": "Teknisyen",
+  "fiyatKomisyonu": [
+    {
+      "gorevi": "Komisyon Başkanı",
+      "adSoyad": "Ali KAYA",
+      "unvan": "Mühendis"
+    },
+    {
+      "gorevi": "Komisyon Üyesi",
+      "adSoyad": "Mustafa ÇELİK",
+      "unvan": "Tekniker"
+    },
+    {
+      "gorevi": "Komisyon Üyesi",
+      "adSoyad": "Fatma ŞAHİN",
+      "unvan": "Mimar"
+    },
+    {
+      "gorevi": "Komisyon Üyesi",
+      "adSoyad": "Ahmet YILMAZ",
+      "unvan": "Teknisyen"
+    }
+  ],
+  "muayeneKomisyonu": [
+    {
+      "gorevi": "Komisyon Başkanı",
+      "adSoyad": "Ali KAYA",
+      "unvan": "Mühendis"
+    },
+    {
+      "gorevi": "Komisyon Üyesi",
+      "adSoyad": "Ayşe YILDIRIM",
+      "unvan": "Memur"
+    },
+    {
+      "gorevi": "Komisyon Üyesi",
+      "adSoyad": "Mehmet ÖZTÜRK",
+      "unvan": "Teknisyen"
+    }
+  ],
+  "baskanAdi": "İbrahim ALTAY",
+  "baskanUnvan": "Büyükşehir Belediye Başkanı",
+  "solLogo": "https://raw.githubusercontent.com/ilyasbozdemir/dt-asistan-desktop-app/refs/heads/main/resources/icon.png",
+  "sagLogo": "https://upload.wikimedia.org/wikipedia/commons/0/0f/Logo_of_100th_years_of_the_Republic_of_T%C3%BCrkiye.svg",
+  "kurumIci": false
+}
