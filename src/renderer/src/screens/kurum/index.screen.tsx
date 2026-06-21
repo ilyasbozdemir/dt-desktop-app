@@ -31,6 +31,12 @@ export default function KurumScreen(): React.JSX.Element {
   const [finansmanKodu, setFinansmanKodu] = useState('5')
   const [institutionType, setInstitutionType] = useState('')
   const [subInstitutionType, setSubInstitutionType] = useState('belediye')
+  const [customSubInstitutionLabel, setCustomSubInstitutionLabel] = useState('')
+  const [customSubInstitutionKurumumuz, setCustomSubInstitutionKurumumuz] = useState('')
+  const [customSubInstitutionKurumunuz, setCustomSubInstitutionKurumunuz] = useState('')
+  const [customSubInstitutionKurumu, setCustomSubInstitutionKurumu] = useState('')
+  const [customSubInstitutionKurumlari, setCustomSubInstitutionKurumlari] = useState('')
+
 
   const handleInstitutionTypeChange = (type: string): void => {
     setInstitutionType(type)
@@ -110,6 +116,12 @@ export default function KurumScreen(): React.JSX.Element {
         setFinansmanKodu(settings.finansmanKodu || '5')
         setInstitutionType(settings.institutionType || '')
         setSubInstitutionType(settings.subInstitutionType || 'belediye')
+        setCustomSubInstitutionLabel(settings.customSubInstitutionLabel || '')
+        setCustomSubInstitutionKurumumuz(settings.customSubInstitutionKurumumuz || '')
+        setCustomSubInstitutionKurumunuz(settings.customSubInstitutionKurumunuz || '')
+        setCustomSubInstitutionKurumu(settings.customSubInstitutionKurumu || '')
+        setCustomSubInstitutionKurumlari(settings.customSubInstitutionKurumlari || '')
+
 
         setAddress(settings.address || '')
         setDistrict(settings.district || '')
@@ -163,6 +175,11 @@ export default function KurumScreen(): React.JSX.Element {
         dataToSave.finansmanKodu = finansmanKodu
         dataToSave.institutionType = institutionType
         dataToSave.subInstitutionType = subInstitutionType
+        dataToSave.customSubInstitutionLabel = customSubInstitutionLabel
+        dataToSave.customSubInstitutionKurumumuz = customSubInstitutionKurumumuz
+        dataToSave.customSubInstitutionKurumunuz = customSubInstitutionKurumunuz
+        dataToSave.customSubInstitutionKurumu = customSubInstitutionKurumu
+        dataToSave.customSubInstitutionKurumlari = customSubInstitutionKurumlari
         dataToSave.eButceKodu = eButceKodu
         dataToSave.say2000iKodu = say2000iKodu
         dataToSave.fonksiyonelKod = fonksiyonelKod
@@ -393,6 +410,87 @@ export default function KurumScreen(): React.JSX.Element {
                                   </option>
                                 ))}
                               </select>
+
+                              {subInstitutionType === 'diger' && (
+                                <div className="mt-4 p-4 bg-white dark:bg-slate-900/80 border border-slate-200/60 dark:border-slate-800/60 rounded-xl space-y-4 shadow-inner">
+                                  <div className="border-b border-slate-100 dark:border-slate-800 pb-2">
+                                    <h4 className="text-[11px] font-bold text-slate-850 dark:text-slate-150 flex items-center gap-1.5">
+                                      <Building2 className="w-3.5 h-3.5 text-blue-500" />
+                                      Özel Alt Kurum Sonekleri (İyelik Halleri)
+                                    </h4>
+                                    <p className="text-[9px] text-slate-500 mt-0.5">
+                                      Kendi tanımladığınız alt kurum tabiri için şablonlarda kullanılacak dilbilgisi eklerini girin.
+                                    </p>
+                                  </div>
+                                  
+                                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div className="md:col-span-2">
+                                      <label className="block text-[10px] font-semibold text-slate-600 dark:text-slate-400 mb-1">
+                                        Özel Alt Kurum Adı / Tanımı (Örn: Dernek, Oda, Şirket)
+                                      </label>
+                                      <Input
+                                        value={customSubInstitutionLabel}
+                                        onChange={(e) => setCustomSubInstitutionLabel(e.target.value)}
+                                        placeholder="Örn: Dernek"
+                                        className="bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-xs"
+                                      />
+                                    </div>
+                                    
+                                    <div>
+                                      <label className="block text-[10px] font-semibold text-slate-600 dark:text-slate-400 mb-1 flex items-center gap-1">
+                                        Bizim (1. Çoğul Şahıs İyelik)
+                                        <span className="text-[9px] font-normal text-slate-400">("kurumumuz" yerine)</span>
+                                      </label>
+                                      <Input
+                                        value={customSubInstitutionKurumumuz}
+                                        onChange={(e) => setCustomSubInstitutionKurumumuz(e.target.value)}
+                                        placeholder="Örn: Derneğimiz"
+                                        className="bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-xs"
+                                      />
+                                    </div>
+                                    
+                                    <div>
+                                      <label className="block text-[10px] font-semibold text-slate-600 dark:text-slate-400 mb-1 flex items-center gap-1">
+                                        Sizin (2. Çoğul Şahıs İyelik)
+                                        <span className="text-[9px] font-normal text-slate-400">("kurumunuz" yerine)</span>
+                                      </label>
+                                      <Input
+                                        value={customSubInstitutionKurumunuz}
+                                        onChange={(e) => setCustomSubInstitutionKurumunuz(e.target.value)}
+                                        placeholder="Örn: Derneğiniz"
+                                        className="bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-xs"
+                                      />
+                                    </div>
+                                    
+                                    <div>
+                                      <label className="block text-[10px] font-semibold text-slate-600 dark:text-slate-400 mb-1 flex items-center gap-1">
+                                        Onun (3. Tekil Şahıs İyelik)
+                                        <span className="text-[9px] font-normal text-slate-400">("kurumu" yerine)</span>
+                                      </label>
+                                      <Input
+                                        value={customSubInstitutionKurumu}
+                                        onChange={(e) => setCustomSubInstitutionKurumu(e.target.value)}
+                                        placeholder="Örn: Derneği"
+                                        className="bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-xs"
+                                      />
+                                    </div>
+                                    
+                                    <div>
+                                      <label className="block text-[10px] font-semibold text-slate-600 dark:text-slate-400 mb-1 flex items-center gap-1">
+                                        Onların (3. Çoğul Şahıs İyelik)
+                                        <span className="text-[9px] font-normal text-slate-400">("kurumları" yerine)</span>
+                                      </label>
+                                      <Input
+                                        value={customSubInstitutionKurumlari}
+                                        onChange={(e) => setCustomSubInstitutionKurumlari(e.target.value)}
+                                        placeholder="Örn: Dernekleri"
+                                        className="bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-xs"
+                                      />
+                                    </div>
+                                  </div>
+                                </div>
+                              )}
+
                               <p className="text-[10px] text-slate-500 mt-2 leading-relaxed font-medium">
                                 💡 Bu seçim, şablonlardaki <strong>{`{{kurumumuz}}`}</strong> etiketinin otomatik ve doğru şekilde doldurulmasını sağlar.
                               </p>

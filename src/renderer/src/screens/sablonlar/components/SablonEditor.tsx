@@ -22,7 +22,14 @@ import { PreviewTab } from './tabs/PreviewTab'
 import { PdfTab } from './tabs/PdfTab'
 
 export function SablonEditor({ sablon, onBack }: { sablon?: Sablon, onBack: () => void }): React.ReactElement {
-  const { subInstitutionType } = useSettingsStore()
+  const {
+    subInstitutionType,
+    customSubInstitutionLabel,
+    customSubInstitutionKurumumuz,
+    customSubInstitutionKurumunuz,
+    customSubInstitutionKurumu,
+    customSubInstitutionKurumlari
+  } = useSettingsStore()
   const [ad, setAd] = useState(sablon?.ad || '')
   const [dosyaAdi, setDosyaAdi] = useState(sablon?.dosya_adi || '')
   const [aciklama, setAciklama] = useState(sablon?.aciklama || '')
@@ -59,7 +66,13 @@ export function SablonEditor({ sablon, onBack }: { sablon?: Sablon, onBack: () =
   const saveSablon = useSaveSablon()
 
   const parsedData = React.useMemo(() => {
-    const suffixes = getInstitutionSuffixes(subInstitutionType)
+    const suffixes = getInstitutionSuffixes(subInstitutionType, {
+      label: customSubInstitutionLabel,
+      kurumumuz: customSubInstitutionKurumumuz,
+      kurumunuz: customSubInstitutionKurumunuz,
+      kurumu: customSubInstitutionKurumu,
+      kurumlari: customSubInstitutionKurumlari
+    })
 
     try {
       const parsed = JSON.parse(testJson)
@@ -80,7 +93,15 @@ export function SablonEditor({ sablon, onBack }: { sablon?: Sablon, onBack: () =
         kurumlari: suffixes.kurumlari
       }
     }
-  }, [testJson, subInstitutionType])
+  }, [
+    testJson,
+    subInstitutionType,
+    customSubInstitutionLabel,
+    customSubInstitutionKurumumuz,
+    customSubInstitutionKurumunuz,
+    customSubInstitutionKurumu,
+    customSubInstitutionKurumlari
+  ])
 
   // Calculate final HTML synchronously so iframe instantly updates via srcDoc
   const finalHtmlForPreview = (() => {

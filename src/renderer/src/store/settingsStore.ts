@@ -17,6 +17,11 @@ interface SettingsState {
   finansmanKodu: string
   institutionType: string
   subInstitutionType: string
+  customSubInstitutionLabel: string
+  customSubInstitutionKurumumuz: string
+  customSubInstitutionKurumunuz: string
+  customSubInstitutionKurumu: string
+  customSubInstitutionKurumlari: string
   kurumsalKod: string
   fonksiyonelKod: string
   muhasebeBirimKodu: string
@@ -68,6 +73,11 @@ export const useSettingsStore = create<SettingsState>((set) => ({
   finansmanKodu: '5',
   institutionType: '',
   subInstitutionType: 'belediye',
+  customSubInstitutionLabel: '',
+  customSubInstitutionKurumumuz: '',
+  customSubInstitutionKurumunuz: '',
+  customSubInstitutionKurumu: '',
+  customSubInstitutionKurumlari: '',
   kurumsalKod: '',
   fonksiyonelKod: '',
   muhasebeBirimKodu: '',
@@ -119,6 +129,11 @@ export const useSettingsStore = create<SettingsState>((set) => ({
         finansmanKodu: settings.finansmanKodu || '5',
         institutionType: settings.institutionType || '',
         subInstitutionType: settings.subInstitutionType || 'belediye',
+        customSubInstitutionLabel: settings.customSubInstitutionLabel || '',
+        customSubInstitutionKurumumuz: settings.customSubInstitutionKurumumuz || '',
+        customSubInstitutionKurumunuz: settings.customSubInstitutionKurumunuz || '',
+        customSubInstitutionKurumu: settings.customSubInstitutionKurumu || '',
+        customSubInstitutionKurumlari: settings.customSubInstitutionKurumlari || '',
         kurumsalKod: settings.kurumsalKod || '',
         fonksiyonelKod: settings.fonksiyonelKod || '',
         muhasebeBirimKodu: settings.muhasebeBirimKodu || '',
@@ -148,6 +163,11 @@ export const useSettingsStore = create<SettingsState>((set) => ({
         finansmanKodu: '5',
         institutionType: '',
         subInstitutionType: 'belediye',
+        customSubInstitutionLabel: '',
+        customSubInstitutionKurumumuz: '',
+        customSubInstitutionKurumunuz: '',
+        customSubInstitutionKurumu: '',
+        customSubInstitutionKurumlari: '',
         kurumsalKod: '',
         fonksiyonelKod: '',
         muhasebeBirimKodu: '',

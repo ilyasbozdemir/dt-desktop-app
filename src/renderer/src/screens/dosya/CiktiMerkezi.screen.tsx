@@ -49,7 +49,13 @@ export function CiktiMerkeziScreen(): React.JSX.Element {
         const settings = await window.electron.ipcRenderer.invoke('db:get-settings')
         const subInstType = settings?.subInstitutionType || ''
         
-        const suffixes = getInstitutionSuffixes(subInstType)
+        const suffixes = getInstitutionSuffixes(subInstType, {
+          label: settings?.customSubInstitutionLabel,
+          kurumumuz: settings?.customSubInstitutionKurumumuz,
+          kurumunuz: settings?.customSubInstitutionKurumunuz,
+          kurumu: settings?.customSubInstitutionKurumu,
+          kurumlari: settings?.customSubInstitutionKurumlari
+        })
 
         const today = new Intl.DateTimeFormat('tr-TR', { timeZone: 'Europe/Istanbul', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date())
 

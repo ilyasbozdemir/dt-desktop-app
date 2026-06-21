@@ -114,11 +114,32 @@ export function getSubInstitutionOptions(instType: string, finKodu: string): Sub
   })
 }
 
-export function getInstitutionSuffixes(subInstType: string): InstitutionSuffixes {
-  return INSTITUTION_MAP[subInstType] || INSTITUTION_MAP.diger
+export function getInstitutionSuffixes(
+  subInstType: string,
+  customSuffixes?: Partial<InstitutionSuffixes>
+): InstitutionSuffixes {
+  const base = INSTITUTION_MAP[subInstType] || INSTITUTION_MAP.diger
+  if (subInstType === 'diger' && customSuffixes) {
+    return {
+      label: customSuffixes.label || base.label,
+      kurumumuz: customSuffixes.kurumumuz || base.kurumumuz,
+      kurumunuz: customSuffixes.kurumunuz || base.kurumunuz,
+      kurumu: customSuffixes.kurumu || base.kurumu,
+      kurumlari: customSuffixes.kurumlari || base.kurumlari
+    }
+  }
+  return base
 }
 
-export function getKurumumuzText(_instType: string, _finKodu: string, subInstType: string): string {
+export function getKurumumuzText(
+  _instType: string,
+  _finKodu: string,
+  subInstType: string,
+  customKurumumuz?: string
+): string {
+  if (subInstType === 'diger' && customKurumumuz) {
+    return customKurumumuz
+  }
   const item = INSTITUTION_MAP[subInstType] || INSTITUTION_MAP.diger
   return item.kurumumuz
 }
