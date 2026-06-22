@@ -40,5 +40,10 @@
   "onaylayanPersonelAdi": "Adı SOYADI",
   "onaylayanPersonelUnvan": "Belediye Başkanı",
   "baskanAdi": "Adı SOYADI",
-  "baskanUnvan": "Belediye Başkanı"
+  "baskanUnvan": "Belediye Başkanı",
+  "ekler": [
+    "Komisyon Listesi",
+    "Lüzum Müzekkeresi",
+    "Yaklaşık Maliyet Cetveli"
+  ]
 }

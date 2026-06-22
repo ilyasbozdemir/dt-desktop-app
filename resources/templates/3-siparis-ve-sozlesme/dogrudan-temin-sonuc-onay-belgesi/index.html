@@ -262,6 +262,13 @@
         </td>
       </tr>
     </table>
+
+    {{#ekler.0}}
+    <div class="paged-keep-together" style="margin-top: 25px; font-size: 10pt; text-align: left;">
+      <strong>EKLER:</strong>
+      <ol style="margin: 5px 0 0 20px; padding: 0; list-style-type: decimal; line-height: 1.5;">{{#ekler}}<li>{{.}}</li>{{/ekler}}</ol>
+    </div>
+    {{/ekler.0}}
   </div>
 </body>
 </html>
