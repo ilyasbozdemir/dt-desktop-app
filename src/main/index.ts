@@ -353,14 +353,13 @@ if (!gotTheLock && !isMultiInstance) {
           currentFile = filePath
         } else {
           workspaceManager.close()
-          backupPath = currentFile + '.networkbak'
+          backupPath = currentFile + '.syncbak'
           fs.copyFileSync(currentFile, backupPath)
         }
         
         try {
           fs.writeFileSync(currentFile, buffer)
           workspaceManager.open(currentFile, false)
-          if (backupPath && fs.existsSync(backupPath)) fs.unlinkSync(backupPath)
           
           BrowserWindow.getAllWindows().forEach((win) => {
             if (!win.isDestroyed()) win.webContents.send('network:db-pulled')
@@ -370,7 +369,6 @@ if (!gotTheLock && !isMultiInstance) {
         } catch (e: any) {
           if (backupPath && fs.existsSync(backupPath)) {
             fs.copyFileSync(backupPath, currentFile)
-            fs.unlinkSync(backupPath)
             try { workspaceManager.open(currentFile, false) } catch {}
           }
           throw e
@@ -403,6 +401,48 @@ if (!gotTheLock && !isMultiInstance) {
            throw new Error(`Hata: ${errData.error || response.statusText}`)
         }
         
+        return { success: true }
+      } catch (err: any) {
+        return { success: false, error: err.message }
+      }
+    })
+
+    ipcMain.handle('network:can-undo-sync', async () => {
+      try {
+        const currentFile = workspaceManager.getCurrentFilePath()
+        if (!currentFile) return { canUndo: false }
+        const backupPath = currentFile + '.syncbak'
+        if (fs.existsSync(backupPath)) {
+          const stats = fs.statSync(backupPath)
+          return { canUndo: true, mtime: stats.mtime.toISOString() }
+        }
+        return { canUndo: false }
+      } catch {
+        return { canUndo: false }
+      }
+    })
+
+    ipcMain.handle('network:undo-sync', async () => {
+      try {
+        const currentFile = workspaceManager.getCurrentFilePath()
+        if (!currentFile) throw new Error('Açık bir çalışma dosyası yok.')
+        const backupPath = currentFile + '.syncbak'
+        if (!fs.existsSync(backupPath)) throw new Error('Geri alınacak senkronizasyon yedeği bulunamadı.')
+
+        workspaceManager.close()
+        
+        // Restore backup
+        fs.copyFileSync(backupPath, currentFile)
+        fs.unlinkSync(backupPath)
+
+        workspaceManager.open(currentFile, false)
+        
+        BrowserWindow.getAllWindows().forEach((win) => {
+          if (!win.isDestroyed()) {
+            win.webContents.send('db:invalidated')
+          }
+        })
+
         return { success: true }
       } catch (err: any) {
         return { success: false, error: err.message }

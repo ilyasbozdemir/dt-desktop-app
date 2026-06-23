@@ -91,8 +91,8 @@ export function startExpressServer(port: number = 4000) {
         // Close the DB before overwriting
         workspaceManager.close()
 
-        // Backup the old file just in case
-        const backupPath = currentFile + '.networkbak'
+        // Backup the old file for Undo
+        const backupPath = currentFile + '.syncbak'
         fs.copyFileSync(currentFile, backupPath)
 
         try {
@@ -108,9 +108,6 @@ export function startExpressServer(port: number = 4000) {
               win.webContents.send('network:db-pushed')
             }
           })
-          
-          // Delete backup on success
-          if (fs.existsSync(backupPath)) fs.unlinkSync(backupPath)
           
           res.json({ success: true, message: 'Dosya başarıyla yüklendi ve güncellendi.' })
         } catch (err: any) {

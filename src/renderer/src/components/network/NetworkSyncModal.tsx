@@ -27,8 +27,30 @@ export function NetworkSyncModal({ onClose }: NetworkSyncModalProps): React.JSX.
   
   const [, setLocalServerActive] = useState(false)
   const [localIp, setLocalIp] = useState('')
+  const [canUndo, setCanUndo] = useState(false)
+  const [backupTime, setBackupTime] = useState<string | null>(null)
   
   const electron = window.electron?.ipcRenderer
+
+  const checkCanUndo = async () => {
+    if (electron?.invoke) {
+      try {
+        const res = await electron.invoke('network:can-undo-sync')
+        if (res.canUndo) {
+          setCanUndo(true)
+          setBackupTime(res.mtime)
+        } else {
+          setCanUndo(false)
+        }
+      } catch (e) {
+        console.error(e)
+      }
+    }
+  }
+
+  useEffect(() => {
+    checkCanUndo()
+  }, [])
 
   useEffect(() => {
     if (electron?.invoke) {
@@ -65,6 +87,26 @@ export function NetworkSyncModal({ onClose }: NetworkSyncModalProps): React.JSX.
       window.electron?.ipcRenderer?.removeListener('network:db-pushed', onPushed)
     }
   }, [])
+
+  const handleUndo = async () => {
+    if (!confirm('DİKKAT: En son senkronizasyon öncesindeki veritabanı yedeğiniz (.syncbak) geri yüklenecektir. Bu işlem mevcut verilerinizi ezecektir. Devam etmek istiyor musunuz?')) return
+    
+    setStatus('loading')
+    setMessage('Yedek geri yükleniyor...')
+    try {
+      const res = await electron.invoke('network:undo-sync')
+      if (res.success) {
+        setStatus('success')
+        setMessage('Yedek başarıyla geri yüklendi, sistem yenileniyor...')
+        setTimeout(() => window.location.reload(), 2000)
+      } else {
+        throw new Error(res.error)
+      }
+    } catch (err: unknown) {
+      setStatus('error')
+      setMessage((err as Error).message)
+    }
+  }
 
   const getCleanUrl = (rawIp: string) => {
     let cleanIp = rawIp.trim()
@@ -288,6 +330,24 @@ export function NetworkSyncModal({ onClose }: NetworkSyncModalProps): React.JSX.
                   <span className="text-[10px] text-slate-500 text-center">Sizin verinizi gönderip<br/>karşının verisini ezer</span>
                 </button>
               </div>
+            </div>
+          )}
+
+          {/* Undo Sync Section */}
+          {canUndo && (
+            <div className="flex items-center justify-between p-4 bg-amber-50/50 dark:bg-amber-500/5 border border-amber-200/50 dark:border-amber-500/20 rounded-xl">
+              <div className="flex flex-col gap-0.5">
+                <span className="text-xs font-bold text-slate-800 dark:text-slate-200 font-sans">Geri Yükleme Noktası</span>
+                <span className="text-[10px] text-slate-500 dark:text-slate-400 font-mono">
+                  Senkronizasyon öncesi yedek: {backupTime ? new Date(backupTime).toLocaleString('tr-TR') : ''}
+                </span>
+              </div>
+              <button
+                onClick={handleUndo}
+                className="px-3.5 py-1.5 bg-amber-600 hover:bg-amber-700 text-white rounded-lg text-xs font-bold transition-colors cursor-pointer"
+              >
+                Senkronizasyonu Geri Al
+              </button>
             </div>
           )}
         </div>
