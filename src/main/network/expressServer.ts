@@ -1,11 +1,9 @@
 import express from 'express'
 import cors from 'cors'
-import multer from 'multer'
 import http from 'http'
 import fs from 'fs'
-import path from 'path'
 import os from 'os'
-import { app, BrowserWindow } from 'electron'
+import { BrowserWindow } from 'electron'
 import { workspaceManager } from '../database/workspace'
 
 let server: http.Server | null = null
@@ -37,12 +35,7 @@ export function startExpressServer(port: number = 4000) {
     expressApp.use(cors())
     expressApp.use(express.json())
 
-    // Configure multer to save to temp directory
-    const uploadDir = path.join(app.getPath('userData'), 'dtm_uploads')
-    if (!fs.existsSync(uploadDir)) {
-      fs.mkdirSync(uploadDir, { recursive: true })
-    }
-    const upload = multer({ dest: uploadDir })
+
 
     expressApp.get('/api/network/info', (_req, res) => {
       try {
@@ -79,20 +72,19 @@ export function startExpressServer(port: number = 4000) {
       }
     })
 
-    expressApp.post('/api/network/push', upload.single('file'), (req, res) => {
+    expressApp.post('/api/network/push', express.raw({ type: 'application/octet-stream', limit: '100mb' }), (req, res) => {
       try {
-        if (!req.file) {
-          res.status(400).json({ error: 'Dosya yüklenemedi.' })
-          return
-        }
-        
-        const uploadedFile = req.file.path
         const currentFile = workspaceManager.getCurrentFilePath()
         
         if (!currentFile) {
           // Hedef makinede açık dosya yoksa push yapılamaz
-          fs.unlinkSync(uploadedFile)
           res.status(400).json({ error: 'Karşı tarafta açık bir dosya yok.' })
+          return
+        }
+
+        const buffer = req.body
+        if (!buffer || !Buffer.isBuffer(buffer) || buffer.length === 0) {
+          res.status(400).json({ error: 'Dosya verisi alınamadı veya boş.' })
           return
         }
 
@@ -105,8 +97,7 @@ export function startExpressServer(port: number = 4000) {
 
         try {
           // Overwrite
-          fs.copyFileSync(uploadedFile, currentFile)
-          fs.unlinkSync(uploadedFile)
+          fs.writeFileSync(currentFile, buffer)
 
           // Reopen DB via manager
           workspaceManager.open(currentFile, false)

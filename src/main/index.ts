@@ -15,7 +15,6 @@ import { connectToServer, disconnectFromServer, emitEvent } from './client'
 import { generateContent, testConnection, AIGenerateOptions } from './ai/index'
 import { renderPdfBuffer } from './pdfService'
 import { startExpressServer, stopExpressServer } from './network/expressServer'
-import FormData from 'form-data' // Electron's Node may not have full FormData for file streams, so we can use node-fetch or similar, but let's try native fetch with blob first, or just write a small push function.
 import { registerArchiveHandlers } from './archive'
 
 process.on('uncaughtException', (error) => {
@@ -390,13 +389,13 @@ if (!gotTheLock && !isMultiInstance) {
         workspaceManager.save()
         
         const fileData = fs.readFileSync(currentFile)
-        const blob = new Blob([fileData], { type: 'application/octet-stream' })
-        const formData = new FormData()
-        formData.append('file', blob as any, 'database.dtm')
         
         const response = await fetch(`${url}/api/network/push`, {
           method: 'POST',
-          body: formData as any
+          headers: {
+            'Content-Type': 'application/octet-stream'
+          },
+          body: fileData
         })
         
         if (!response.ok) {
