@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { Wifi, Search, Download, Upload, X, AlertTriangle, CheckCircle2, Server } from 'lucide-react'
+import { useWorkspaceStore } from '../../store/workspaceStore'
 
 interface NetworkSyncModalProps {
   onClose: () => void
@@ -17,6 +18,7 @@ interface ServerInfo {
 }
 
 export function NetworkSyncModal({ onClose }: NetworkSyncModalProps): React.JSX.Element {
+  const { activeMeta } = useWorkspaceStore()
   const [ipAddress, setIpAddress] = useState('')
   const [port, setPort] = useState('4000')
   const [status, setStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle')
@@ -210,18 +212,62 @@ export function NetworkSyncModal({ onClose }: NetworkSyncModalProps): React.JSX.
           {/* Connected Server Info & Actions */}
           {serverInfo && (
             <div className="flex flex-col gap-4 p-4 border border-blue-200 dark:border-blue-500/30 bg-blue-50/50 dark:bg-blue-500/5 rounded-xl">
-              <div className="flex flex-col gap-1">
-                <h3 className="text-sm font-bold text-slate-800 dark:text-slate-200 flex items-center gap-2">
-                  <Server className="w-4 h-4 text-blue-500" />
-                  Karşı Cihaz Verileri
-                </h3>
-                <div className="text-xs text-slate-600 dark:text-slate-400 mt-2 grid grid-cols-2 gap-2">
-                  <div>Kurum: <span className="font-semibold">{serverInfo.meta.institution}</span></div>
-                  <div>Sürüm: <span className="font-semibold">v{serverInfo.meta.schema_version}</span></div>
-                  <div>Son Güncelleme: <span className="font-semibold">{new Date(serverInfo.meta.updated_at).toLocaleString('tr-TR')}</span></div>
-                  <div>Boyut: <span className="font-semibold">{(serverInfo.fileSize / 1024).toFixed(1)} KB</span></div>
+              <h3 className="text-sm font-bold text-slate-800 dark:text-slate-200 flex items-center gap-2">
+                <Server className="w-4 h-4 text-blue-500" />
+                Veri Karşılaştırması
+              </h3>
+              
+              <div className="grid grid-cols-2 gap-4 mt-2">
+                {/* Local Info */}
+                <div className="p-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg flex flex-col gap-1">
+                  <span className="text-[10px] text-blue-600 dark:text-blue-400 font-bold uppercase tracking-wider">Yerel Cihaz (Siz)</span>
+                  <div className="text-xs font-semibold text-slate-800 dark:text-slate-200 truncate">{activeMeta?.institution || 'Açık Dosya Yok'}</div>
+                  <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">
+                    Son Güncelleme:<br />
+                    <span className="font-semibold text-slate-700 dark:text-slate-300">
+                      {activeMeta?.updated_at ? new Date(activeMeta.updated_at).toLocaleString('tr-TR') : 'Bilinmiyor'}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Remote Info */}
+                <div className="p-3 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-lg flex flex-col gap-1">
+                  <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold uppercase tracking-wider">Karşı Cihaz</span>
+                  <div className="text-xs font-semibold text-slate-800 dark:text-slate-200 truncate">{serverInfo.meta.institution}</div>
+                  <div className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">
+                    Son Güncelleme:<br />
+                    <span className="font-semibold text-slate-700 dark:text-slate-300">
+                      {serverInfo.meta.updated_at ? new Date(serverInfo.meta.updated_at).toLocaleString('tr-TR') : 'Bilinmiyor'}
+                    </span>
+                  </div>
                 </div>
               </div>
+
+              {/* Status Comparison Info */}
+              {(() => {
+                const localTime = activeMeta?.updated_at ? new Date(activeMeta.updated_at).getTime() : 0
+                const remoteTime = serverInfo.meta.updated_at ? new Date(serverInfo.meta.updated_at).getTime() : 0
+                
+                if (localTime > remoteTime) {
+                  return (
+                    <div className="text-xs p-2.5 bg-amber-50 dark:bg-amber-500/10 border border-amber-200 dark:border-amber-500/20 text-amber-800 dark:text-amber-400 rounded-lg font-medium">
+                      ⚠️ Sizin yerel verileriniz karşı cihazdaki verilerden daha güncel. Gönder (Push) yapabilirsiniz.
+                    </div>
+                  )
+                } else if (remoteTime > localTime) {
+                  return (
+                    <div className="text-xs p-2.5 bg-emerald-50 dark:bg-emerald-500/10 border border-emerald-200 dark:border-emerald-500/20 text-emerald-800 dark:text-emerald-400 rounded-lg font-medium">
+                      💡 Karşı cihazdaki veriler sizinkinden daha güncel! Çek (Pull) yapmanız önerilir.
+                    </div>
+                  )
+                } else {
+                  return (
+                    <div className="text-xs p-2.5 bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 rounded-lg font-medium">
+                      ✓ Her iki cihazın verileri de aynı güncellikte.
+                    </div>
+                  )
+                }
+              })()}
               
               <div className="grid grid-cols-2 gap-3 mt-2">
                 <button

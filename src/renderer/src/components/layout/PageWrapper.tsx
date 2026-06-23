@@ -128,11 +128,12 @@ export function PageWrapper(): React.ReactNode {
     if (!window.electron) return
     const removeListener = window.electron.ipcRenderer.on('db:invalidated', () => {
       queryClient.invalidateQueries()
+      loadActiveMeta()
     })
     return () => {
       if (removeListener) removeListener()
     }
-  }, [queryClient])
+  }, [queryClient, loadActiveMeta])
 
   // Listen for tabs returned from detached windows
   useEffect(() => {

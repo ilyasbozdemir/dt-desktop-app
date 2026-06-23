@@ -2,8 +2,10 @@ import React, { useState, useRef, useEffect } from 'react'
 import { Info, ExternalLink, Bug, Star, Wifi } from 'lucide-react'
 import packageJson from '../../../../../package.json'
 import { NetworkSyncModal } from '../network/NetworkSyncModal'
+import { useWorkspaceStore } from '../../store/workspaceStore'
 
 export function Footer(): React.JSX.Element {
+  const { activeMeta } = useWorkspaceStore()
   const [showAbout, setShowAbout] = useState(false)
   const [showNetwork, setShowNetwork] = useState(false)
   const [appVersion, setAppVersion] = useState(packageJson.version)
@@ -64,6 +66,14 @@ export function Footer(): React.JSX.Element {
         <span>Doğrudan Temin Yönetim Sistemi</span>
         <span className="w-px h-3 bg-slate-300 dark:bg-slate-700"></span>
         <span>Hazır</span>
+        {activeMeta?.updated_at && (
+          <>
+            <span className="w-px h-3 bg-slate-300 dark:bg-slate-700"></span>
+            <span className="text-slate-600 dark:text-slate-400">
+              Son Güncelleme: <span className="font-semibold text-slate-700 dark:text-slate-300">{new Date(activeMeta.updated_at).toLocaleString('tr-TR')}</span>
+            </span>
+          </>
+        )}
       </div>
 
       <div className="flex items-center space-x-2 relative" ref={aboutRef}>
