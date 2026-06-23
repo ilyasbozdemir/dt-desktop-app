@@ -9,17 +9,15 @@
 - `DATA_TeminDosyasi` şemasına `tekrar_no` kolonu eklendi
 - Aynı isimde dosya kaydedilince otomatik `#2`, `#3` eki — `yeni.screen.tsx`
 - İşin Adı alanında Türkçe destekli autocomplete + duplicate uyarısı
-- `db:run` IPC handler'da `workspaceManager.save()` tetikleniyor (dosya .dtm'ye
-  yazılıyor)
-- Schema Self-Healing: `ALTER TABLE ADD COLUMN` ile UNIQUE/NOT NULL ekleme
-  hatası düzeltildi
-- `index.screen.tsx` (dosyalar listesi) tamamen yenilendi:
-  - Özet istatistik barı (Toplam / Aktif / Taslak / YM)
-  - Tür filtresi (Mal / Hizmet / Yapım / Danışmanlık)
-  - Zengin kart görünümü (birim, talep no, ekonomik kod, durum badge, tekrar_no)
-  - Sağ detay paneli (bütçe & muhasebe, ihale & sözleşme, notlar)
+- `db:run` IPC handler'da `workspaceManager.save()` tetikleniyor (dosya .dtm'ye yazılıyor)
+- Schema Self-Healing: `ALTER TABLE ADD COLUMN` ile UNIQUE/NOT NULL ekleme hatası düzeltildi
+- `index.screen.tsx` (dosyalar listesi) tamamen yenilendi
 - "Kurum İçi Temin Numarası" → "Doğrudan Temin Numarası" düzeltildi
-- **JSON Şeması Desteği (Alpha)**: Geleneksel Mustache şablonları yerine dinamik sayfa ayarlarını (`page`, `margin`, `antet`) ve gövde bloklarını (`body`, `paragraph`, `list`) destekleyen yeni veri tabanlı mimari için alpha düzeyinde çalışmalar başlatıldı (`ISSUE_JSON_schema_support.md` oluşturuldu).
+- **Şablon Tasarımları & İmzalar**: `odeme-yazisi` ve `odeme-emri-belgesi` şablonları standart antet ve logolu yapıya kavuşturuldu. `odeme-emri-belgesi` imza panelleri dinamik değişkenlere bağlandı (antet alan darlığı nedeniyle kaldırıldı).
+- **Hakediş Raporu Şablonu**: `hakedis-raporu` için girdiler şablon değişkenleriyle değiştirilerek yeni şablon oluşturuldu, antet ve imza düzenleri standartlaştırıldı.
+- **Test Verisi Çeşitliliği**: Şablon test verilerinde (mock JSON) Antalya/Kaş, Ankara/Çankaya ve İzmir/Seferihisar gibi farklı belediyeler ve firmalar kullanılarak zenginlik sağlandı.
+- **Tag & Release**: `v1.0.0-alpha.78` ve `v1.0.0-alpha.79` sürümleri paketlenip GitHub üzerinde yeni release olarak yayınlandı.
+- **JSON Şeması Desteği (Alpha)**: Geleneksel Mustache şablonları yerine dinamik sayfa ayarlarını ve gövde bloklarını destekleyen yeni veri tabanlı mimari için alpha düzeyinde çalışmalar başlatıldı (`ISSUE_JSON_schema_support.md` oluşturuldu).
 
 ---
 
