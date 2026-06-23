@@ -32,12 +32,7 @@
       padding: 5px;
       vertical-align: middle;
     }
-    .main-table input[type="text"] {
-      font-family: inherit;
-      font-size: inherit;
-      border: 1px solid #7a7a7a;
-      padding: 2px 5px;
-    }
+
     .content-table {
       width: 100%;
       border-collapse: collapse;
@@ -47,13 +42,7 @@
       padding: 5px 0;
       line-height: 1.6;
     }
-    .content-table input[type="text"] {
-      font-family: inherit;
-      font-size: inherit;
-      border: 1px solid #7a7a7a;
-      padding: 2px 5px;
-      text-align: center;
-    }
+
     .commission-table {
       width: 100%;
       border-collapse: collapse;
@@ -69,13 +58,6 @@
     <!-- TOP CONTROLS -->
     <table width="100%" style="border-collapse: collapse;">
       <tbody>
-        <tr>
-          <td align="right" style="font-size: 10pt; line-height: 1.6;">
-            <input type="checkbox" name="eimza"> E-İmza&nbsp; 
-            <input type="checkbox" name="worddoc"> Word&nbsp;<br>
-            <input type="button" value="Yazdır" onclick="window.print();">
-          </td>
-        </tr>
         <tr align="center">
           <td height="80" style="vertical-align: middle;">
             <div style="font-weight: bold; font-size: 13pt; text-transform: uppercase;">HİZMET İŞLERİ KABUL TEKLİF BELGESİ</div>
@@ -110,47 +92,27 @@
         <tr>
           <td><span>Sözleşmeye Göre İşin Süresi (Takvim Günü)</span></td>
           <td><strong>:</strong></td>
-          <td>
-            <strong>
-              <input type="text" size="10" name="sozlesmeSuresi" value="{{sozlesmeSuresi}}{{^sozlesmeSuresi}}10{{/sozlesmeSuresi}}">
-            </strong>
-          </td>
+          <td><strong>{{sozlesmeSuresi}}{{^sozlesmeSuresi}}10{{/sozlesmeSuresi}}</strong></td>
         </tr>
         <tr>
           <td><span>Sözleşmeye Göre İşin Bitirilmesi Gereken Tarih</span></td>
           <td><strong>:</strong></td>
-          <td>
-            <strong>
-              <input type="text" size="10" name="sozlesmeBitisTarihi" value="{{sozlesmeBitisTarihi}}{{^sozlesmeBitisTarihi}}..../..../20....{{/sozlesmeBitisTarihi}}">
-            </strong>
-          </td>
+          <td><strong>{{#sozlesmeBitisTarihi}}{{sozlesmeBitisTarihi}}{{/sozlesmeBitisTarihi}}{{^sozlesmeBitisTarihi}}..../..../20....{{/sozlesmeBitisTarihi}}</strong></td>
         </tr>
         <tr>
           <td><span>Varsa Süre Uzatımları</span></td>
           <td><strong>:</strong></td>
-          <td>
-            <strong>
-              <input type="text" size="10" name="sureUzatimlari" value="{{sureUzatimlari}}{{^sureUzatimlari}}0{{/sureUzatimlari}}">
-            </strong>
-          </td>
+          <td><strong>{{sureUzatimlari}}{{^sureUzatimlari}}0{{/sureUzatimlari}}</strong></td>
         </tr>
         <tr>
           <td><span>Süre Uzatımı Dahil İşin Bitirilmesi Gereken Tarih</span></td>
           <td><strong>:</strong></td>
-          <td>
-            <strong>
-              <input type="text" size="10" name="sureUzatimliBitisTarihi" value="{{sureUzatimliBitisTarihi}}{{^sureUzatimliBitisTarihi}}..../..../20....{{/sureUzatimliBitisTarihi}}">
-            </strong>
-          </td>
+          <td><strong>{{#sureUzatimliBitisTarihi}}{{sureUzatimliBitisTarihi}}{{/sureUzatimliBitisTarihi}}{{^sureUzatimliBitisTarihi}}..../..../20....{{/sureUzatimliBitisTarihi}}</strong></td>
         </tr>
         <tr>
           <td><span>İşin bitirildiği tarih</span></td>
           <td><strong>:</strong></td>
-          <td>
-            <strong>
-              <input type="text" size="10" name="isinBitirildigiTarih" value="{{isinBitirildigiTarih}}{{^isinBitirildigiTarih}}..../..../20....{{/isinBitirildigiTarih}}">
-            </strong>
-          </td>
+          <td><strong>{{#isinBitirildigiTarih}}{{isinBitirildigiTarih}}{{/isinBitirildigiTarih}}{{^isinBitirildigiTarih}}..../..../20....{{/isinBitirildigiTarih}}</strong></td>
         </tr>
       </tbody>
     </table>
@@ -161,17 +123,17 @@
         <tr>
           <td style="text-align: justify;">
             <strong>{{dosyaKonusu}}</strong> işinin bitirildiğine ilişkin yüklenici 
-            <strong>{{yukleniciFirma}}</strong> ‘ın verdiği 
-            <input type="text" size="10" name="dilekceTarihi" value="{{dilekceTarihi}}{{^dilekceTarihi}}..../..../20....{{/dilekceTarihi}}"> 
-            tarihli dilekçe üzerine <strong>{{baskanAdi}}</strong>’ın talimatı ile, yukarıda yazılı işin ön incelemesi 
-            <input type="text" size="10" name="onIncelemeTarihi" value="{{onIncelemeTarihi}}{{^onIncelemeTarihi}}..../..../20....{{/onIncelemeTarihi}}"> 
+            <strong>{{yukleniciFirma}}</strong>'ın verdiği 
+            <strong>{{#dilekceTarihi}}{{dilekceTarihi}}{{/dilekceTarihi}}{{^dilekceTarihi}}..../..../20....{{/dilekceTarihi}}</strong> 
+            tarihli dilekçe üzerine <strong>{{baskanAdi}}</strong>'ın talimatı ile, yukarıda yazılı işin ön incelemesi 
+            <strong>{{#onIncelemeTarihi}}{{onIncelemeTarihi}}{{/onIncelemeTarihi}}{{^onIncelemeTarihi}}..../..../20....{{/onIncelemeTarihi}}</strong> 
             tarihinde tarafımızdan/tarafımdan yapılmış, işin sözleşmesine uygun olarak tamamlandığı ve kabule hazır olduğu tespit edilmiştir.
             <p>Gereğinin yapılmasını arz ederim/ederiz.</p>
           </td>
         </tr>
         <tr>
           <td align="right">
-            Tarih: <input type="text" size="10" name="belgeTarihi" value="{{dosyaTarihi}}">
+            Tarih: {{dosyaTarihi}}
           </td>
         </tr>
       </tbody>
