@@ -97,46 +97,48 @@ export function useSaveSablon() {
       const isUpdate = !!oldSablon
 
       if (isUpdate) {
-        if (oldSablon.versiyon === 1) {
-          // Create customized version (v2)
-          const parent_id = oldSablon.parent_id || oldSablon.id
-          const insertRes = await window.electron.ipcRenderer.invoke(
-            'db:run',
-            `INSERT INTO TANIM_Sablon (ad, dosya_adi, dosya_turu, icerik, aciklama, test_verisi, aktif_mi, parent_id, versiyon)
-             VALUES (?, ?, ?, ?, ?, ?, 1, ?, 2)`,
-            [ad, dosya_adi, dosya_turu, icerik, aciklama, test_verisi || null, parent_id]
-          )
-          if (insertRes.error) throw new Error(insertRes.error)
-          const newSablonId = insertRes.lastID
+        const parent_id = oldSablon.parent_id || oldSablon.id
 
-          for (const p of extractedPlaceholders) {
-            await window.electron.ipcRenderer.invoke(
-              'db:run',
-              'INSERT INTO SABLON_Placeholder (sablon_id, placeholder_id) VALUES (?, ?)',
-              [newSablonId, p.id]
-            )
-          }
-          return newSablonId
-        } else {
-          // Update existing customized version in place
-          const updateRes = await window.electron.ipcRenderer.invoke(
-            'db:run',
-            `UPDATE TANIM_Sablon SET ad = ?, dosya_adi = ?, icerik = ?, aciklama = ?, test_verisi = ?, updated_at = CURRENT_TIMESTAMP WHERE id = ?`,
-            [ad, dosya_adi, icerik, aciklama, test_verisi || null, oldSablon.id]
-          )
-          if (updateRes.error) throw new Error(updateRes.error)
+        // Deactivate all active templates of the same family
+        await window.electron.ipcRenderer.invoke(
+          'db:run',
+          'UPDATE TANIM_Sablon SET aktif_mi = 0 WHERE (id = ? OR parent_id = ?) AND aktif_mi = 1',
+          [parent_id, parent_id]
+        )
 
-          // Replace placeholders
-          await window.electron.ipcRenderer.invoke('db:run', 'DELETE FROM SABLON_Placeholder WHERE sablon_id = ?', [oldSablon.id])
-          for (const p of extractedPlaceholders) {
-            await window.electron.ipcRenderer.invoke(
-              'db:run',
-              'INSERT INTO SABLON_Placeholder (sablon_id, placeholder_id) VALUES (?, ?)',
-              [oldSablon.id, p.id]
-            )
-          }
-          return oldSablon.id
+        // Insert new version
+        const insertRes = await window.electron.ipcRenderer.invoke(
+          'db:run',
+          `INSERT INTO TANIM_Sablon (ad, dosya_adi, dosya_turu, icerik, aciklama, test_verisi, aktif_mi, parent_id, versiyon)
+           VALUES (?, ?, ?, ?, ?, ?, 1, ?, (SELECT COALESCE(MAX(versiyon), 0) + 1 FROM TANIM_Sablon WHERE id = ? OR parent_id = ?))`,
+          [ad, dosya_adi, dosya_turu, icerik, aciklama, test_verisi || null, parent_id, parent_id, parent_id]
+        )
+        if (insertRes.error) throw new Error(insertRes.error)
+        const newSablonId = insertRes.lastID
+
+        // Copy/insert placeholders for the new version
+        for (const p of extractedPlaceholders) {
+          await window.electron.ipcRenderer.invoke(
+            'db:run',
+            'INSERT INTO SABLON_Placeholder (sablon_id, placeholder_id) VALUES (?, ?)',
+            [newSablonId, p.id]
+          )
         }
+
+        // Update active configuration mappings to point to the new sablon_id
+        await window.electron.ipcRenderer.invoke(
+          'db:run',
+          'UPDATE TANIM_Komisyon_Sablon SET sablon_id = ? WHERE sablon_id = ?',
+          [newSablonId, oldSablon.id]
+        )
+
+        await window.electron.ipcRenderer.invoke(
+          'db:run',
+          'UPDATE TANIM_AlimTuru_Sablon SET sablon_id = ? WHERE sablon_id = ?',
+          [newSablonId, oldSablon.id]
+        )
+
+        return newSablonId
       } else {
         // Insert new fresh template (v1)
         const insertRes = await window.electron.ipcRenderer.invoke(

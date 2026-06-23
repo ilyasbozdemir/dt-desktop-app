@@ -120,7 +120,14 @@ export function SablonListesi({ onEdit, onCreate }: { onEdit: (s: Sablon) => voi
                             {sablon.dosya_adi}{sablon.dosya_adi.endsWith(`.${sablon.dosya_turu}`) ? '' : `.${sablon.dosya_turu}`}
                           </p>
                         </div>
-                        <div className="bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400 text-[10px] font-bold px-2 py-1 rounded">
+                        <div 
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            setHistorySablon(sablon)
+                          }}
+                          className="bg-purple-100 hover:bg-purple-200 dark:bg-purple-900/30 dark:hover:bg-purple-900/55 text-purple-700 dark:text-purple-400 text-[10px] font-bold px-2 py-1 rounded cursor-pointer transition-colors"
+                          title="Versiyon Geçmişi"
+                        >
                           v{sablon.versiyon}
                         </div>
                       </div>
