@@ -879,6 +879,11 @@ if (!gotTheLock && !isMultiInstance) {
       return { success: true }
     })
 
+    ipcMain.handle('app:remove-recent-file', (_, filePath: string) => {
+      recentFilesStore.removeRecentFile(filePath)
+      return { success: true }
+    })
+
     ipcMain.handle('export-pdf', async (_, htmlContent: string, _printOptions?: any, fileName?: string) => {
       try {
         const { canceled, filePath } = await dialog.showSaveDialog({

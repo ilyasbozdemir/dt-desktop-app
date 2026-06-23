@@ -65,7 +65,13 @@ class RecentFilesStore {
     this.writeData(files)
   }
 
-  public clearRecentFiles() {
+  public removeRecentFile(filePath: string): void {
+    let files = this.readData()
+    files = files.filter((f) => f.path !== filePath)
+    this.writeData(files)
+  }
+
+  public clearRecentFiles(): void {
     this.writeData([])
   }
 }

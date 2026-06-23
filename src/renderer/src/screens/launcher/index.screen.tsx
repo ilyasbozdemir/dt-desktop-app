@@ -138,6 +138,21 @@ export default function LauncherScreen(): React.ReactNode {
     }
   }
 
+  const handleRemoveRecent = async (filePath: string, e: React.MouseEvent): Promise<void> => {
+    e.stopPropagation()
+    const confirmDelete = window.confirm('Bu dosyayı son açılanlar listesinden kaldırmak istediğinize emin misiniz?')
+    if (!confirmDelete) return
+
+    try {
+      const res = await window.electron?.ipcRenderer.invoke('app:remove-recent-file', filePath)
+      if (res?.success) {
+        setRecentFiles((prev) => prev.filter((file) => file.path !== filePath))
+      }
+    } catch (err) {
+      console.error('Son açılan dosya kaldırılırken hata oluştu:', err)
+    }
+  }
+
   const handleConfirmMigration = async (): Promise<void> => {
     if (!migrationData) return
     setCreating(true)
@@ -272,10 +287,10 @@ export default function LauncherScreen(): React.ReactNode {
             </div>
             <div className="space-y-2 max-h-48 overflow-y-auto pr-2 custom-scrollbar">
               {recentFiles.map((file) => (
-                <button
+                <div
                   key={file.id}
                   onClick={() => handleOpenRecent(file.path)}
-                  className="w-full flex items-center justify-between p-3 rounded-xl hover:bg-white dark:hover:bg-slate-800 border border-transparent hover:border-slate-200 dark:hover:border-slate-700 transition-all group text-left"
+                  className="w-full flex items-center justify-between p-3 rounded-xl hover:bg-white dark:hover:bg-slate-800 border border-transparent hover:border-slate-200 dark:hover:border-slate-700 transition-all group text-left cursor-pointer"
                 >
                   <div className="flex items-center gap-3 overflow-hidden">
                     <div className="w-8 h-8 rounded-lg bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center text-blue-600 dark:text-blue-400 shrink-0">
@@ -290,8 +305,17 @@ export default function LauncherScreen(): React.ReactNode {
                       </p>
                     </div>
                   </div>
-                  <ChevronRight className="w-4 h-4 text-slate-300 dark:text-slate-600 group-hover:text-slate-400 dark:group-hover:text-slate-400 opacity-0 group-hover:opacity-100 transition-all shrink-0" />
-                </button>
+                  <div className="flex items-center gap-1 shrink-0">
+                    <button
+                      onClick={(e) => handleRemoveRecent(file.path, e)}
+                      className="p-1 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 text-slate-400 hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100"
+                      title="Listeden Kaldır"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                    <ChevronRight className="w-4 h-4 text-slate-300 dark:text-slate-600 group-hover:text-slate-400 dark:group-hover:text-slate-400 opacity-0 group-hover:opacity-100 transition-all shrink-0" />
+                  </div>
+                </div>
               ))}
               {recentFiles.length === 0 && (
                 <div className="flex flex-col items-center justify-center h-32 text-center">
