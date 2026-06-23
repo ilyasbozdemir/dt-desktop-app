@@ -422,6 +422,8 @@ export class DtmWorkspace {
 
     fs.mkdirSync(path.join(this.tempDir, 'attachments'))
 
+    seedTemplates(this.db)
+
     this.saveWorkspace()
 
     this.meta = meta
