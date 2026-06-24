@@ -16,6 +16,7 @@ import { generateContent, testConnection, AIGenerateOptions } from './ai/index'
 import { renderPdfBuffer } from './pdfService'
 import { startExpressServer, stopExpressServer } from './network/expressServer'
 import { registerArchiveHandlers } from './archive'
+import { TANIM_Placeholder } from './database/tables/TANIM_Placeholder'
 
 process.on('uncaughtException', (error) => {
   console.error('UNCAUGHT EXCEPTION:', error)
@@ -1963,7 +1964,6 @@ if (!gotTheLock && !isMultiInstance) {
     // Reset Placeholders to defaults
     ipcMain.handle('db:resetPlaceholders', async () => {
       try {
-        const { TANIM_Placeholder } = require('./database/tables/TANIM_Placeholder')
         const db = workspaceManager.getDb()
         db.exec('DELETE FROM TANIM_Placeholder;')
         if (TANIM_Placeholder.initialData && TANIM_Placeholder.initialData.length > 0) {

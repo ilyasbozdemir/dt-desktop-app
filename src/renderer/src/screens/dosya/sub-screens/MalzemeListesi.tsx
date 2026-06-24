@@ -30,13 +30,17 @@ import { cn } from '../../../utils/cn'
 import { Modal } from '../../../components/ui/Modal'
 
 import { SubScreen } from '../SubScreens.screen'
+import { useCiktiMerkeziData } from '../CiktiMerkezi.hooks'
+import Mustache from 'mustache'
 
 export function MalzemeListesi(): React.JSX.Element {
   const { activeDosyaId } = useWorkspaceStore()
+  const { sablons, loading: ciktiLoading, masterHtml, dosyaContext } = useCiktiMerkeziData(activeDosyaId)
   const [items, setItems] = useState<any[]>([])
   const [units, setUnits] = useState<any[]>([])
   const [libraryItems, setLibraryItems] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
+  const [isPrinting, setIsPrinting] = useState(false)
 
   // Form states
   const [kalemAdi, setKalemAdi] = useState('')
@@ -249,6 +253,41 @@ export function MalzemeListesi(): React.JSX.Element {
       ).slice(0, 5)
     : []
 
+  const handlePrintTemplate = async () => {
+    try {
+      setIsPrinting(true)
+      const settingsRes = await window.electron.ipcRenderer.invoke('db:get-settings')
+      const sablonIdStr = settingsRes?.success ? settingsRes.data['MAPPING_IHTIYAC_LISTESI_SABLON_ID'] : null
+      
+      if (!sablonIdStr) {
+        alert("Lütfen Şablon & Kategori Yönetimi bölümünden İhtiyaç Listesi için bir şablon bağlayınız.")
+        return
+      }
+
+      const selectedSablon = sablons.find(s => s.id.toString() === sablonIdStr)
+      if (!selectedSablon) {
+        alert("Bağlı şablon bulunamadı veya silinmiş. Lütfen Şablon & Kategori Yönetimi bölümünden kontrol ediniz.")
+        return
+      }
+
+      if (!masterHtml) {
+        alert("Master şablon yüklenemedi, veriler bekleniyor.")
+        return
+      }
+
+      // İhtiyaç listesi şablonunu context ile işle
+      const renderedContent = Mustache.render(selectedSablon.icerik, dosyaContext)
+      // İşlenmiş şablonu master HTML içerisine göm
+      const finalHtml = Mustache.render(masterHtml, dosyaContext, { content: renderedContent })
+
+      await window.electron.ipcRenderer.invoke('print-html', finalHtml, { silent: false })
+    } catch (error: any) {
+      alert("Yazdırma sırasında bir hata oluştu: " + error.message)
+    } finally {
+      setIsPrinting(false)
+    }
+  }
+
   return (
     <SubScreen
       title="Malzeme / Hizmet Kalem Listesi"
@@ -257,10 +296,11 @@ export function MalzemeListesi(): React.JSX.Element {
     >
       <div className="flex justify-end mb-4 print:hidden">
         <button
-          onClick={() => window.print()}
-          className="px-4 py-2 bg-slate-800 hover:bg-slate-900 text-white rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer shadow-sm"
+          onClick={handlePrintTemplate}
+          disabled={isPrinting || ciktiLoading}
+          className="px-4 py-2 bg-slate-800 hover:bg-slate-900 text-white rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer shadow-sm disabled:opacity-50"
         >
-          <Printer className="w-4 h-4" />
+          {isPrinting ? <AlertCircle className="w-4 h-4 animate-spin" /> : <Printer className="w-4 h-4" />}
           Yazdır / PDF Olarak Kaydet
         </button>
       </div>

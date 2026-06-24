@@ -104,7 +104,7 @@ const menuGroups: MenuGroup[] = [
           { name: 'Mevzuat ve Parametreler', path: '/mevzuat', icon: Scale },
           { name: 'Toplu İçe Aktarma', path: '/import', icon: Database },
           { name: 'Şablon Yönetimi', path: '/sablonlar', icon: FileText },
-          { name: 'Veri Bağlaması (Değişkenler)', path: '/degiskenler', icon: Key }
+          { name: 'Şablon & Kategori Yönetimi', path: '/degiskenler', icon: Key }
         ]
       }
     ]
