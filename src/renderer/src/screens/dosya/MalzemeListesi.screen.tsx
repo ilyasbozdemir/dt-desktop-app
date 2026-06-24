@@ -93,9 +93,13 @@ export function MalzemeListesi(): React.JSX.Element {
     try {
       const checkRes = await window.electron.ipcRenderer.invoke('db:query', 'SELECT id FROM TANIM_Kalem WHERE kalem_adi = ? LIMIT 1', [nameToUse])
       if (checkRes.success && checkRes.data.length === 0) {
-        await window.electron.ipcRenderer.invoke('db:run',
-          `INSERT INTO TANIM_Kalem (kalem_adi, tipi, birim, kdv_orani, tasinir_kodu, okas_kodu, aktif_mi) VALUES (?, ?, ?, ?, ?, ?, 1)`,
-          [nameToUse, tipi, birim, kdvOrani, tasinirKodu || null, okasKodu || null])
+        const generatedBarkod = Math.floor(1000000000000 + Math.random() * 9000000000000).toString()
+        const libInsertRes = await window.electron.ipcRenderer.invoke('db:run',
+          `INSERT INTO TANIM_Kalem (barkod_id, kalem_adi, tipi, birim, kdv_orani, tasinir_kodu, okas_kodu, aktif_mi) VALUES (?, ?, ?, ?, ?, ?, ?, 1)`,
+          [generatedBarkod, nameToUse, tipi, birim, kdvOrani, tasinirKodu || null, okasKodu || null])
+        if (!libInsertRes.success) {
+          console.error('Kütüphaneye eklenirken hata oluştu:', libInsertRes.error)
+        }
       }
       const res = await window.electron.ipcRenderer.invoke('db:run',
         `INSERT INTO DATA_TeminKalem (temin_dosya_id, tasinir_kodu, okas_kodu, kalem_adi, tipi, birim, miktar, kdv_orani, aciklama) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
