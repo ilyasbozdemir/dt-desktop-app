@@ -179,13 +179,12 @@ import {
   FiyatArastirmaMuayeneKomisyonu,
   KomisyonAtamaOnayEki,
   MalzemeListesi,
-  IhtiyacListesiTalepFormu,
   LuzumMuzekkeresiBelgesi,
   LuzumOnayEki,
   LuzumTeslimTesellum,
   IstekliFirmalar,
   YaklasikMaliyetCetveli,
-  PiyasaArastirmaTutanağı,
+  PiyasaArastirmaTutanagi,
   DogrudanTeminOnayBelgesi,
   IhaleOnayBelgesi,
   ButceSorgusu,
@@ -266,7 +265,7 @@ const yaklasikMaliyetRoute = createRoute({
 const piyasaArastirmaTutanakRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/dosya/firmalar-maliyet/tutanak',
-  component: PiyasaArastirmaTutanağı
+  component: PiyasaArastirmaTutanagi
 })
 
 // 5. Onay
@@ -348,7 +347,6 @@ const routeTree = rootRoute.addChildren([
   fiyatMuayeneRoute,
   komisyonOnayEkiRoute,
   malzemeListesiRoute,
-  talepFormuRoute,
   luzumBelgeRoute,
   luzumOnayEkiRoute,
   luzumTeslimTesellumRoute,
