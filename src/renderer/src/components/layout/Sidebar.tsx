@@ -23,7 +23,8 @@ import {
   Compass,
   FileCheck,
   CreditCard,
-  HelpCircle
+  HelpCircle,
+  Key
 } from 'lucide-react'
 import { cn } from '../../utils/cn'
 import { useSettingsStore } from '../../store/settingsStore'
@@ -102,7 +103,8 @@ const menuGroups: MenuGroup[] = [
           { name: 'Genel Ayarlar', path: '/ayarlar', icon: Settings },
           { name: 'Mevzuat ve Parametreler', path: '/mevzuat', icon: Scale },
           { name: 'Toplu İçe Aktarma', path: '/import', icon: Database },
-          { name: 'Şablon Yönetimi', path: '/sablonlar', icon: FileText }
+          { name: 'Şablon Yönetimi', path: '/sablonlar', icon: FileText },
+          { name: 'Veri Bağlaması (Değişkenler)', path: '/degiskenler', icon: Key }
         ]
       }
     ]

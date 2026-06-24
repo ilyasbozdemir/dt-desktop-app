@@ -17,6 +17,7 @@ import KurumScreen from '../../screens/kurum/index.screen'
 import ProfilScreen from '../../screens/profil/index.screen'
 import DosyaScreen from '../../screens/dosya/index.screen'
 import SablonlarScreen from '../../screens/sablonlar/index.screen'
+import DegiskenlerScreen from '../../screens/sablonlar/degiskenler.screen'
 import RaporlarScreen from '../../screens/raporlar/index.screen'
 import OkasKodScreen from '../../screens/okaskod/index.screen'
 import OlcuBirimleriScreen from '../../screens/olcubirimleri/index.screen'
@@ -53,6 +54,7 @@ export const routeComponents: Record<string, React.ComponentType<any>> = {
   '/firmalar': FirmalarScreen,
   '/personel': PersonelScreen,
   '/sablonlar': SablonlarScreen,
+  '/degiskenler': DegiskenlerScreen,
   '/komisyonlar': KomisyonlarScreen,
   '/komisyonlar/detay': KomisyonDetayScreen,
   '/komisyon-gorevleri': KomisyonGorevleriScreen,

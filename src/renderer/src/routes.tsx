@@ -18,6 +18,7 @@ import KurumScreen from './screens/kurum/index.screen'
 import ProfilScreen from './screens/profil/index.screen'
 import DosyaScreen from './screens/dosya/index.screen'
 import SablonlarScreen from './screens/sablonlar/index.screen'
+import DegiskenlerScreen from './screens/sablonlar/degiskenler.screen'
 import RaporlarScreen from './screens/raporlar/index.screen'
 import OkasKodScreen from './screens/okaskod/index.screen'
 import OlcuBirimleriScreen from './screens/olcubirimleri/index.screen'
@@ -65,6 +66,12 @@ const sablonlarRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/sablonlar',
   component: SablonlarScreen
+})
+
+const degiskenlerRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/degiskenler',
+  component: DegiskenlerScreen
 })
 
 const komisyonlarRoute = createRoute({
@@ -322,6 +329,7 @@ const routeTree = rootRoute.addChildren([
   firmalarRoute,
   personelRoute,
   sablonlarRoute,
+  degiskenlerRoute,
   komisyonlarRoute,
   komisyonDetayRoute,
   komisyonGorevleriRoute,
