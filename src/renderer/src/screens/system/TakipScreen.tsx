@@ -18,7 +18,9 @@ import {
   Save,
   Plus,
   XCircle,
-  FileSignature
+  FileSignature,
+  ArrowUp,
+  ArrowDown
 } from 'lucide-react'
 import { Link } from '@tanstack/react-router'
 import { useWorkspaceStore } from '../../store/workspaceStore'
@@ -57,6 +59,7 @@ export function TakipScreen(): React.JSX.Element {
       if (!res.success) return []
       return res.data.map((t: any) => ({
         ...t,
+        ordered_docs: t.ordered_docs ? JSON.parse(t.ordered_docs) : null,
         starred_docs: t.starred_docs ? JSON.parse(t.starred_docs) : [],
         skipped_docs: t.skipped_docs ? JSON.parse(t.skipped_docs) : []
       }))
@@ -64,6 +67,7 @@ export function TakipScreen(): React.JSX.Element {
   })
 
   // Local state for active dossier configurations
+  const [orderedDocs, setOrderedDocs] = useState<string[] | null>(null)
   const [starredDocs, setStarredDocs] = useState<string[]>([])
   const [skippedDocs, setSkippedDocs] = useState<string[]>([])
   const [isTaslakModalOpen, setIsTaslakModalOpen] = useState(false)
@@ -73,25 +77,31 @@ export function TakipScreen(): React.JSX.Element {
   useEffect(() => {
     if (activeDosya) {
       try {
+        setOrderedDocs(activeDosya.ordered_docs ? JSON.parse(activeDosya.ordered_docs) : null)
+      } catch { setOrderedDocs(null) }
+      try {
         setStarredDocs(activeDosya.starred_docs ? JSON.parse(activeDosya.starred_docs) : [])
       } catch { setStarredDocs([]) }
       try {
         setSkippedDocs(activeDosya.skipped_docs ? JSON.parse(activeDosya.skipped_docs) : [])
       } catch { setSkippedDocs([]) }
     } else {
+      setOrderedDocs(null)
       setStarredDocs([])
       setSkippedDocs([])
     }
-  }, [activeDosyaId, activeDosya?.starred_docs, activeDosya?.skipped_docs])
+  }, [activeDosyaId, activeDosya?.ordered_docs, activeDosya?.starred_docs, activeDosya?.skipped_docs])
 
   // Update Database when starred/skipped changes
-  const saveDosyaConfig = async (newStarred: string[], newSkipped: string[]) => {
+  const saveDosyaConfig = async (newOrdered: string[] | null, newStarred: string[], newSkipped: string[]) => {
     if (!activeDosyaId) return
+    setOrderedDocs(newOrdered)
     setStarredDocs(newStarred)
     setSkippedDocs(newSkipped)
     await window.electron.ipcRenderer.invoke(
       'db:execute',
-      `UPDATE DATA_TeminDosyasi SET starred_docs = ?, skipped_docs = ? WHERE id = ?`,
+      `UPDATE DATA_TeminDosyasi SET ordered_docs = ?, starred_docs = ?, skipped_docs = ? WHERE id = ?`,
+      newOrdered ? JSON.stringify(newOrdered) : null,
       JSON.stringify(newStarred),
       JSON.stringify(newSkipped),
       activeDosyaId
@@ -102,24 +112,24 @@ export function TakipScreen(): React.JSX.Element {
     let updated
     if (starredDocs.includes(docName)) updated = starredDocs.filter(d => d !== docName)
     else updated = [...starredDocs, docName]
-    saveDosyaConfig(updated, skippedDocs)
+    saveDosyaConfig(orderedDocs, updated, skippedDocs)
   }
 
   const toggleSkip = (docName: string) => {
     let updated
     if (skippedDocs.includes(docName)) updated = skippedDocs.filter(d => d !== docName)
     else updated = [...skippedDocs, docName]
-    saveDosyaConfig(starredDocs, updated)
+    saveDosyaConfig(orderedDocs, starredDocs, updated)
   }
 
   const applyTaslak = async (taslakId: string) => {
     if (!taslakId || taslakId === 'none') {
-       saveDosyaConfig([], [])
+       saveDosyaConfig(null, [], [])
        return
     }
     const taslak = dbTaslaklar.find(t => t.id.toString() === taslakId)
     if (taslak) {
-       saveDosyaConfig(taslak.starred_docs, taslak.skipped_docs)
+       saveDosyaConfig(taslak.ordered_docs, taslak.starred_docs, taslak.skipped_docs)
        await window.electron.ipcRenderer.invoke(
          'db:execute',
          `UPDATE DATA_TeminDosyasi SET surec_taslak_id = ? WHERE id = ?`,
@@ -133,9 +143,10 @@ export function TakipScreen(): React.JSX.Element {
     if (!newTaslakAdi.trim()) return
     await window.electron.ipcRenderer.invoke(
       'db:execute',
-      `INSERT INTO TANIM_SurecTaslak (taslak_adi, tur, starred_docs, skipped_docs) VALUES (?, ?, ?, ?)`,
+      `INSERT INTO TANIM_SurecTaslak (taslak_adi, tur, ordered_docs, starred_docs, skipped_docs) VALUES (?, ?, ?, ?, ?)`,
       newTaslakAdi,
       activeDosya?.tur || '',
+      orderedDocs ? JSON.stringify(orderedDocs) : null,
       JSON.stringify(starredDocs),
       JSON.stringify(skippedDocs)
     )
@@ -229,6 +240,24 @@ export function TakipScreen(): React.JSX.Element {
     }
 
     return 'bekliyor'
+  }
+
+  const moveDocUp = (idx: number, currentList: string[]) => {
+    if (idx === 0) return
+    const newList = [...currentList]
+    const temp = newList[idx - 1]
+    newList[idx - 1] = newList[idx]
+    newList[idx] = temp
+    saveDosyaConfig(newList, starredDocs, skippedDocs)
+  }
+
+  const moveDocDown = (idx: number, currentList: string[]) => {
+    if (idx === currentList.length - 1) return
+    const newList = [...currentList]
+    const temp = newList[idx + 1]
+    newList[idx + 1] = newList[idx]
+    newList[idx] = temp
+    saveDosyaConfig(newList, starredDocs, skippedDocs)
   }
 
   // Handle file upload / mark as signed
@@ -501,8 +530,9 @@ export function TakipScreen(): React.JSX.Element {
                     Bu alım türü için mevzuata göre dosyada bulunması gereken evraklar ve dinamik durumları:
                   </p>
                   
-                  {activeAlimTuru.belgeler.map((b: any, idx: number) => {
-                    const documentName = typeof b === 'string' ? b : (b?.ad || '')
+                  {(() => {
+                    const documentList = orderedDocs || activeAlimTuru.belgeler.map((b: any) => typeof b === 'string' ? b : (b?.ad || ''))
+                    return documentList.map((documentName: string, idx: number) => {
                     const status = getDocumentStatus(documentName)
                     const isStarred = starredDocs.includes(documentName)
                     const isSkipped = skippedDocs.includes(documentName)
@@ -512,6 +542,14 @@ export function TakipScreen(): React.JSX.Element {
                         isSkipped ? 'bg-slate-100/50 dark:bg-slate-900/50 border-transparent opacity-60' : 'bg-slate-50/50 dark:bg-slate-950/35 border-slate-100/50 dark:border-slate-850/50'
                       }`}>
                         <div className="flex gap-2.5 items-center">
+                          <div className="flex flex-col gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <button onClick={() => moveDocUp(idx, documentList)} className="p-0.5 text-slate-400 hover:text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded" disabled={idx === 0}>
+                              <ArrowUp className="w-3 h-3" />
+                            </button>
+                            <button onClick={() => moveDocDown(idx, documentList)} className="p-0.5 text-slate-400 hover:text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded" disabled={idx === documentList.length - 1}>
+                              <ArrowDown className="w-3 h-3" />
+                            </button>
+                          </div>
                           <div className="shrink-0">
                             {status === 'tamamlandi' ? (
                               <CheckCircle2 className="w-4 h-4 text-emerald-500 fill-emerald-500/10" />
@@ -542,7 +580,7 @@ export function TakipScreen(): React.JSX.Element {
                         </div>
                       </div>
                     )
-                  })}
+                  })})()}
                 </div>
               ) : (
                 <div className="p-4 rounded-xl bg-amber-50/40 dark:bg-amber-950/10 border border-amber-100 dark:border-amber-900/30 text-xs text-amber-700 dark:text-amber-400 flex items-start gap-2">

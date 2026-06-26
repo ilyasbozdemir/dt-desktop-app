@@ -63,6 +63,7 @@ export const DATA_TeminDosyasi = {
     { name: 'durum_asama_id', type: 'INTEGER' }, // TANIM_Asama referansı
     { name: 'mevzuat_id', type: 'INTEGER' }, // TANIM_Mevzuat kaydına referans
     { name: 'surec_taslak_id', type: 'INTEGER' }, // TANIM_SurecTaslak referansı
+    { name: 'ordered_docs', type: 'TEXT' }, // Dosyaya özel belge sıralaması (JSON array)
     { name: 'starred_docs', type: 'TEXT' }, // Dosyaya özel yıldızlı belgeler (JSON array)
     { name: 'skipped_docs', type: 'TEXT' }, // Dosyaya özel atlanmış belgeler (JSON array)
     { name: 'notlar', type: 'TEXT' },

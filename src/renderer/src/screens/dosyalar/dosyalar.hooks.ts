@@ -59,6 +59,10 @@ export interface TeminDosyasi {
   is_deleted: number
   ekap_no: string | null
   is_ekap_sent: number
+  surec_taslak_id?: number
+  ordered_docs?: string
+  starred_docs?: string
+  skipped_docs?: string
   created_at: string
   updated_at: string
   birim_adi?: string | null

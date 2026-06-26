@@ -5,6 +5,7 @@ export const TANIM_SurecTaslak = {
     { name: 'id', type: 'INTEGER', primaryKey: true, autoIncrement: true },
     { name: 'taslak_adi', type: 'TEXT', notNull: true },
     { name: 'tur', type: 'TEXT' }, // Hangi alım türüne ait taslak olduğu
+    { name: 'ordered_docs', type: 'TEXT' }, // JSON array of strings (belge sıralaması)
     { name: 'starred_docs', type: 'TEXT' }, // JSON array of strings
     { name: 'skipped_docs', type: 'TEXT' }, // JSON array of strings
     { name: 'aktif_mi', type: 'INTEGER', default: 1 },
