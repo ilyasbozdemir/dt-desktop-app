@@ -1,5 +1,6 @@
 import React from 'react'
 import DashboardScreen from '../../screens/dashboard/index.screen'
+import { CiktiMerkezi } from '../../screens/dosya/CiktiMerkezi'
 import DosyalarScreen from '../../screens/dosyalar/index.screen'
 import FirmalarScreen from '../../screens/firmalar/index.screen'
 import PersonelScreen from '../../screens/personel/index.screen'
@@ -90,6 +91,7 @@ export const routeComponents: Record<string, React.ComponentType<any>> = {
   '/dosya/harcama/talimat': HarcamaTalimati,
   '/dosya/harcama/pusula': HarcamaPusulasi,
   '/dosya/cikti-merkezi': CiktiMerkeziScreen,
+  '/cikti-merkezi': CiktiMerkezi,
   '/olcubirimleri': OlcuBirimleriScreen,
   '/malzemeler/yeni': YeniMalzemeScreen,
   '/yardim': YardimScreen
