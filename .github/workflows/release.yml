@@ -57,9 +57,9 @@ jobs:
           files: |
             dist/*.exe
             dist/*.exe.blockmap
-            dist/latest.yml
+            dist/*.yml
           draft: false
-          prerelease: false
+          prerelease: ${{ contains(github.ref_name, 'alpha') || contains(github.ref_name, 'beta') }}
           name: "dt-asistan-desktop-app ${{ github.ref_name }}"
           body: "Doğrudan Temin Masaüstü Yönetim uygulaması sürümü."
         env:
