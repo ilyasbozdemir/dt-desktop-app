@@ -24,7 +24,9 @@ import {
   FileCheck,
   CreditCard,
   HelpCircle,
-  Key
+  Key,
+  ArrowRightLeft,
+  Printer
 } from 'lucide-react'
 import { cn } from '../../utils/cn'
 import { useSettingsStore } from '../../store/settingsStore'
@@ -282,7 +284,8 @@ export function Sidebar(): React.JSX.Element {
         title: 'Dosya Navigasyonu',
         items: [
           ...(!isDosyaWindowMode ? [{ name: '⬅ Tüm Teminlere Dön', path: '/dosyalar', icon: ChevronLeft, onClick: () => setActiveDosyaId(null) }] : []),
-          { name: 'Süreç Takip & Durum', path: '/takip', icon: ClipboardList }
+          { name: 'Süreç Takip & Durum', path: '/takip', icon: ClipboardList },
+          { name: '🖨️ Çıktı & Üretim Merkezi', path: '/cikti-merkezi', icon: Printer }
         ]
       },
       activeGroup

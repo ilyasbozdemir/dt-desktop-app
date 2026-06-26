@@ -93,12 +93,19 @@ const komisyonGorevleriRoute = createRoute({
 })
 
 import { TakipScreen } from './screens/system/TakipScreen'
+import { CiktiMerkezi } from './screens/dosya/CiktiMerkezi'
 
 // Dynamic routes
 const takipRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: '/takip',
   component: TakipScreen
+})
+
+const ciktiMerkeziDashboardRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: '/cikti-merkezi',
+  component: CiktiMerkezi
 })
 
 
@@ -334,6 +341,7 @@ const routeTree = rootRoute.addChildren([
   komisyonDetayRoute,
   komisyonGorevleriRoute,
   takipRoute,
+  ciktiMerkeziDashboardRoute,
   raporlarRoute,
   okasKodRoute,
   mevzuatRoute,
