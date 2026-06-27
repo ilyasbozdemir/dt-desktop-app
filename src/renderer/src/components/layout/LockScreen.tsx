@@ -552,7 +552,7 @@ export default function LockScreen(): React.JSX.Element {
             className="flex items-center gap-2 text-xs text-slate-400 dark:text-slate-550 hover:text-slate-600 dark:hover:text-slate-300 transition-colors"
           >
             <LogOut className="w-4 h-4" />
-            Başka Çalışma Dosyası Seç (.dtm)
+            Başka Çalışma Dosyası Seç (.dtal)
           </button>
         </div>
       </div>

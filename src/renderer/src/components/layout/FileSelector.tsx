@@ -44,13 +44,13 @@ export function FileSelector(): React.JSX.Element {
       const res = await window.electron?.ipcRenderer.invoke('dialog:showSaveDialog')
       if (!res.canceled && res.filePath) {
         const fileBaseName = res.filePath.split(/[/\\]/).pop() || 'Yeni Kurum'
-        const projectName = fileBaseName.replace(/\.dt[ma]$/i, '')
+        const projectName = fileBaseName.replace(/\.dt(al|m|a)$/i, '')
 
         const result = await createWorkspace(res.filePath, projectName)
         if (result.success) {
           queryClient.clear()
         } else {
-          alert(`Çalışma dosyası (.dtm) oluşturulamadı!\nHata: ${result.error || 'Bilinmeyen hata'}`)
+          alert(`Çalışma dosyası (.dtal) oluşturulamadı!\nHata: ${result.error || 'Bilinmeyen hata'}`)
         }
       }
     } catch (e) {
@@ -67,7 +67,7 @@ export function FileSelector(): React.JSX.Element {
         if (result.success) {
           queryClient.clear()
         } else {
-          alert(`Çalışma dosyası (.dtm) açılamadı!\nHata: ${result.error || 'Bilinmeyen hata'}`)
+          alert(`Çalışma dosyası (.dtal) açılamadı!\nHata: ${result.error || 'Bilinmeyen hata'}`)
         }
       }
     } catch (e) {
