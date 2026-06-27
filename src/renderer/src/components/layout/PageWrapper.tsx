@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Outlet, useRouterState, useNavigate } from '@tanstack/react-router'
 import { Sidebar } from './Sidebar'
 import { Header } from './Header'
+import { ActiveFileToolbar } from './ActiveFileToolbar'
 import { Footer } from './Footer'
 import { TabsBar } from './TabsBar'
 import { useWorkspaceStore } from '../../store/workspaceStore'
@@ -380,6 +381,7 @@ export function PageWrapper(): React.ReactNode {
       <Sidebar />
       <div className="flex flex-col flex-1 min-w-0">
         <Header />
+        {activeDosyaId && <ActiveFileToolbar />}
         <TabsBar />
         <main className="flex-1 relative overflow-hidden">
           {tabs.map((tab) => {
