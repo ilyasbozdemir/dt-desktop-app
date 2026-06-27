@@ -8,7 +8,8 @@ import {
   ChevronDown,
   Printer,
   ClipboardList,
-  ChevronLeft
+  ChevronLeft,
+  Star
 } from 'lucide-react'
 import { useQuery } from '@tanstack/react-query'
 import { useWorkspaceStore } from '../../store/workspaceStore'
@@ -30,7 +31,7 @@ interface MenuItem {
 }
 
 export function ActiveFileToolbar(): React.JSX.Element | null {
-  const { activeDosyaId, setActiveDosyaId } = useWorkspaceStore()
+  const { activeDosyaId, setActiveDosyaId, activeStarredDocs } = useWorkspaceStore()
   const { dosyalar } = useDosyalarHooks()
   const [openDropdown, setOpenDropdown] = useState<string | null>(null)
   const dropdownRef = useRef<HTMLDivElement>(null)
@@ -169,6 +170,40 @@ export function ActiveFileToolbar(): React.JSX.Element | null {
       )}
 
       <div className="flex-1 flex items-center gap-2 flex-wrap" ref={dropdownRef}>
+        {activeStarredDocs.length > 0 && (
+          <div className="relative inline-block mr-2">
+            <button
+              onClick={() => setOpenDropdown(openDropdown === 'hizli_erisim' ? null : 'hizli_erisim')}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold transition-colors ${
+                openDropdown === 'hizli_erisim'
+                ? 'bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300'
+                : 'text-amber-600 hover:bg-amber-50 dark:text-amber-400 dark:hover:bg-amber-900/20'
+              }`}
+            >
+              <Star className={`w-3.5 h-3.5 ${openDropdown === 'hizli_erisim' ? 'fill-current' : ''}`} />
+              Hızlı Erişim
+              <ChevronDown className={`w-3 h-3 transition-transform ${openDropdown === 'hizli_erisim' ? 'rotate-180' : ''}`} />
+            </button>
+            
+            {openDropdown === 'hizli_erisim' && (
+              <div className="absolute top-full left-0 mt-1 w-64 bg-white dark:bg-slate-900 border border-amber-200 dark:border-amber-700/50 shadow-xl rounded-lg py-1 z-50">
+                {activeStarredDocs.map((docName, idx) => (
+                  <Link
+                    key={idx}
+                    to="/cikti-merkezi"
+                    search={{ sablonAd: docName }}
+                    onClick={() => setOpenDropdown(null)}
+                    className="flex items-center gap-2 px-3 py-2 text-xs text-slate-700 hover:bg-amber-50 hover:text-amber-700 dark:text-slate-300 dark:hover:bg-amber-900/30 dark:hover:text-amber-300"
+                  >
+                    <Star className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
+                    <span className="truncate">{docName}</span>
+                  </Link>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
         {dynamicActiveItems.map((item, idx) => (
           <div key={idx} className="relative inline-block">
             <button

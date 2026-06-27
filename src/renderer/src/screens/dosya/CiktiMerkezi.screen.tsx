@@ -1,11 +1,25 @@
 import React, { useState, useMemo, useCallback } from 'react'
 import { SubScreen } from './SubScreens.screen'
-import { Printer, Download, FileText, CheckSquare, Square, Layers, Loader2, Star, AlertCircle, RefreshCw, ChevronDown, ChevronRight } from 'lucide-react'
+import { Printer, Download, FileText, CheckSquare, Square, Layers, Loader2, Star, AlertCircle, RefreshCw, ChevronDown, ChevronRight, Eye, X } from 'lucide-react'
 import { useWorkspaceStore } from '../../store/workspaceStore'
 import Mustache from 'mustache'
 import { Sablon } from '../sablonlar/sablonlar.hooks'
 import { useCiktiMerkeziData } from './CiktiMerkezi.hooks'
 import { useDocumentLogger } from '../../hooks/useDocumentLogger'
+import { useRouterState } from '@tanstack/react-router'
+import { PrintManagerModal } from './components/PrintManagerModal'
+
+const normalizeForMatch = (str: string) => {
+  return str.toLocaleLowerCase('tr-TR')
+    .replace(/ğ/g, 'g')
+    .replace(/ü/g, 'u')
+    .replace(/ş/g, 's')
+    .replace(/ı/g, 'i')
+    .replace(/i̇/g, 'i')
+    .replace(/ö/g, 'o')
+    .replace(/ç/g, 'c')
+    .replace(/[^a-z0-9]/g, '');
+}
 
 export function CiktiMerkeziScreen(): React.JSX.Element {
   const { activeDosyaId, activeStarredDocs, setActiveStarredDocs } = useWorkspaceStore()
@@ -15,6 +29,11 @@ export function CiktiMerkeziScreen(): React.JSX.Element {
   const [processing, setProcessing] = useState(false)
   const [refreshing, setRefreshing] = useState(false)
   const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set())
+  const [previewSablon, setPreviewSablon] = useState<Sablon | null>(null)
+  const [isPrintManagerOpen, setIsPrintManagerOpen] = useState(false)
+  
+  const router = useRouterState()
+  const searchSablonAd = (router.location.search as any)?.sablonAd
 
   // localStarredDocs artık global store'dan geliyor; DB'deki starred_docs ile sync
   React.useEffect(() => {
@@ -51,6 +70,17 @@ export function CiktiMerkeziScreen(): React.JSX.Element {
     }
   }, [activeDosyaId, setActiveStarredDocs])
 
+  React.useEffect(() => {
+    if (searchSablonAd && sablons.length > 0) {
+      const found = sablons.find(s => normalizeForMatch(s.ad) === normalizeForMatch(searchSablonAd))
+      if (found && !selectedIds.has(found.id)) {
+        setSelectedIds(prev => new Set([...prev, found.id]))
+        const cat = found.kategori || 'Diğer'
+        setExpandedCategories(prev => new Set([...prev, cat]))
+      }
+    }
+  }, [searchSablonAd, sablons])
+
   const toggleCategory = (kategori: string) => {
     const newSet = new Set(expandedCategories)
     if (newSet.has(kategori)) {
@@ -74,12 +104,16 @@ export function CiktiMerkeziScreen(): React.JSX.Element {
   const toggleStar = async (sablonAd: string, e: React.MouseEvent) => {
     e.stopPropagation()
     if (!activeDosyaId) return
+    
+    const existingIdx = activeStarredDocs.findIndex(d => normalizeForMatch(d) === normalizeForMatch(sablonAd))
     let newDocs = [...activeStarredDocs]
-    if (newDocs.includes(sablonAd)) {
-      newDocs = newDocs.filter(d => d !== sablonAd)
+    
+    if (existingIdx >= 0) {
+      newDocs.splice(existingIdx, 1)
     } else {
       newDocs.push(sablonAd)
     }
+    
     setActiveStarredDocs(newDocs)  // Instantly update global store
     await window.electron.ipcRenderer.invoke(
       'db:execute',
@@ -160,15 +194,17 @@ export function CiktiMerkeziScreen(): React.JSX.Element {
     }
   }
 
-  const handleAction = async (action: 'pdf' | 'udf' | 'docx' | 'print') => {
-    if (selectedIds.size === 0) {
+  const handleAction = async (action: 'pdf' | 'udf' | 'docx' | 'print', specificIds?: number[]) => {
+    const targetIds = specificIds ? new Set(specificIds) : selectedIds
+    
+    if (targetIds.size === 0) {
       alert('Lütfen en az bir belge seçin.')
       return
     }
 
     setProcessing(true)
     try {
-      const selectedSablons = sablons.filter(s => selectedIds.has(s.id))
+      const selectedSablons = sablons.filter(s => targetIds.has(s.id))
 
       for (const sablon of selectedSablons) {
         const html = renderHtml(sablon)
@@ -190,6 +226,7 @@ export function CiktiMerkeziScreen(): React.JSX.Element {
       }
 
       if (action === 'print') {
+        setIsPrintManagerOpen(false)
         alert('Belgeler başarıyla yazdırma kuyruğuna gönderildi.')
       } else {
         alert('Belgeler başarıyla oluşturuldu ve kaydedildi.')
@@ -244,69 +281,6 @@ export function CiktiMerkeziScreen(): React.JSX.Element {
             </div>
           ) : (
             <div className="flex-1 overflow-y-auto pr-2 space-y-6 custom-scrollbar">
-              
-              {/* HIZLI ERİŞİM BÖLÜMÜ */}
-              {activeStarredDocs.length > 0 && (
-                <div className="bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-950/20 dark:to-orange-950/10 border border-amber-200/50 dark:border-amber-900/30 rounded-2xl p-4 shadow-sm mb-6">
-                  <div className="flex items-center gap-2 mb-3">
-                    <Star className="w-5 h-5 text-amber-500 fill-amber-500" />
-                    <h3 className="text-sm font-bold text-amber-900 dark:text-amber-500">Hızlı Erişim Belgeleri</h3>
-                  </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
-                    {activeStarredDocs.map((doc, idx) => {
-                      const sablon = sablons.find(s => s.ad === doc)
-                      const missingMsg = sablon ? getMissingRequirement(sablon) : null
-                      const isPrintable = !!sablon
-                      
-                      return (
-                        <div 
-                          key={idx}
-                          onClick={() => {
-                            if (isPrintable) toggleSelect(sablon.id)
-                          }}
-                          className={`flex items-center gap-3 p-2.5 rounded-xl border transition-all ${
-                            !isPrintable
-                              ? 'bg-slate-50 border-slate-200 cursor-default dark:bg-slate-900/50 dark:border-slate-800'
-                              : missingMsg 
-                                ? 'bg-white/40 border-amber-200/50 opacity-70 cursor-not-allowed dark:bg-slate-900/50 dark:border-amber-900/30'
-                                : selectedIds.has(sablon.id)
-                                  ? 'bg-amber-100/50 border-amber-300 text-amber-900 cursor-pointer dark:bg-amber-900/30 dark:border-amber-700/50 dark:text-amber-300'
-                                  : 'bg-white/80 border-amber-200/60 text-slate-700 cursor-pointer hover:border-amber-400 dark:bg-slate-900/80 dark:border-amber-800/40 dark:text-slate-300'
-                          }`}
-                        >
-                          <div className="shrink-0">
-                            {!isPrintable ? (
-                              <FileText className="w-4 h-4 text-slate-400" />
-                            ) : missingMsg ? (
-                              <span title={missingMsg ?? undefined}>
-                                <AlertCircle className="w-4 h-4 text-rose-500" />
-                              </span>
-                            ) : selectedIds.has(sablon.id) ? (
-                              <CheckSquare className="w-4 h-4 text-amber-600 dark:text-amber-500" />
-                            ) : (
-                              <Square className="w-4 h-4 text-slate-300 dark:text-slate-600" />
-                            )}
-                          </div>
-                          <div className="flex-1 min-w-0" title={missingMsg || doc}>
-                            <p className={`text-[11px] font-bold truncate ${missingMsg ? 'text-slate-500 line-through' : ''}`}>
-                              {doc}
-                              {!isPrintable && <span className="text-[9px] font-normal text-slate-400 ml-2">(Sadece Ekran)</span>}
-                            </p>
-                          </div>
-                          <button
-                            onClick={(e) => toggleStar(doc, e)}
-                            className="shrink-0 p-1 text-amber-500 hover:bg-amber-100 dark:hover:bg-amber-900/50 rounded-lg transition-colors"
-                            title="Hızlı Erişimden Çıkar"
-                          >
-                            <Star className="w-3.5 h-3.5 fill-amber-500" />
-                          </button>
-                        </div>
-                      )
-                    })}
-                  </div>
-                </div>
-              )}
-
               {Object.entries(groupedSablons).map(([kategori, items]) => {
                 const isExpanded = expandedCategories.has(kategori)
                 return (
@@ -343,7 +317,7 @@ export function CiktiMerkeziScreen(): React.JSX.Element {
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-2 pl-4">
                     {items.map((sablon) => {
                       const missingMsg = getMissingRequirement(sablon)
-                      const isStarred = activeStarredDocs.includes(sablon.ad)
+                      const isStarred = activeStarredDocs.some(d => normalizeForMatch(d) === normalizeForMatch(sablon.ad))
                       
                       return (
                       <div 
@@ -372,17 +346,29 @@ export function CiktiMerkeziScreen(): React.JSX.Element {
                           <p className={`text-xs font-bold truncate ${missingMsg ? 'text-slate-500 line-through' : ''}`}>{sablon.ad}</p>
                           <p className="text-[10px] text-slate-500 truncate" title={sablon.dosya_adi}>{sablon.dosya_adi}</p>
                         </div>
-                        <button
-                          onClick={(e) => toggleStar(sablon.ad, e)}
-                          className={`shrink-0 p-1.5 rounded-lg transition-colors ${
-                            isStarred 
-                              ? 'text-amber-500 bg-amber-50 hover:bg-amber-100 dark:bg-amber-900/20 dark:hover:bg-amber-900/40' 
-                              : 'text-slate-300 hover:text-amber-500 hover:bg-slate-100 dark:text-slate-600 dark:hover:bg-slate-800'
-                          }`}
-                          title={isStarred ? "Hızlı Erişimden Çıkar" : "Hızlı Erişime Ekle"}
-                        >
-                          <Star className={`w-4 h-4 ${isStarred ? 'fill-amber-500' : ''}`} />
-                        </button>
+                        <div className="flex items-center gap-1 shrink-0">
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation()
+                              setPreviewSablon(sablon)
+                            }}
+                            className="p-1.5 rounded-lg transition-colors text-slate-300 hover:text-blue-500 hover:bg-slate-100 dark:text-slate-600 dark:hover:bg-slate-800"
+                            title="Önizle"
+                          >
+                            <Eye className="w-4 h-4" />
+                          </button>
+                          <button
+                            onClick={(e) => toggleStar(sablon.ad, e)}
+                            className={`p-1.5 rounded-lg transition-colors ${
+                              isStarred 
+                                ? 'text-amber-500 bg-amber-50 hover:bg-amber-100 dark:bg-amber-900/20 dark:hover:bg-amber-900/40' 
+                                : 'text-slate-300 hover:text-amber-500 hover:bg-slate-100 dark:text-slate-600 dark:hover:bg-slate-800'
+                            }`}
+                            title={isStarred ? "Hızlı Erişimden Çıkar" : "Hızlı Erişime Ekle"}
+                          >
+                            <Star className={`w-4 h-4 ${isStarred ? 'fill-amber-500' : ''}`} />
+                          </button>
+                        </div>
                       </div>
                     )})}
                       </div>
@@ -402,8 +388,8 @@ export function CiktiMerkeziScreen(): React.JSX.Element {
           </div>
 
           <button
-            onClick={() => handleAction('print')}
-            disabled={processing || selectedIds.size === 0}
+            onClick={() => setIsPrintManagerOpen(true)}
+            disabled={processing || (selectedIds.size === 0 && activeStarredDocs.length === 0)}
             className="w-full flex items-center gap-3 p-4 bg-slate-800 hover:bg-slate-900 text-white rounded-2xl disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-md shadow-slate-900/10 cursor-pointer"
           >
             <Printer className="w-5 h-5 text-slate-300" />
@@ -459,6 +445,36 @@ export function CiktiMerkeziScreen(): React.JSX.Element {
 
         </div>
       </div>
+
+      {/* ÖNİZLEME MODALI */}
+      {previewSablon && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-8 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl shadow-2xl w-full max-w-5xl h-[85vh] flex flex-col overflow-hidden animate-in zoom-in-95 duration-200">
+            {/* Modal Header */}
+            <div className="flex items-center justify-between p-4 border-b border-slate-200 dark:border-slate-800 shrink-0 bg-slate-50 dark:bg-slate-900/50">
+              <div>
+                <h3 className="font-bold text-slate-800 dark:text-slate-200 text-lg">{previewSablon.ad}</h3>
+                <p className="text-xs text-slate-500">{previewSablon.dosya_adi}</p>
+              </div>
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={(e) => toggleStar(previewSablon.ad, e as any)}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold transition-all ${
+                    activeStarredDocs.some(d => d.localeCompare(previewSablon.ad, 'tr', { sensitivity: 'base' }) === 0)
+                      ? 'bg-amber-100 text-amber-700 hover:bg-amber-200 dark:bg-amber-900/40 dark:text-amber-300 dark:hover:bg-amber-900/60 border border-amber-300 dark:border-amber-700/50'
+                      : 'bg-white text-slate-600 hover:text-amber-600 hover:border-amber-400 dark:bg-slate-800 dark:text-slate-300 border border-slate-300 dark:border-slate-700'
+                  }`}
+            {/* Modal Body */}
+            <div className="flex-1 bg-slate-100 dark:bg-slate-950 p-4 relative min-h-0">
+              <iframe
+                srcDoc={renderHtml(previewSablon)}
+                className="w-full h-full bg-white rounded-xl shadow-inner border border-slate-200 dark:border-slate-800"
+                sandbox="allow-same-origin"
+              />
+            </div>
+          </div>
+        </div>
+      )}
     </SubScreen>
   )
 }
