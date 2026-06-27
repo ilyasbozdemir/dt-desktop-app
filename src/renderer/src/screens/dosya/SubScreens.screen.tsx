@@ -81,10 +81,9 @@ export function SubScreen({ title, icon: Icon, description, children }: SubScree
     setActiveStarredDocs(newDocs)  // Instantly sync to global store
     
     await window.electron.ipcRenderer.invoke(
-      'db:execute',
+      'db:run',
       'UPDATE DATA_TeminDosyasi SET starred_docs = ? WHERE id = ?',
-      JSON.stringify(newDocs),
-      activeDosyaId
+      [JSON.stringify(newDocs), activeDosyaId]
     )
   }
 
