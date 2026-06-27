@@ -644,7 +644,7 @@ if (!gotTheLock && !isMultiInstance) {
     ipcMain.handle('workspace:create', async (_, filePath: string, institutionName: string) => {
       try {
         const meta = workspaceManager.create(filePath, institutionName)
-        return { success: true, meta }
+        return { success: true, meta, newFilePath: workspaceManager.getCurrentFilePath() }
       } catch (error: any) {
         console.error('Create workspace error:', error)
         return { success: false, error: error.message }
@@ -695,7 +695,7 @@ if (!gotTheLock && !isMultiInstance) {
       try {
         closeAllSecondaryWindows()
         const meta = workspaceManager.open(filePath, allowMigration)
-        return { success: true, meta }
+        return { success: true, meta, newFilePath: workspaceManager.getCurrentFilePath() }
       } catch (error: any) {
         if (error.message && error.message.startsWith('MIGRATION_REQUIRED|')) {
            const payloadStr = error.message.split('|')[1]

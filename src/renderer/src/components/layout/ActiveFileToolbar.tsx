@@ -158,7 +158,7 @@ export function ActiveFileToolbar(): React.JSX.Element | null {
   if (!activeDosyaId) return null
 
   return (
-    <div className="h-12 bg-white/95 dark:bg-slate-900/95 backdrop-blur shadow-sm border-b border-slate-200 dark:border-slate-800 flex items-center px-4 gap-2 shrink-0 z-40 relative">
+    <div className="min-h-[3rem] py-1.5 bg-white/95 dark:bg-slate-900/95 backdrop-blur shadow-sm border-b border-slate-200 dark:border-slate-800 flex flex-wrap items-center px-4 gap-2 shrink-0 z-40 relative">
       {!isDosyaWindowMode && (
         <button
           onClick={() => setActiveDosyaId(null)}

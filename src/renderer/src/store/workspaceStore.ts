@@ -86,11 +86,12 @@ export const useWorkspaceStore = create<WorkspaceState>((set, get) => ({
       }
 
       if (result.success) {
-        const isSameFile = sessionStorage.getItem('workspace_path') === filePath
+        const actualFilePath = result.newFilePath || filePath
+        const isSameFile = sessionStorage.getItem('workspace_path') === actualFilePath
         const wasAuth = sessionStorage.getItem('workspace_auth') === 'true'
         const keepAuth = isSameFile && wasAuth
 
-        sessionStorage.setItem('workspace_path', filePath)
+        sessionStorage.setItem('workspace_path', actualFilePath)
         sessionStorage.setItem('workspace_auth', keepAuth ? 'true' : 'false')
         
         if (!keepAuth) {
@@ -98,8 +99,8 @@ export const useWorkspaceStore = create<WorkspaceState>((set, get) => ({
         }
 
         set({
-          activeFilePath: filePath,
-          fileName: filePath.split(/[/\\]/).pop() || 'Bilinmeyen Dosya',
+          activeFilePath: actualFilePath,
+          fileName: actualFilePath.split(/[/\\]/).pop() || 'Bilinmeyen Dosya',
           isAuthenticated: keepAuth,
           activeMeta: result.meta || null,
           activeDosyaId: keepAuth
@@ -110,8 +111,8 @@ export const useWorkspaceStore = create<WorkspaceState>((set, get) => ({
         })
         
         // Add to recent files
-        const nameWithoutExt = filePath.split(/[/\\]/).pop()?.replace(/\.dt[ma]$/i, '') || 'Bilinmeyen Kurum'
-        window.electron.ipcRenderer.invoke('app:add-recent-file', filePath, nameWithoutExt).catch(console.error)
+        const nameWithoutExt = actualFilePath.split(/[/\\]/).pop()?.replace(/\.dt[ma]$/i, '') || 'Bilinmeyen Kurum'
+        window.electron.ipcRenderer.invoke('app:add-recent-file', actualFilePath, nameWithoutExt).catch(console.error)
 
         return { success: true }
       }
@@ -138,20 +139,21 @@ export const useWorkspaceStore = create<WorkspaceState>((set, get) => ({
         adminPassword || ''
       )
       if (result.success) {
-        sessionStorage.setItem('workspace_path', filePath)
+        const actualFilePath = result.newFilePath || filePath
+        sessionStorage.setItem('workspace_path', actualFilePath)
         sessionStorage.setItem('workspace_auth', 'true')
         sessionStorage.removeItem('workspace_dosya_id')
         set({
-          activeFilePath: filePath,
-          fileName: filePath.split(/[/\\]/).pop() || 'Bilinmeyen Dosya',
+          activeFilePath: actualFilePath,
+          fileName: actualFilePath.split(/[/\\]/).pop() || 'Bilinmeyen Dosya',
           isAuthenticated: true, // Auto-logged in on create
           activeMeta: result.meta || null,
           activeDosyaId: null
         })
 
         // Add to recent files
-        const nameWithoutExt = filePath.split(/[/\\]/).pop()?.replace(/\.dt[ma]$/i, '') || 'Bilinmeyen Kurum'
-        window.electron.ipcRenderer.invoke('app:add-recent-file', filePath, nameWithoutExt).catch(console.error)
+        const nameWithoutExt = actualFilePath.split(/[/\\]/).pop()?.replace(/\.dt[ma]$/i, '') || 'Bilinmeyen Kurum'
+        window.electron.ipcRenderer.invoke('app:add-recent-file', actualFilePath, nameWithoutExt).catch(console.error)
 
         return { success: true }
       }

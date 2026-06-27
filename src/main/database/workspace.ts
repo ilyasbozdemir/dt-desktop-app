@@ -1,6 +1,6 @@
 import AdmZip from 'adm-zip'
 import Database from 'better-sqlite3'
-import { app } from 'electron'
+import { app, dialog } from 'electron'
 import fs from 'fs'
 import path from 'path'
 import crypto from 'crypto'
@@ -300,7 +300,8 @@ export class DtmWorkspace {
     this.currentFilePath = filePath
     this.ensureTempDir()
 
-    const zip = new AdmZip(filePath)
+    const zipBuffer = fs.readFileSync(filePath)
+    const zip = new AdmZip(zipBuffer)
     zip.extractAllTo(this.tempDir, true)
 
     const metaPath = path.join(this.tempDir, 'meta.json')
@@ -412,20 +413,38 @@ export class DtmWorkspace {
       }
     }
 
-    // Otomatik uzantıyı .dtal yapma mantığı
+    // Otomatik uzantıyı .dtal yapma mantığı (Kullanıcı onaylı)
     if (!filePath.toLowerCase().endsWith('.dtal')) {
-      const ext = path.extname(filePath)
-      const newFilePath = filePath.substring(0, filePath.length - ext.length) + '.dtal'
-      
-      const newLockPath = newFilePath + '.lock'
-      try {
-        fs.writeFileSync(newLockPath, process.pid.toString(), { encoding: 'utf-8' })
-        if (fs.existsSync(lockPath)) {
-          fs.unlinkSync(lockPath)
+      const response = dialog.showMessageBoxSync({
+        type: 'question',
+        buttons: ['Evet, Güncelle', 'Hayır, Eski Uzantıda Bırak'],
+        defaultId: 0,
+        title: 'Eski Uzantı Tespit Edildi',
+        message: 'Açtığınız dosyanın uzantısı eski formattadır (.dta veya .dtm). Uygulama verimliliği ve uyumluluğu için uzantının yeni .dtal formatına dönüştürülmesi önerilir.\n\nDosya uzantısı güncellensin mi?'
+      })
+
+      if (response === 0) {
+        const ext = path.extname(filePath)
+        const newFilePath = filePath.substring(0, filePath.length - ext.length) + '.dtal'
+        
+        const newLockPath = newFilePath + '.lock'
+        try {
+          fs.writeFileSync(newLockPath, process.pid.toString(), { encoding: 'utf-8' })
+          
+          // Asıl dosyayı da yeniden adlandır ki kullanıcı eski dosyayı tekrar açmasın
+          if (fs.existsSync(filePath)) {
+            fs.renameSync(filePath, newFilePath)
+          }
+
+          if (fs.existsSync(lockPath)) {
+            fs.unlinkSync(lockPath)
+          }
+          this.currentFilePath = newFilePath
+        } catch (err: any) {
+          console.error('Uzantı değiştirilirken hata oluştu:', err)
+          // Eğer adlandırma başarısız olursa (ör. izin hatası), en azından orijinal yolda kal
+          this.currentFilePath = filePath
         }
-        this.currentFilePath = newFilePath
-      } catch (err: any) {
-        console.error('Yeni uzantı için kilit dosyası oluşturulamadı:', err)
       }
     }
 
@@ -434,6 +453,10 @@ export class DtmWorkspace {
   }
 
   public createWorkspace(filePath: string, institutionName: string): WorkspaceMeta {
+    if (!filePath.toLowerCase().endsWith('.dtal')) {
+      const ext = path.extname(filePath)
+      filePath = filePath.substring(0, filePath.length - ext.length) + '.dtal'
+    }
     const lockPath = filePath + '.lock'
     if (fs.existsSync(lockPath)) {
       throw new Error('LOCKED|Bu dosya şu anda başka bir pencerede veya programda açık durumda.')
