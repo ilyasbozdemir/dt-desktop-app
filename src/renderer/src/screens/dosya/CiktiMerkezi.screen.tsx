@@ -116,10 +116,9 @@ export function CiktiMerkeziScreen(): React.JSX.Element {
     
     setActiveStarredDocs(newDocs)  // Instantly update global store
     await window.electron.ipcRenderer.invoke(
-      'db:execute',
+      'db:run',
       'UPDATE DATA_TeminDosyasi SET starred_docs = ? WHERE id = ?',
-      JSON.stringify(newDocs),
-      activeDosyaId
+      [JSON.stringify(newDocs), activeDosyaId]
     )
   }
 
