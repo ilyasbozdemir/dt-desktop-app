@@ -17,19 +17,16 @@ export function useDocumentLogger() {
       if (existRes.success && existRes.data.length > 0) {
         // Varsa güncelleyelim (yeni dosya yolu, tarih vs.)
         await window.electron.ipcRenderer.invoke(
-          'db:execute',
+          'db:run',
           'UPDATE DATA_TeminBelge SET dosya_yolu = ?, created_at = CURRENT_TIMESTAMP WHERE id = ?',
-          dosyaYolu,
-          existRes.data[0].id
+          [dosyaYolu, existRes.data[0].id]
         )
       } else {
         // Yoksa yeni insert atalım
         await window.electron.ipcRenderer.invoke(
-          'db:execute',
+          'db:run',
           'INSERT INTO DATA_TeminBelge (temin_dosya_id, belge_adi, dosya_yolu) VALUES (?, ?, ?)',
-          activeDosyaId,
-          belgeAdi,
-          dosyaYolu
+          [activeDosyaId, belgeAdi, dosyaYolu]
         )
       }
     } catch (error) {
