@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useCallback } from 'react'
 import { SubScreen } from './SubScreens.screen'
-import { Printer, Download, FileText, CheckSquare, Square, Layers, Loader2, Star, AlertCircle, RefreshCw } from 'lucide-react'
+import { Printer, Download, FileText, CheckSquare, Square, Layers, Loader2, Star, AlertCircle, RefreshCw, ChevronDown, ChevronRight } from 'lucide-react'
 import { useWorkspaceStore } from '../../store/workspaceStore'
 import Mustache from 'mustache'
 import { Sablon } from '../sablonlar/sablonlar.hooks'
@@ -14,6 +14,7 @@ export function CiktiMerkeziScreen(): React.JSX.Element {
   const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set())
   const [processing, setProcessing] = useState(false)
   const [refreshing, setRefreshing] = useState(false)
+  const [expandedCategories, setExpandedCategories] = useState<Set<string>>(new Set())
 
   // localStarredDocs artık global store'dan geliyor; DB'deki starred_docs ile sync
   React.useEffect(() => {
@@ -49,6 +50,26 @@ export function CiktiMerkeziScreen(): React.JSX.Element {
       setRefreshing(false)
     }
   }, [activeDosyaId, setActiveStarredDocs])
+
+  const toggleCategory = (kategori: string) => {
+    const newSet = new Set(expandedCategories)
+    if (newSet.has(kategori)) {
+      newSet.delete(kategori)
+    } else {
+      newSet.add(kategori)
+    }
+    setExpandedCategories(newSet)
+  }
+
+  const toggleAllCategories = () => {
+    const allCats = Object.keys(groupedSablons)
+    const allExpanded = allCats.every(cat => expandedCategories.has(cat))
+    if (allExpanded) {
+      setExpandedCategories(new Set())
+    } else {
+      setExpandedCategories(new Set(allCats))
+    }
+  }
 
   const toggleStar = async (sablonAd: string, e: React.MouseEvent) => {
     e.stopPropagation()
@@ -205,6 +226,13 @@ export function CiktiMerkeziScreen(): React.JSX.Element {
               >
                 <RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin' : ''}`} />
               </button>
+              <button
+                onClick={toggleAllCategories}
+                className="p-1.5 rounded-lg border border-slate-200 dark:border-slate-700 text-slate-400 hover:text-blue-600 hover:border-blue-300 transition-all text-xs font-bold flex items-center gap-1"
+                title="Tüm Grupları Aç / Kapat"
+              >
+                {Object.keys(groupedSablons).every(cat => expandedCategories.has(cat)) ? 'Hepsini Kapat' : 'Hepsini Aç'}
+              </button>
             </div>
           </div>
 
@@ -277,20 +305,40 @@ export function CiktiMerkeziScreen(): React.JSX.Element {
                 </div>
               )}
 
-              {Object.entries(groupedSablons).map(([kategori, items]) => (
-                <div key={kategori} className="space-y-2">
-                  <div 
-                    className="flex items-center gap-2 px-2 py-1.5 hover:bg-slate-50 dark:hover:bg-slate-800/50 rounded-lg cursor-pointer transition-colors"
-                    onClick={() => toggleGroup(kategori)}
-                  >
-                    {items.filter((i) => !getMissingRequirement(i)).every(i => selectedIds.has(i.id)) ? (
-                      <CheckSquare className="w-4 h-4 text-blue-600" />
-                    ) : (
-                      <Square className="w-4 h-4 text-slate-400" />
-                    )}
-                    <h4 className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">{kategori}</h4>
-                  </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2 pl-4">
+              {Object.entries(groupedSablons).map(([kategori, items]) => {
+                const isExpanded = expandedCategories.has(kategori)
+                return (
+                  <div key={kategori} className="space-y-2">
+                    <div 
+                      className="flex items-center justify-between px-2 py-1.5 hover:bg-slate-50 dark:hover:bg-slate-800/50 rounded-lg cursor-pointer transition-colors"
+                      onClick={() => toggleCategory(kategori)}
+                    >
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation()
+                            toggleGroup(kategori)
+                          }}
+                          className="p-0.5 rounded hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors"
+                        >
+                          {items.filter((i) => !getMissingRequirement(i)).every(i => selectedIds.has(i.id)) ? (
+                            <CheckSquare className="w-4 h-4 text-blue-600" />
+                          ) : (
+                            <Square className="w-4 h-4 text-slate-400" />
+                          )}
+                        </button>
+                        <h4 className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">{kategori}</h4>
+                      </div>
+                      <div>
+                        {isExpanded ? (
+                          <ChevronDown className="w-4 h-4 text-slate-400" />
+                        ) : (
+                          <ChevronRight className="w-4 h-4 text-slate-400" />
+                        )}
+                      </div>
+                    </div>
+                    {isExpanded && (
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-2 pl-4">
                     {items.map((sablon) => {
                       const missingMsg = getMissingRequirement(sablon)
                       const isStarred = activeStarredDocs.includes(sablon.ad)
@@ -335,9 +383,11 @@ export function CiktiMerkeziScreen(): React.JSX.Element {
                         </button>
                       </div>
                     )})}
+                      </div>
+                    )}
                   </div>
-                </div>
-              ))}
+                )
+              })}
             </div>
           )}
         </div>
