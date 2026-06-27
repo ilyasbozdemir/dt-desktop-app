@@ -1,8 +1,13 @@
-import { app, shell, BrowserWindow, ipcMain, dialog, Tray, Menu, session } from 'electron'
+import { app, shell, BrowserWindow, ipcMain, dialog, Tray, Menu, session, protocol } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import { autoUpdater } from 'electron-updater'
 import fs from 'fs'
+
+protocol.registerSchemesAsPrivileged([
+  { scheme: 'dta-res', privileges: { standard: true, secure: true, supportFetchAPI: true, corsEnabled: true, stream: true } }
+])
+
 import icon from '../../resources/icon.png?asset'
 import { workspaceManager } from './database/workspace'
 import { CURRENT_SCHEMA_VERSION } from './database/migrate'
@@ -189,6 +194,21 @@ if (!gotTheLock && !isMultiInstance) {
   // initialization and is ready to create browser windows.
   // Some APIs can only be used after this event occurs.
   app.whenReady().then(() => {
+    // Custom Protocol: dta-res:// -> local resource mapping
+    protocol.handle('dta-res', (request) => {
+      const urlPath = decodeURIComponent(new URL(request.url).pathname)
+      // In development, resolve relative to project root
+      // In production, resolve relative to app.getPath('userData') or process.resourcesPath
+      const resourcesDir = app.isPackaged
+        ? process.resourcesPath
+        : join(__dirname, '../../resources')
+      
+      const targetFilePath = join(resourcesDir, urlPath)
+      const fileUrl = `file://${targetFilePath}`
+      const { net } = require('electron')
+      return net.fetch(fileUrl)
+    })
+
     if (process.platform === 'win32') {
       app.setUserTasks([
         {

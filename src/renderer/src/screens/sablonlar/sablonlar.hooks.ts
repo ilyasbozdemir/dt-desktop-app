@@ -12,6 +12,7 @@ export interface Sablon {
   versiyon: number
   kategori: string | null
   test_verisi: string | null
+  route_path: string | null
   created_at: string
   updated_at: string
 }

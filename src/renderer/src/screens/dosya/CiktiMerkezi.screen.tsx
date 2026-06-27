@@ -1,6 +1,6 @@
-import React, { useState, useMemo } from 'react'
+import React, { useState, useMemo, useCallback } from 'react'
 import { SubScreen } from './SubScreens.screen'
-import { Printer, Download, FileText, CheckSquare, Square, Layers, Loader2, Star, AlertCircle } from 'lucide-react'
+import { Printer, Download, FileText, CheckSquare, Square, Layers, Loader2, Star, AlertCircle, RefreshCw } from 'lucide-react'
 import { useWorkspaceStore } from '../../store/workspaceStore'
 import Mustache from 'mustache'
 import { Sablon } from '../sablonlar/sablonlar.hooks'
@@ -8,35 +8,64 @@ import { useCiktiMerkeziData } from './CiktiMerkezi.hooks'
 import { useDocumentLogger } from '../../hooks/useDocumentLogger'
 
 export function CiktiMerkeziScreen(): React.JSX.Element {
-  const { activeDosyaId } = useWorkspaceStore()
+  const { activeDosyaId, activeStarredDocs, setActiveStarredDocs } = useWorkspaceStore()
   const { sablons, loading, masterHtml, dosyaContext, activeDosya } = useCiktiMerkeziData(activeDosyaId)
   const { logDocument } = useDocumentLogger()
   const [selectedIds, setSelectedIds] = useState<Set<number>>(new Set())
   const [processing, setProcessing] = useState(false)
-  
-  const starredDocs = useMemo(() => {
-    if (!activeDosya?.starred_docs) return []
-    try { return JSON.parse(activeDosya.starred_docs) } catch(e) { return [] }
-  }, [activeDosya?.starred_docs])
+  const [refreshing, setRefreshing] = useState(false)
+
+  // localStarredDocs artık global store'dan geliyor; DB'deki starred_docs ile sync
+  React.useEffect(() => {
+    if (activeDosya?.starred_docs) {
+      try {
+        const docs = JSON.parse(activeDosya.starred_docs)
+        setActiveStarredDocs(docs)
+      } catch (_e) {
+        setActiveStarredDocs([])
+      }
+    } else {
+      setActiveStarredDocs([])
+    }
+  }, [activeDosya?.starred_docs, setActiveStarredDocs])
+
+  const handleRefresh = useCallback(async () => {
+    setRefreshing(true)
+    try {
+      if (activeDosyaId) {
+        const res = await window.electron.ipcRenderer.invoke(
+          'db:query',
+          'SELECT starred_docs FROM DATA_TeminDosyasi WHERE id = ?',
+          [activeDosyaId]
+        )
+        if (res.success && res.data.length > 0) {
+          try {
+            const docs = JSON.parse(res.data[0].starred_docs || '[]')
+            setActiveStarredDocs(docs)
+          } catch (_e) { /* noop */ }
+        }
+      }
+    } finally {
+      setRefreshing(false)
+    }
+  }, [activeDosyaId, setActiveStarredDocs])
 
   const toggleStar = async (sablonAd: string, e: React.MouseEvent) => {
     e.stopPropagation()
     if (!activeDosyaId) return
-    let newDocs = [...starredDocs]
+    let newDocs = [...activeStarredDocs]
     if (newDocs.includes(sablonAd)) {
       newDocs = newDocs.filter(d => d !== sablonAd)
     } else {
       newDocs.push(sablonAd)
     }
+    setActiveStarredDocs(newDocs)  // Instantly update global store
     await window.electron.ipcRenderer.invoke(
       'db:execute',
       'UPDATE DATA_TeminDosyasi SET starred_docs = ? WHERE id = ?',
       JSON.stringify(newDocs),
       activeDosyaId
     )
-    // To instantly reflect in UI without full reload we could manually update the state if we had a local one, 
-    // but CiktiMerkeziHooks re-fetches if dosya changes? Actually it only fetches on activeDosyaId.
-    // So we need local state for starred_docs to feel responsive. Let's fix that.
   }
 
   const groupedSablons = useMemo(() => {
@@ -164,9 +193,19 @@ export function CiktiMerkeziScreen(): React.JSX.Element {
               <Layers className="w-5 h-5 text-blue-500" />
               Dosya Belgeleri
             </h3>
-            <span className="text-xs bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded-lg text-slate-600 dark:text-slate-400 font-semibold">
-              {selectedIds.size} Seçili
-            </span>
+            <div className="flex items-center gap-2">
+              <span className="text-xs bg-slate-100 dark:bg-slate-800 px-2 py-1 rounded-lg text-slate-600 dark:text-slate-400 font-semibold">
+                {selectedIds.size} Seçili
+              </span>
+              <button
+                onClick={handleRefresh}
+                disabled={refreshing}
+                className="p-1.5 rounded-lg border border-slate-200 dark:border-slate-700 text-slate-400 hover:text-blue-600 hover:border-blue-300 transition-all"
+                title="Hızlı Erişim listesini yenile"
+              >
+                <RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin' : ''}`} />
+              </button>
+            </div>
           </div>
 
           {loading ? (
@@ -175,6 +214,69 @@ export function CiktiMerkeziScreen(): React.JSX.Element {
             </div>
           ) : (
             <div className="flex-1 overflow-y-auto pr-2 space-y-6 custom-scrollbar">
+              
+              {/* HIZLI ERİŞİM BÖLÜMÜ */}
+              {activeStarredDocs.length > 0 && (
+                <div className="bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-950/20 dark:to-orange-950/10 border border-amber-200/50 dark:border-amber-900/30 rounded-2xl p-4 shadow-sm mb-6">
+                  <div className="flex items-center gap-2 mb-3">
+                    <Star className="w-5 h-5 text-amber-500 fill-amber-500" />
+                    <h3 className="text-sm font-bold text-amber-900 dark:text-amber-500">Hızlı Erişim Belgeleri</h3>
+                  </div>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                    {activeStarredDocs.map((doc, idx) => {
+                      const sablon = sablons.find(s => s.ad === doc)
+                      const missingMsg = sablon ? getMissingRequirement(sablon) : null
+                      const isPrintable = !!sablon
+                      
+                      return (
+                        <div 
+                          key={idx}
+                          onClick={() => {
+                            if (isPrintable) toggleSelect(sablon.id)
+                          }}
+                          className={`flex items-center gap-3 p-2.5 rounded-xl border transition-all ${
+                            !isPrintable
+                              ? 'bg-slate-50 border-slate-200 cursor-default dark:bg-slate-900/50 dark:border-slate-800'
+                              : missingMsg 
+                                ? 'bg-white/40 border-amber-200/50 opacity-70 cursor-not-allowed dark:bg-slate-900/50 dark:border-amber-900/30'
+                                : selectedIds.has(sablon.id)
+                                  ? 'bg-amber-100/50 border-amber-300 text-amber-900 cursor-pointer dark:bg-amber-900/30 dark:border-amber-700/50 dark:text-amber-300'
+                                  : 'bg-white/80 border-amber-200/60 text-slate-700 cursor-pointer hover:border-amber-400 dark:bg-slate-900/80 dark:border-amber-800/40 dark:text-slate-300'
+                          }`}
+                        >
+                          <div className="shrink-0">
+                            {!isPrintable ? (
+                              <FileText className="w-4 h-4 text-slate-400" />
+                            ) : missingMsg ? (
+                              <span title={missingMsg ?? undefined}>
+                                <AlertCircle className="w-4 h-4 text-rose-500" />
+                              </span>
+                            ) : selectedIds.has(sablon.id) ? (
+                              <CheckSquare className="w-4 h-4 text-amber-600 dark:text-amber-500" />
+                            ) : (
+                              <Square className="w-4 h-4 text-slate-300 dark:text-slate-600" />
+                            )}
+                          </div>
+                          <div className="flex-1 min-w-0" title={missingMsg || doc}>
+                            <p className={`text-[11px] font-bold truncate ${missingMsg ? 'text-slate-500 line-through' : ''}`}>
+                              {doc}
+                              {!isPrintable && <span className="text-[9px] font-normal text-slate-400 ml-2">(Sadece Ekran)</span>}
+                            </p>
+                          </div>
+                          <button
+                            onClick={(e) => toggleStar(doc, e)}
+                            className="shrink-0 p-1 text-amber-500 hover:bg-amber-100 dark:hover:bg-amber-900/50 rounded-lg transition-colors"
+                            title="Hızlı Erişimden Çıkar"
+                          >
+                            <Star className="w-3.5 h-3.5 fill-amber-500" />
+                          </button>
+                        </div>
+                      )
+                    })}
+                  </div>
+                </div>
+              )}
+
               {Object.entries(groupedSablons).map(([kategori, items]) => (
                 <div key={kategori} className="space-y-2">
                   <div 
@@ -191,7 +293,7 @@ export function CiktiMerkeziScreen(): React.JSX.Element {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-2 pl-4">
                     {items.map((sablon) => {
                       const missingMsg = getMissingRequirement(sablon)
-                      const isStarred = starredDocs.includes(sablon.ad)
+                      const isStarred = activeStarredDocs.includes(sablon.ad)
                       
                       return (
                       <div 
@@ -207,7 +309,9 @@ export function CiktiMerkeziScreen(): React.JSX.Element {
                       >
                         <div className="shrink-0">
                           {missingMsg ? (
-                            <AlertCircle className="w-4 h-4 text-rose-500" title={missingMsg} />
+                            <span title={missingMsg ?? undefined}>
+                              <AlertCircle className="w-4 h-4 text-rose-500" />
+                            </span>
                           ) : selectedIds.has(sablon.id) ? (
                             <CheckSquare className="w-4 h-4 text-blue-600" />
                           ) : (

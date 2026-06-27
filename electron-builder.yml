@@ -28,6 +28,12 @@ files:
   - '!{tsconfig.json,tsconfig.node.json,tsconfig.web.json}'
 asarUnpack:
   - resources/**
+extraResources:
+  - from: resources/
+    to: .
+    filter:
+      - '**/*'
+
 
 win:
   executableName: DTAsistan

@@ -40,7 +40,7 @@ interface SubScreenProps {
 import { Star } from 'lucide-react'
 
 export function SubScreen({ title, icon: Icon, description, children }: SubScreenProps): React.JSX.Element {
-  const { activeDosyaId } = useWorkspaceStore()
+  const { activeDosyaId, setActiveStarredDocs } = useWorkspaceStore()
   const [activeDosya, setActiveDosya] = useState<any>(null)
   const [loading, setLoading] = useState(false)
   const [isStarred, setIsStarred] = useState(false)
@@ -64,12 +64,13 @@ export function SubScreen({ title, icon: Icon, description, children }: SubScree
           const docs = res.data[0].starred_docs ? JSON.parse(res.data[0].starred_docs) : []
           setStarredDocs(docs)
           setIsStarred(docs.includes(title))
+          setActiveStarredDocs(docs)  // Sync to global store
         } catch (e) {}
       }
     }).finally(() => {
       setLoading(false)
     })
-  }, [activeDosyaId, title])
+  }, [activeDosyaId, title, setActiveStarredDocs])
 
   const toggleStar = async () => {
     if (!activeDosyaId) return
@@ -81,6 +82,7 @@ export function SubScreen({ title, icon: Icon, description, children }: SubScree
     }
     setStarredDocs(newDocs)
     setIsStarred(!isStarred)
+    setActiveStarredDocs(newDocs)  // Instantly sync to global store
     
     await window.electron.ipcRenderer.invoke(
       'db:execute',

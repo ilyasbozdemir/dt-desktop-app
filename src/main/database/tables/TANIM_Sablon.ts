@@ -15,6 +15,7 @@ export const TANIM_Sablon = {
     { name: 'test_verisi', type: 'TEXT' },
     { name: 'html_yolu', type: 'TEXT' },
     { name: 'json_yolu', type: 'TEXT' },
+    { name: 'route_path', type: 'TEXT' },
     { name: 'created_at', type: 'DATETIME', default: 'CURRENT_TIMESTAMP' },
     { name: 'updated_at', type: 'DATETIME', default: 'CURRENT_TIMESTAMP' }
   ],

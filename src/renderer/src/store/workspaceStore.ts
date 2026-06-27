@@ -19,10 +19,12 @@ interface WorkspaceState {
   activeDosyaId: number | null
   isCreatingDosya: boolean
   activeMeta: WorkspaceMeta | null
+  activeStarredDocs: string[]
   setIsCreatingDosya: (flag: boolean) => void
   setActiveFile: (path: string | null) => void
   setIsAuthenticated: (auth: boolean) => void
   setActiveDosyaId: (id: number | null) => void
+  setActiveStarredDocs: (docs: string[]) => void
   openWorkspace: (filePath: string, allowMigration?: boolean) => Promise<{ success: boolean; error?: string; requiresMigration?: boolean; pendingUpdates?: any[] }>
   createWorkspace: (
     filePath: string,
@@ -47,7 +49,9 @@ export const useWorkspaceStore = create<WorkspaceState>((set, get) => ({
     : null,
   isCreatingDosya: false,
   activeMeta: null,
+  activeStarredDocs: [],
   setIsCreatingDosya: (flag) => set({ isCreatingDosya: flag }),
+  setActiveStarredDocs: (docs) => set({ activeStarredDocs: docs }),
   setActiveFile: (path) => {
     if (path) {
       sessionStorage.setItem('workspace_path', path)

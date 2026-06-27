@@ -110,6 +110,32 @@ function seedTemplates(db: Database.Database): void {
 
     if (!fs.existsSync(targetDir)) return;
 
+    // Her şablonun navigasyon route'u — dosya_adi (uzantsız) → app route
+    const ROUTE_BY_DOSYA_ADI: Record<string, string> = {
+      // Komisyon
+      'fiyat-arastirma-komisyonu-atama': '/dosya/komisyon/fiyat-arastirma',
+      'muayene-kabul-komisyonu-atama': '/dosya/komisyon/muayene-kabul',
+      'fiyat-arastirma-ve-muayene-komisyonu': '/dosya/komisyon/fiyat-muayene',
+      'komisyon-atama-onay-eki': '/dosya/komisyon/onay-eki',
+      // Malzemeler
+      'malzeme-hizmet-kalem-listesi': '/dosya/malzemeler/liste',
+      // Lüzum
+      'luzum-muzekkeresi-belgesi': '/dosya/luzum/belge',
+      'luzum-onay-eki': '/dosya/luzum/onay-eki',
+      'teslim-tesellum-belgesi': '/dosya/luzum/teslim-tesellum',
+      // Firmalar / Maliyet
+      'istekli-tedarikci-firmalar': '/dosya/firmalar-maliyet/istekliler',
+      'yaklasik-maliyet-hesap-cetveli': '/dosya/firmalar-maliyet/yaklasik',
+      'piyasa-fiyat-arastirma-tutanagi': '/dosya/firmalar-maliyet/tutanak',
+      // Onay
+      'dogrudan-temin-onay-belgesi': '/dosya/onay/dt-onay',
+      'ihale-onay-belgesi': '/dosya/onay/ihale-onay',
+      'butce-sorgusu': '/dosya/onay/butce-sorgu',
+      // Harcama
+      'harcama-talimati': '/dosya/harcama/talimat',
+      'harcama-pusulasi': '/dosya/harcama/pusula',
+    }
+
     const findHtmlFiles = (dir: string): string[] => {
       let results: string[] = []
       const list = fs.readdirSync(dir)
@@ -189,29 +215,33 @@ function seedTemplates(db: Database.Database): void {
       const relativeHtmlPath = path.relative(targetDir, filePath)
       const relativeJsonPath = fs.existsSync(jsonFilePath) ? path.relative(targetDir, jsonFilePath) : null
 
+      // route_path: dosya_adi'nın uzantsız hali ile ara
+      const dosya_adi_no_ext = dosya_adi.replace(/\.html$/, '')
+      const route_path = ROUTE_BY_DOSYA_ADI[dosya_adi_no_ext] || null
+
       const existing = db.prepare('SELECT * FROM TANIM_Sablon WHERE dosya_adi = ?').get(dosya_adi) as any
       if (!existing) {
         db.prepare(`
-          INSERT INTO TANIM_Sablon (ad, dosya_adi, dosya_turu, icerik, aciklama, aktif_mi, kategori, test_verisi, html_yolu, json_yolu)
-          VALUES (?, ?, 'html', ?, ?, 1, ?, ?, ?, ?)
-        `).run(ad, dosya_adi, content, 'Sistem varsayılan şablonu', kategori, testJsonContent, relativeHtmlPath, relativeJsonPath)
+          INSERT INTO TANIM_Sablon (ad, dosya_adi, dosya_turu, icerik, aciklama, aktif_mi, kategori, test_verisi, html_yolu, json_yolu, route_path)
+          VALUES (?, ?, 'html', ?, ?, 1, ?, ?, ?, ?, ?)
+        `).run(ad, dosya_adi, content, 'Sistem varsayılan şablonu', kategori, testJsonContent, relativeHtmlPath, relativeJsonPath, route_path)
         console.log(`[Seed] Seeded default template: ${dosya_adi} in category: ${kategori}`)
       } else {
         // Güncelle: Sadece sistem şablonu (versiyon = 1) ise diskteki güncel dosyadan güncelle
         if (existing.versiyon === 1) {
           db.prepare(`
             UPDATE TANIM_Sablon 
-            SET kategori = ?, icerik = ?, test_verisi = ?, html_yolu = ?, json_yolu = ? 
+            SET kategori = ?, icerik = ?, test_verisi = ?, html_yolu = ?, json_yolu = ?, route_path = COALESCE(route_path, ?)
             WHERE id = ?
-          `).run(kategori, content, testJsonContent, relativeHtmlPath, relativeJsonPath, existing.id)
+          `).run(kategori, content, testJsonContent, relativeHtmlPath, relativeJsonPath, route_path, existing.id)
           console.log(`[Seed] Updated default template: ${dosya_adi}`)
         } else {
-          // Kullanıcı özelleştirmişse (versiyon > 1) üzerine yazma, sadece yolları ekle
+          // Kullanıcı özelleştirmişse (versiyon > 1) üzerine yazma, sadece yolları ve route'u ekle
           db.prepare(`
             UPDATE TANIM_Sablon 
-            SET html_yolu = COALESCE(html_yolu, ?), json_yolu = COALESCE(json_yolu, ?) 
+            SET html_yolu = COALESCE(html_yolu, ?), json_yolu = COALESCE(json_yolu, ?), route_path = COALESCE(route_path, ?)
             WHERE id = ?
-          `).run(relativeHtmlPath, relativeJsonPath, existing.id)
+          `).run(relativeHtmlPath, relativeJsonPath, route_path, existing.id)
         }
       }
     }

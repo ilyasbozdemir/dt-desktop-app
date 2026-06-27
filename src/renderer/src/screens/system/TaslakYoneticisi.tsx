@@ -1,9 +1,8 @@
-import React, { useState } from 'react'
-import { Link, useNavigate } from '@tanstack/react-router'
+import React, { useState, useMemo } from 'react'
+import { Link } from '@tanstack/react-router'
 import {
   Star,
   FileText,
-  Search,
   Plus,
   ArrowRight,
   Trash2,
@@ -11,30 +10,26 @@ import {
 } from 'lucide-react'
 import { useQuery } from '@tanstack/react-query'
 import { useWorkspaceStore } from '../../store/workspaceStore'
+import { useSablonlar } from '../sablonlar/sablonlar.hooks'
 
-const ROUTE_MAP: Record<string, string> = {
-  "Fiyat Araştırma Komisyonu Atama": "/dosya/komisyon/fiyat-arastirma",
-  "Muayene Kabul Komisyonu Atama": "/dosya/komisyon/muayene-kabul",
-  "Fiyat Araştırma ve Muayene Komisyonu": "/dosya/komisyon/fiyat-muayene",
-  "Komisyon Atama Onay Eki": "/dosya/komisyon/onay-eki",
-  "Malzeme / Hizmet Kalem Listesi": "/dosya/malzemeler/liste",
-  "Lüzum Müzekkeresi Belgesi": "/dosya/luzum/belge",
-  "Lüzum Onay Eki": "/dosya/luzum/onay-eki",
-  "Teslim Tesellüm Belgesi": "/dosya/luzum/teslim-tesellum",
-  "İstekli Tedarikçi Firmalar": "/dosya/firmalar-maliyet/istekliler",
-  "Yaklaşık Maliyet Hesap Cetveli": "/dosya/firmalar-maliyet/yaklasik",
-  "Piyasa Fiyat Araştırma Tutanağı": "/dosya/firmalar-maliyet/tutanak",
-  "Doğrudan Temin Onay Belgesi": "/dosya/onay/dt-onay",
-  "İhale Onay Belgesi": "/dosya/onay/ihale-onay",
-  "Bütçe Sorgusu": "/dosya/onay/butce-sorgu",
-  "Harcama Talimatı": "/dosya/harcama/talimat",
-  "Harcama Pusulası": "/dosya/harcama/pusula"
-}
+// DB'den gelen route_path'e fallback: şablon adı bilinmiyorsa çıktı merkezine git
+const FALLBACK_ROUTE = '/dosya/cikti-merkezi'
 
 export default function TaslakYoneticisi(): React.JSX.Element {
   const [activeTab, setActiveTab] = useState<'kisayollar' | 'taslaklar'>('kisayollar')
   const { setActiveDosyaId } = useWorkspaceStore()
-  const navigate = useNavigate()
+
+  // Şablonları çek — route_path DB'den geliyor
+  const { data: sablonlar = [] } = useSablonlar()
+
+  // Şablon adı → route_path eşleşmesi (tümü DB'den)
+  const routeMap = useMemo(() => {
+    const map: Record<string, string> = {}
+    sablonlar.forEach((s) => {
+      if (s.route_path) map[s.ad] = s.route_path
+    })
+    return map
+  }, [sablonlar])
 
   // Dosyalardaki kısayolları bulalım
   const { data: dosyalar = [], isLoading: dosyalarLoading } = useQuery({
@@ -129,7 +124,7 @@ export default function TaslakYoneticisi(): React.JSX.Element {
                   </div>
                   <div className="space-y-2 mt-4">
                     {dosya.starred.map((doc: string, idx: number) => {
-                      const route = ROUTE_MAP[doc] || '/dosya/cikti-merkezi'
+                      const route = routeMap[doc] || FALLBACK_ROUTE
                       return (
                       <Link 
                         key={idx} 
@@ -195,7 +190,7 @@ export default function TaslakYoneticisi(): React.JSX.Element {
 
                     <div className="space-y-2 max-h-64 overflow-y-auto pr-1 custom-scrollbar">
                       {orderedDocs.map((doc, idx) => {
-                        const route = ROUTE_MAP[doc] || '/dosya/cikti-merkezi'
+                        const route = routeMap[doc] || FALLBACK_ROUTE
                         return (
                           <Link
                             key={idx}
