@@ -1,4 +1,11 @@
 !macro customInstall
+  ; --- .dtal Uzantısı (Varsayılan) ---
+  WriteRegStr HKCU "Software\Classes\.dtal" "" "DTAsistan.Document"
+  WriteRegStr HKCU "Software\Classes\.dtal" "Content Type" "application/x-dtal"
+  WriteRegStr HKCU "Software\Classes\.dtal\ShellNew" "NullFile" ""
+  WriteRegStr HKCU "Software\Classes\.dtal\ShellNew" "ItemName" "DT Asistan Lite Proje Dosyası"
+  WriteRegStr HKCU "Software\Classes\.dtal\ShellNew" "IconPath" '"$INSTDIR\DTAsistan.exe",0'
+
   ; --- .dtm Uzantısı ---
   WriteRegStr HKCU "Software\Classes\.dtm" "" "DTAsistan.Document"
   WriteRegStr HKCU "Software\Classes\.dtm" "Content Type" "application/x-dtm"
@@ -30,6 +37,7 @@
 !macroend
 
 !macro customUnInstall
+  DeleteRegKey HKCU "Software\Classes\.dtal"
   DeleteRegKey HKCU "Software\Classes\.dtm"
   DeleteRegKey HKCU "Software\Classes\.dta"
   DeleteRegKey HKCU "Software\Classes\.dte"

@@ -1,9 +1,14 @@
 appId: dev.ilyasbozdemir.dtasistan
 productName: DT Asistan Lite
 fileAssociations:
-  - ext: dta
+  - ext: dtal
     name: DT Asistan Lite Proje Dosyası
     description: DT Asistan Lite Proje Dosyası
+    role: Editor
+    icon: build/icon.png
+  - ext: dta
+    name: Doğrudan Temin Asistan Veri Dosyası (Eski)
+    description: DT Asistan Lite Veri Dosyası
     role: Editor
     icon: build/icon.png
   - ext: dtm

@@ -19,10 +19,15 @@ export interface FileFormat {
 
 export const SUPPORTED_FORMATS: FileFormat[] = [
   {
-    ext: 'dta',
-    label: 'Doğrudan Temin Asistan Veri Dosyası',
-    dialogName: 'DT Asistan Dosyası',
+    ext: 'dtal',
+    label: 'DT Asistan Lite Dosyası',
+    dialogName: 'DT Asistan Lite Dosyası',
     isDefault: true
+  },
+  {
+    ext: 'dta',
+    label: 'Doğrudan Temin Asistan Veri Dosyası (Eski)',
+    dialogName: 'Eski DT Asistan Dosyası'
   },
   {
     ext: 'dtm',
@@ -31,8 +36,8 @@ export const SUPPORTED_FORMATS: FileFormat[] = [
   },
   {
     ext: 'dte',
-    label: 'Doğrudan Temin Veri Aktarım Dosyası',
-    dialogName: 'DT Veri Aktarım Dosyası'
+    label: 'Doğrudan Temin Veri Aktarım Dosyası (Eski)',
+    dialogName: 'Eski DT Veri Aktarım Dosyası'
   }
 ]
 

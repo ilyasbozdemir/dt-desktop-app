@@ -410,6 +410,23 @@ export class DtmWorkspace {
       }
     }
 
+    // Otomatik uzantıyı .dtal yapma mantığı
+    if (!filePath.toLowerCase().endsWith('.dtal')) {
+      const ext = path.extname(filePath)
+      const newFilePath = filePath.substring(0, filePath.length - ext.length) + '.dtal'
+      
+      const newLockPath = newFilePath + '.lock'
+      try {
+        fs.writeFileSync(newLockPath, process.pid.toString(), { encoding: 'utf-8' })
+        if (fs.existsSync(lockPath)) {
+          fs.unlinkSync(lockPath)
+        }
+        this.currentFilePath = newFilePath
+      } catch (err: any) {
+        console.error('Yeni uzantı için kilit dosyası oluşturulamadı:', err)
+      }
+    }
+
     this.meta = meta
     return meta
   }
