@@ -188,6 +188,25 @@ export function buildDocumentContext(
     isBold: item.isBold || false
   }))
 
+  // evrakSayisi formatting: detsisno-yil-sayisi
+  const detsisNo = kurum?.detsis_kodu || ''
+  const dosyaYili = dosyaResData?.butce_yili || (dosyaResData?.tarih ? dosyaResData.tarih.split('.')[2] : new Date().getFullYear())
+  const dosyaSayisi = dosyaResData?.temin_no || ''
+  
+  let formattedEvrakSayisi = 'Belirtilmedi'
+  if (detsisNo) {
+    if (dosyaYili && dosyaSayisi) {
+      const cleanSayi = dosyaSayisi.includes('/') 
+        ? dosyaSayisi.split('/').pop() 
+        : (dosyaSayisi.includes('-') ? dosyaSayisi.split('-').pop() : dosyaSayisi)
+      formattedEvrakSayisi = `${detsisNo}-${dosyaYili}-${cleanSayi}`
+    } else {
+      formattedEvrakSayisi = detsisNo
+    }
+  } else if (dosyaSayisi) {
+    formattedEvrakSayisi = dosyaSayisi
+  }
+
   const context: any = {
     kapakDetaylari,
     tarih: today,
@@ -211,7 +230,7 @@ export function buildDocumentContext(
     kurumKep: kurum?.kep_adresi || '',
     kurumWeb: kurum?.web_sitesi || '',
     kurumIci: false,
-    evrakSayisi: dosyaResData?.temin_no || 'Belirtilmedi',
+    evrakSayisi: formattedEvrakSayisi,
     dosyaKonusu: dosyaResData?.konu || 'Konu Belirtilmedi',
     isAdi: dosyaResData?.konu || 'Konu Belirtilmedi',
     sayiYazıyla: SAYI_YAZI_MAP,
