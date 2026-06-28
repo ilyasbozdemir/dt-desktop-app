@@ -4,6 +4,7 @@ import { Star, FileText, Plus, ArrowRight, Trash2, FolderOpen } from 'lucide-rea
 import { useQuery } from '@tanstack/react-query'
 import { useWorkspaceStore } from '../../store/workspaceStore'
 import { useSablonlar } from '../sablonlar/sablonlar.hooks'
+import { subPagesMapping } from '../../constants/surecler'
 
 // DB'den gelen route_path'e fallback: şablon adı bilinmiyorsa çıktı merkezine git
 const FALLBACK_ROUTE = '/dosya/cikti-merkezi'
@@ -15,9 +16,16 @@ export default function TaslakYoneticisi(): React.JSX.Element {
   // Şablonları çek — route_path DB'den geliyor
   const { data: sablonlar = [] } = useSablonlar()
 
-  // Şablon adı → route_path eşleşmesi (tümü DB'den)
+  // Şablon adı → route_path eşleşmesi (tümü DB ve süreç tanımları)
   const routeMap = useMemo(() => {
     const map: Record<string, string> = {}
+
+    // Statik süreç sayfaları
+    subPagesMapping.forEach((p) => {
+      map[p.name] = p.path
+    })
+
+    // Dinamik şablonlar
     sablonlar.forEach((s) => {
       if (s.route_path) map[s.ad] = s.route_path
     })
@@ -30,13 +38,21 @@ export default function TaslakYoneticisi(): React.JSX.Element {
     queryFn: async () => {
       const res = await window.electron.ipcRenderer.invoke(
         'db:query',
-        'SELECT id, temin_no, konu, starred_docs FROM DATA_TeminDosyasi WHERE starred_docs IS NOT NULL AND starred_docs != "[]"'
+        'SELECT id, temin_no, konu, starred_docs FROM DATA_TeminDosyasi WHERE is_deleted = 0 AND starred_docs IS NOT NULL'
       )
       if (!res.success) return []
-      return res.data.map((d: any) => ({
-        ...d,
-        starred: JSON.parse(d.starred_docs || '[]')
-      }))
+      return res.data
+        .map((d: any) => {
+          try {
+            return {
+              ...d,
+              starred: JSON.parse(d.starred_docs || '[]')
+            }
+          } catch {
+            return { ...d, starred: [] }
+          }
+        })
+        .filter((d: any) => Array.isArray(d.starred) && d.starred.length > 0)
     }
   })
 

@@ -47,6 +47,8 @@ import {
   CiktiMerkeziScreen
 } from '../../screens/dosya/SubScreens.screen'
 
+import TaslakYoneticisi from '../../screens/system/TaslakYoneticisi'
+
 export const routeComponents: Record<string, React.ComponentType<any>> = {
   '/': DashboardScreen,
   '/dosyalar': DosyalarScreen,
@@ -59,6 +61,7 @@ export const routeComponents: Record<string, React.ComponentType<any>> = {
   '/komisyonlar/detay': KomisyonDetayScreen,
   '/komisyon-gorevleri': KomisyonGorevleriScreen,
   '/takip': TakipScreen,
+  '/taslakyonetim': TaslakYoneticisi,
   '/raporlar': RaporlarScreen,
   '/okaskod': OkasKodScreen,
   '/mevzuat': MevzuatScreen,
