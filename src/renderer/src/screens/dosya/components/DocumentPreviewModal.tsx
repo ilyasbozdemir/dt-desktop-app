@@ -51,12 +51,13 @@ export function DocumentPreviewModal({
     }
   };
 
-  // Initialization: Format context to JSON, or just leave as empty if we only want overrides
+  // Initialization: Format context to JSON on open
   useEffect(() => {
     if (isOpen) {
       setOverrideData({});
-      setOverrideJson("{\n  \n}");
-      setJsonError("");
+      // JSON tab'ı tam context ile başlat (tüm anahtarları göster)
+      setOverrideJson(JSON.stringify(baseContext, null, 2));
+      setJsonError('');
       updatePreview(baseContext);
     }
   }, [isOpen, baseContext, templateHtml, masterHtml]);

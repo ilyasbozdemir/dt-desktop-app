@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react'
 import { SAYI_YAZI_MAP, sayiyiYaziyaCevir, paraYaziyaCevir } from '../../constants/sayiEslesmeleri'
 import { getInstitutionSuffixes } from '../../utils/kurumHelper'
 import { Sablon } from '../sablonlar/sablonlar.hooks'
+import { subPagesMapping } from '../../constants/surecler'
+import { getDefaultMappingForProcess, ProcessMapping } from '../../constants/mappings'
 
 export function useCiktiMerkeziData(activeDosyaId: number | null) {
   const [sablons, setSablons] = useState<Sablon[]>([])
@@ -111,6 +113,26 @@ export function useCiktiMerkeziData(activeDosyaId: number | null) {
         const settings = await window.electron.ipcRenderer.invoke('db:get-settings')
         const subInstType = settings?.subInstitutionType || ''
         
+        // TANIM_Kurum'dan kurum bilgilerini al (yeni tablo)
+        const kurumRes = await window.electron.ipcRenderer.invoke(
+          'db:query',
+          'SELECT * FROM TANIM_Kurum WHERE id = 1'
+        )
+        const kurum = kurumRes.success && kurumRes.data?.length > 0 ? kurumRes.data[0] : null
+
+        // Antet satırlarını parse et
+        let antetSatirlari: string[] = []
+        if (kurum?.kurum_anteti) {
+          try {
+            const parsed = JSON.parse(kurum.kurum_anteti)
+            if (Array.isArray(parsed)) {
+              antetSatirlari = parsed.filter((s: string) => s && s.trim() !== '')
+            }
+          } catch {
+            antetSatirlari = kurum.kurum_anteti ? [kurum.kurum_anteti] : []
+          }
+        }
+
         const suffixes = getInstitutionSuffixes(subInstType, {
           label: settings?.customSubInstitutionLabel,
           kurumumuz: settings?.customSubInstitutionKurumumuz,
@@ -272,7 +294,42 @@ export function useCiktiMerkeziData(activeDosyaId: number | null) {
           isBold: item.isBold || false
         }))
 
+        // Dynamic mapping resolver
+        const resolvedMappings: Record<string, any> = {}
+        for (const process of subPagesMapping) {
+          const defaultMap = getDefaultMappingForProcess(process.path)
+          const overridesKey = `MAPPING_${process.path}_PLACEHOLDERS`
+          let overriddenMap: ProcessMapping = {}
+          if (settings && settings[overridesKey]) {
+            try {
+              overriddenMap = JSON.parse(settings[overridesKey])
+            } catch (e) {}
+          }
+          const activeMap = { ...defaultMap, ...overriddenMap }
+
+          for (const [sablonKey, colMap] of Object.entries(activeMap)) {
+            if (colMap && colMap.tablo && colMap.sutun) {
+              let val: any = null
+              if (colMap.tablo === 'TANIM_Kurum' && kurum) {
+                val = kurum[colMap.sutun as keyof typeof kurum]
+              } else if (colMap.tablo === 'DATA_TeminDosyasi' && dosyaRes.data?.[0]) {
+                val = dosyaRes.data[0][colMap.sutun]
+              }
+              
+              if (val !== null && val !== undefined) {
+                if (typeof val === 'string' && ((val.startsWith('[') && val.endsWith(']')) || (val.startsWith('{') && val.endsWith('}')))) {
+                  try {
+                    val = JSON.parse(val)
+                  } catch (e) {}
+                }
+                resolvedMappings[sablonKey] = val
+              }
+            }
+          }
+        }
+
         let context: any = {
+          ...resolvedMappings,
           kapakDetaylari,
           tarih: today,
           alimTuru: alimTuruText,
@@ -286,11 +343,15 @@ export function useCiktiMerkeziData(activeDosyaId: number | null) {
           yukleniciEposta: dosyaRes.data?.[0]?.yuklenici_firma_email || '',
           yukleniciVergiDairesi: dosyaRes.data?.[0]?.yuklenici_firma_vergi_dairesi || '',
           yukleniciVergiNo: dosyaRes.data?.[0]?.yuklenici_firma_vergi_no || '',
-          idareAdresi: settings?.kurumAdres || 'İdare Adresi Belirtilmedi',
-          idareTelefon: settings?.kurumTelefon || 'Telefon Belirtilmedi',
-          idareEposta: settings?.kurumEposta || 'E-posta Belirtilmedi',
-          idareVergiDairesi: settings?.taxOffice || '',
-          idareVergiNo: settings?.taxNumber || '',
+          idareAdresi: kurum?.adres || settings?.kurumAdres || 'İdare Adresi Belirtilmedi',
+          idareTelefon: kurum?.telefon || settings?.kurumTelefon || 'Telefon Belirtilmedi',
+          idareEposta: kurum?.eposta || settings?.kurumEposta || 'E-posta Belirtilmedi',
+          kurumAdres: kurum?.adres || settings?.kurumAdres || '',
+          kurumTelefon: kurum?.telefon || settings?.kurumTelefon || '',
+          kurumEposta: kurum?.eposta || settings?.kurumEposta || '',
+          kurumKep: kurum?.kep_adresi || '',
+          kurumWeb: kurum?.web_sitesi || '',
+          antetSatirlari,
           kurumIci: false,
           evrakSayisi: dosyaRes.data?.[0]?.temin_no || 'Belirtilmedi',
           dosyaKonusu: dosyaRes.data?.[0]?.konu || 'Konu Belirtilmedi',

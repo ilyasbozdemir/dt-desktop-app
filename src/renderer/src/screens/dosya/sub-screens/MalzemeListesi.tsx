@@ -19,11 +19,13 @@ export function MalzemeListesi(): React.JSX.Element {
     placeholders,
   } = useCiktiMerkeziData(activeDosyaId);
   const [previewModalOpen, setPreviewModalOpen] = useState(false);
-  const [previewData, setPreviewData] = useState<{
-    title: string;
-    templateHtml: string;
-    processPath: string;
-  } | null>(null);
+  const [previewData, setPreviewData] = useState<
+    {
+      title: string;
+      templateHtml: string;
+      processPath: string;
+    } | null
+  >(null);
 
   const state = useMalzemeListesi(activeDosyaId);
 
@@ -98,7 +100,23 @@ export function MalzemeListesi(): React.JSX.Element {
         </span>
         <div className="flex items-center gap-2">
           <button
-            onClick={() => handleOpenPreview("/dosya/luzum/talep-formu", "İhtiyaç Talep Formu")}
+            onClick={() =>
+              handleOpenPreview(
+                '/dosya/malzemeler/liste',
+                'Son Alım Fiyat Cetveli',
+              )}
+            disabled={ciktiLoading}
+            className="px-4 py-2 bg-violet-600 hover:bg-violet-700 text-white rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer shadow-sm disabled:opacity-50"
+          >
+            <FileText className="w-4 h-4" />
+            Son Alım Fiyat Cetveli
+          </button>
+          <button
+            onClick={() =>
+              handleOpenPreview(
+                "/dosya/luzum/talep-formu",
+                "İhtiyaç Talep Formu",
+              )}
             disabled={ciktiLoading}
             className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer shadow-sm disabled:opacity-50"
           >
@@ -106,7 +124,8 @@ export function MalzemeListesi(): React.JSX.Element {
             İhtiyaç Talep Formu
           </button>
           <button
-            onClick={() => handleOpenPreview("/dosya/malzemeler/liste", "İhtiyaç Listesi")}
+            onClick={() =>
+              handleOpenPreview("/dosya/malzemeler/liste", "İhtiyaç Listesi")}
             disabled={ciktiLoading}
             className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer shadow-sm disabled:opacity-50"
           >
