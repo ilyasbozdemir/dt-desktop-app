@@ -27,7 +27,7 @@ export default function SablonlarScreen(): React.JSX.Element {
   }
 
   return (
-    <div className="flex flex-col h-full animate-in fade-in slide-in-from-bottom-4 duration-300">
+    <div className="flex flex-col flex-1 min-h-0 animate-in fade-in slide-in-from-bottom-4 duration-300">
       <div className="flex-1 overflow-y-auto">
         <SablonListesi onEdit={handleEdit} onCreate={handleCreate} />
       </div>
