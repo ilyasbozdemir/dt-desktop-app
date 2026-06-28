@@ -6,6 +6,63 @@ import { useSablonlar, Sablon, useDbTables, useDbColumns } from '../sablonlar.ho
 import { subPagesMapping } from '../../../constants/surecler'
 import { getDefaultMappingForProcess, ProcessMapping, TableColumnMapping } from '../../../constants/mappings'
 
+const DB_DICTIONARY: Record<string, { label: string, columns: Record<string, string> }> = {
+  'DATA_TeminDosyasi': {
+    label: 'Dosya Ana Bilgileri',
+    columns: {
+      'id': 'Kayıt Numarası',
+      'temin_no': 'Kurum İçi Dosya Numarası',
+      'dosya_acilis_tarihi': 'Dosya Açılış Tarihi',
+      'konu': 'İşin Adı / Temin Konusu',
+      'isin_aciklamasi': 'İşin Detaylı Açıklaması',
+      'yaklasik_maliyet': 'Toplam Yaklaşık Maliyet',
+      'talep_tarihi': 'Talep Tarihi',
+      'talep_sayisi': 'Talep Sayısı (Belge No)'
+    }
+  },
+  'DATA_TeminKalem': {
+    label: 'İhtiyaç Listesi (Kalemler)',
+    columns: {
+      'sira_no': 'Sıra No',
+      'malzeme_adi': 'Malzeme / Hizmet Adı',
+      'miktar': 'Miktar',
+      'olcu_birimi': 'Ölçü Birimi',
+      'ortalama_fiyat': 'Ortalama / Yaklaşık Birim Fiyat'
+    }
+  },
+  'DATA_TeminFirma': {
+    label: 'Davetli/Katılımcı Firmalar',
+    columns: {
+      'unvan': 'Firma Unvanı',
+      'vergi_no': 'Vergi Numarası',
+      'teklif_toplami': 'Firmanın Verdiği Toplam Teklif',
+      'kazandi_mi': 'İhale Bu Firmada mı Kaldı? (1/0)'
+    }
+  },
+  'DATA_TeminKomisyon': {
+    label: 'Komisyon Üyeleri',
+    columns: {
+      'gorev_turu': 'Görev Türü (Asil/Yedek)',
+      'unvan': 'Üyenin Unvanı'
+    }
+  },
+  'TANIM_Birim': {
+    label: 'Birim (Müdürlük) Bilgileri',
+    columns: {
+      'ad': 'Birim Adı',
+      'harcama_yetkilisi_unvan': 'Harcama Yetkilisi Unvanı'
+    }
+  },
+  'TANIM_Personel': {
+    label: 'Personel Bilgileri',
+    columns: {
+      'ad_soyad': 'Adı Soyadı',
+      'unvan': 'Unvanı'
+    }
+  }
+}
+
+
 function VariableRow({ 
   variableKey, 
   mapping, 
@@ -33,7 +90,10 @@ function VariableRow({
           className="w-full px-2 py-1.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded text-xs focus:outline-none focus:ring-1 focus:ring-indigo-500"
         >
           <option value="">-- Tablo Seçin --</option>
-          {dbTables.map(t => <option key={t} value={t}>{t}</option>)}
+          {dbTables.map(t => {
+            const label = DB_DICTIONARY[t]?.label ? `${t} (${DB_DICTIONARY[t].label})` : t;
+            return <option key={t} value={t}>{label}</option>;
+          })}
         </select>
       </td>
       <td className="px-4 py-3 border-b border-slate-100 dark:border-slate-800">
@@ -45,7 +105,11 @@ function VariableRow({
           className="w-full px-2 py-1.5 bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded text-xs focus:outline-none focus:ring-1 focus:ring-indigo-500 disabled:opacity-50"
         >
           <option value="">-- Sütun Seçin --</option>
-          {dbColumns.map(c => <option key={c} value={c}>{c}</option>)}
+          {dbColumns.map(c => {
+             const t = mapping?.tablo || '';
+             const colLabel = DB_DICTIONARY[t]?.columns[c] ? `${c} (${DB_DICTIONARY[t].columns[c]})` : c;
+             return <option key={c} value={c}>{colLabel}</option>;
+          })}
         </select>
       </td>
       <td className="px-4 py-3 border-b border-slate-100 dark:border-slate-800 text-xs text-slate-500 truncate max-w-[200px]" title={mapping?.aciklama}>

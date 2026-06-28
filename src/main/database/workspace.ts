@@ -246,6 +246,20 @@ function seedTemplates(db: Database.Database): void {
           `).run(relativeHtmlPath, relativeJsonPath, route_path, existing.id)
         }
       }
+
+      // Ayrıca bu şablonun bir sürece (route_path) bağlı olduğu belirtilmişse, bunu varsayılan ayar olarak settings tablosuna ekle.
+      if (route_path) {
+        let sablonId = existing ? existing.id : null;
+        if (!sablonId) {
+          const newRow = db.prepare('SELECT id FROM TANIM_Sablon WHERE dosya_adi = ?').get(dosya_adi) as any;
+          if (newRow) sablonId = newRow.id;
+        }
+        if (sablonId) {
+          const mappingKey = `MAPPING_${route_path}_SABLON_ID`;
+          // Sadece daha önce ayarlanmamışsa ekle (kullanıcı değiştirdiyse ezme)
+          db.prepare(`INSERT OR IGNORE INTO settings (key, value) VALUES (?, ?)`).run(mappingKey, sablonId.toString());
+        }
+      }
     }
   } catch (err: any) {
     console.error('Error seeding templates:', err)
