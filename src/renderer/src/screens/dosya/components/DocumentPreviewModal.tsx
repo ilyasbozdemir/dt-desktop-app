@@ -56,7 +56,6 @@ export function DocumentPreviewModal({
     }
   };
 
-  // Merge baseContext with templateTestVerisi if provided
   const mergedContext = React.useMemo(() => {
     let testData = {};
     if (templateTestVerisi) {
@@ -65,6 +64,11 @@ export function DocumentPreviewModal({
       } catch (e) {
         console.error("Failed to parse template test verisi:", e);
       }
+    }
+    // Eğer gerçek dosya verisi varsa, dummy test verilerini karıştırmayalım ki kullanıcının yaptığı mapping net görünsün.
+    const hasRealData = baseContext && Object.keys(baseContext).length > 2; // logo vb. harici dosya verisi varsa
+    if (hasRealData) {
+      return { ...baseContext };
     }
     return { ...testData, ...baseContext };
   }, [baseContext, templateTestVerisi]);
