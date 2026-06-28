@@ -1,6 +1,6 @@
 export interface TemplateVariableDef {
   label: string;
-  type: 'string' | 'number' | 'boolean' | 'array' | 'object';
+  type: 'string' | 'number' | 'boolean' | 'array' | 'object' | 'date';
   description?: string;
 }
 
@@ -8,7 +8,7 @@ export const TemplateVariablesSchema: Record<string, TemplateVariableDef> = {
   antetSatirlari: { label: 'Antet Satırları', type: 'array' },
   evrakSayisi: { label: 'Evrak Sayısı', type: 'string' },
   dosyaKonusu: { label: 'Dosya Konusu', type: 'string' },
-  tarih: { label: 'Tarih', type: 'string' },
+  tarih: { label: 'Tarih', type: 'date' },
   sunulacakMakamAdi: { label: 'Sunulacak Makam Adı', type: 'string' },
   talepEdenPersonelAdi: { label: 'Talep Eden Personel Adı', type: 'string' },
   talepEdenPersonelUnvan: { label: 'Talep Eden Personel Ünvanı', type: 'string' },
@@ -26,7 +26,7 @@ export const TemplateVariablesSchema: Record<string, TemplateVariableDef> = {
   ihtiyacYeri: { label: 'İhtiyaç Yeri', type: 'string' },
   ihtiyacKalemleri: { label: 'İhtiyaç Kalemleri', type: 'array', description: 'Kodu, Malzeme Adı, Miktar gibi detayları içerir.' },
   olurYazisi: { label: 'Olur Yazısı Gösterilsin mi?', type: 'boolean' },
-  dosyaTarihi: { label: 'Dosya Tarihi', type: 'string' },
+  dosyaTarihi: { label: 'Dosya Tarihi', type: 'date' },
   onaylayanPersonelAdi: { label: 'Onaylayan Personel Adı', type: 'string' },
   onaylayanPersonelUnvan: { label: 'Onaylayan Personel Ünvanı', type: 'string' },
   

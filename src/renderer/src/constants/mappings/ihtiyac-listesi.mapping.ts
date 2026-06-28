@@ -28,7 +28,6 @@ export const IhtiyacListesiMapping: ProcessMapping = {
     aciklama: 'KDV hariç yaklaşık maliyet tutarı'
   },
   
-  // TANIM_Personel Tablosundan Çekilecekler (Örnek)
   personelAdi: {
     tablo: 'TANIM_Personel',
     sutun: 'ad_soyad',
