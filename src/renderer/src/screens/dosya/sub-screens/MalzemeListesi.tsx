@@ -117,6 +117,19 @@ export function MalzemeListesi(): React.JSX.Element {
 
       <MalzemeEkleModal state={state} />
       <MalzemeTablosu state={state} />
+
+      {previewData && (
+        <DocumentPreviewModal
+          isOpen={previewModalOpen}
+          onClose={() => setPreviewModalOpen(false)}
+          title={previewData.title}
+          templateHtml={previewData.templateHtml}
+          masterHtml={masterHtml || ""}
+          baseContext={dosyaContext}
+          onPrint={executePrint}
+          onExportPdf={executeExportPdf}
+        />
+      )}
     </SubScreen>
   );
 }

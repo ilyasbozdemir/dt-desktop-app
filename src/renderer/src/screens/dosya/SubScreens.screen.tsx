@@ -191,6 +191,7 @@ export function SubScreen(
 
 // 1. MALZEME LİSTESİ SCREEN
 
+export * from "./SubScreen";
 export * from "./sub-screens/MalzemeListesi";
 export * from "./sub-screens/IstekliFirmalar";
 export * from "./sub-screens/YaklasikMaliyetCetveli";
