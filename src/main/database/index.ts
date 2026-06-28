@@ -2,6 +2,7 @@ import Database from 'better-sqlite3'
 import { app } from 'electron'
 import { TANIM_Mevzuat } from './tables/TANIM_Mevzuat'
 import { TANIM_Personel } from './tables/TANIM_Personel'
+import { TANIM_Roller } from './tables/TANIM_Roller'
 import { TANIM_Birim } from './tables/TANIM_Birim'
 import { TANIM_Asama } from './tables/TANIM_Asama'
 import { DATA_TeminDosyasi } from './tables/DATA_TeminDosyasi'
@@ -55,6 +56,7 @@ export const schema = {
     TANIM_Mevzuat, // Yıllara göre limitler ve vergi oranları
     TANIM_Birim, // Kurum birimleri (Müdürlükler)
     TANIM_Personel, // Personel havuzu
+    TANIM_Roller, // Personel rolleri ve varsayılanlar
     TANIM_Asama, // İşlem aşamaları (Status)
     TANIM_Firma, // Kayıtlı firmalar havuzu
     TANIM_Ambar, // Ambar depoları

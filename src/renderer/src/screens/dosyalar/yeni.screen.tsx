@@ -133,10 +133,13 @@ export default function YeniDosyaScreen(): React.JSX.Element {
         const resBirim = await window.electron.ipcRenderer.invoke('db:query', 'SELECT * FROM TANIM_Birim WHERE aktif_mi = 1')
         const resPers = await window.electron.ipcRenderer.invoke('db:query', 'SELECT * FROM TANIM_Personel WHERE aktif_mi = 1')
         const resKod = await window.electron.ipcRenderer.invoke('db:query', 'SELECT * FROM TANIM_KodSozlugu WHERE aktif_mi = 1')
+        const resRoller = await window.electron.ipcRenderer.invoke('db:query', 'SELECT * FROM TANIM_Roller')
         
         if (resBirim.success) setBirimler(resBirim.data)
         if (resPers.success) setPersoneller(resPers.data)
         if (resKod.success) setKodSozlugu(resKod.data)
+
+        const roller = resRoller.success ? resRoller.data : []
 
         // Load existing document if in Edit Mode
         if (isEdit) {
@@ -160,6 +163,16 @@ export default function YeniDosyaScreen(): React.JSX.Element {
               teslim_tarihi: formatForInput(doc.teslim_tarihi)
             })
           }
+        } else {
+          // Yeni dosya ise varsayılan rolleri otomatik ata
+          setFormData(prev => ({
+            ...prev,
+            irtibat_yetkilisi_id: roller.find((r: any) => r.rol_kodu === 'ilgili_personel')?.varsayilan_personel_id || prev.irtibat_yetkilisi_id,
+            onay_personel_id: roller.find((r: any) => r.rol_kodu === 'harcama_yetkilisi' || r.rol_kodu === 'onaylayan')?.varsayilan_personel_id || prev.onay_personel_id,
+            hazirlayan_personel_id: roller.find((r: any) => r.rol_kodu === 'hazirlayan')?.varsayilan_personel_id || prev.hazirlayan_personel_id,
+            talep_eden_personel_id: roller.find((r: any) => r.rol_kodu === 'talep_eden')?.varsayilan_personel_id || prev.talep_eden_personel_id,
+            sunan_personel_id: roller.find((r: any) => r.rol_kodu === 'sunan_personel')?.varsayilan_personel_id || prev.sunan_personel_id
+          }))
         }
       } catch (err) {
         console.error('Veritabanı yüklenirken hata oluştu:', err)

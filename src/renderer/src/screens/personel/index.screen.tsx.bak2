@@ -3,17 +3,16 @@ import { usePersonelHooks, Personel, PersonelWithRoles, Rol } from './personel.h
 import { useBirimlerHooks } from '../birimler/birimler.hooks'
 import { Button } from '../../components/ui/Button'
 import { Input } from '../../components/ui/Input'
-import { Plus, Edit, Trash2, Users, Shield, ArrowLeft, HelpCircle, UserCheck, Save, X } from 'lucide-react'
-
-type ViewMode = 'list' | 'view' | 'form'
+import { Modal } from '../../components/ui/Modal'
+import { Plus, Edit, Trash2, Users, Shield, ArrowLeft, HelpCircle, UserCheck } from 'lucide-react'
 
 export default function PersonelScreen(): React.ReactNode {
   const { personelList, rollerList, isLoading: isPersonelLoading, addPersonel, updatePersonel, deletePersonel } =
     usePersonelHooks()
   const { birimler } = useBirimlerHooks()
-
-  const [viewMode, setViewMode] = useState<ViewMode>('list')
+  const [isModalOpen, setIsModalOpen] = useState(false)
   const [editingPersonel, setEditingPersonel] = useState<Personel | null>(null)
+
   const [viewingPersonel, setViewingPersonel] = useState<Personel | null>(null)
 
   const [formData, setFormData] = useState<PersonelWithRoles>({
@@ -27,7 +26,7 @@ export default function PersonelScreen(): React.ReactNode {
     assignedRoles: []
   })
 
-  const openForm = (e?: React.MouseEvent, personel?: Personel): void => {
+  const openModal = (e?: React.MouseEvent, personel?: Personel): void => {
     if (e) e.stopPropagation()
     if (personel) {
       setEditingPersonel(personel)
@@ -46,22 +45,16 @@ export default function PersonelScreen(): React.ReactNode {
         assignedRoles: []
       })
     }
-    setViewMode('form')
+    setIsModalOpen(true)
   }
 
-  const closeForm = (): void => {
-    setViewMode('list')
+  const closeModal = (): void => {
+    setIsModalOpen(false)
     setEditingPersonel(null)
   }
 
   const handleViewClick = (personel: Personel) => {
     setViewingPersonel(personel)
-    setViewMode('view')
-  }
-
-  const closeView = () => {
-    setViewingPersonel(null)
-    setViewMode('list')
   }
 
   const handleSubmit = async (e: React.FormEvent): Promise<void> => {
@@ -72,7 +65,7 @@ export default function PersonelScreen(): React.ReactNode {
       } else {
         await addPersonel(formData)
       }
-      closeForm()
+      closeModal()
     } catch (err) {
       console.error(err)
       alert('Kayıt sırasında bir hata oluştu!')
@@ -102,14 +95,14 @@ export default function PersonelScreen(): React.ReactNode {
     })
   }
 
-  if (viewMode === 'view' && viewingPersonel) {
+  if (viewingPersonel) {
     const rolesOfViewingPerson = rollerList.filter(r => r.varsayilan_personel_id === viewingPersonel.id)
     
     return (
       <div className="p-8 max-w-5xl mx-auto flex flex-col gap-6 w-full animate-in fade-in slide-in-from-bottom-4 duration-500 overflow-y-auto max-h-full">
         <Button 
           variant="ghost" 
-          onClick={closeView}
+          onClick={() => setViewingPersonel(null)}
           className="w-fit mb-2 text-slate-500 hover:text-slate-800 dark:hover:text-slate-200"
         >
           <ArrowLeft className="w-4 h-4 mr-2" />
@@ -177,144 +170,6 @@ export default function PersonelScreen(): React.ReactNode {
     )
   }
 
-  if (viewMode === 'form') {
-    return (
-      <div className="p-8 max-w-5xl mx-auto flex flex-col gap-6 w-full animate-in fade-in slide-in-from-bottom-4 duration-500 overflow-y-auto max-h-full">
-        <div className="flex items-center justify-between">
-          <Button 
-            variant="ghost" 
-            onClick={closeForm}
-            className="w-fit text-slate-500 hover:text-slate-800 dark:hover:text-slate-200"
-          >
-            <ArrowLeft className="w-4 h-4 mr-2" />
-            Listeye Geri Dön
-          </Button>
-          <h2 className="text-2xl font-bold text-slate-800 dark:text-slate-100 flex items-center gap-2">
-            {editingPersonel ? <Edit className="w-6 h-6 text-blue-500" /> : <Plus className="w-6 h-6 text-blue-500" />}
-            {editingPersonel ? 'Personel Düzenle' : 'Yeni Personel Ekle'}
-          </h2>
-        </div>
-        
-        <form onSubmit={handleSubmit} className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl p-8 shadow-sm space-y-8">
-          
-          <div className="space-y-6">
-            <div>
-              <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">Ad Soyad *</label>
-              <Input
-                required
-                autoFocus
-                placeholder="Örn: Ahmet Yılmaz"
-                value={formData.ad_soyad}
-                onChange={(e) => setFormData({ ...formData, ad_soyad: e.target.value })}
-                className="bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-sm py-2 h-11"
-              />
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">Unvan / Görevi</label>
-                <Input
-                  placeholder="Örn: İnşaat Mühendisi"
-                  value={formData.unvan || ''}
-                  onChange={(e) => setFormData({ ...formData, unvan: e.target.value })}
-                  className="bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-sm py-2 h-11"
-                />
-              </div>
-
-              <div>
-                <label className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2 flex items-center gap-1.5">
-                  Kurum Sicil No 
-                  <span className="text-[11px] text-slate-400 font-normal">(İsteğe Bağlı)</span>
-                  <span title="Personelin kurum içi sicil numarası"><HelpCircle className="w-4 h-4 text-blue-500 cursor-help ml-auto" /></span>
-                </label>
-                <Input
-                  placeholder="Örn: 12345"
-                  value={formData.sicil_no || ''}
-                  onChange={(e) => setFormData({ ...formData, sicil_no: e.target.value })}
-                  className="bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-sm py-2 h-11"
-                />
-              </div>
-            </div>
-
-            <div className="relative">
-              <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">Birim / Müdürlük</label>
-              <Input
-                list="birimler-list"
-                placeholder="-- Birim Seçin veya Arayın --"
-                value={formData.birim || ''}
-                onChange={(e) => setFormData({ ...formData, birim: e.target.value })}
-                className="bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-sm py-2 h-11"
-              />
-              <datalist id="birimler-list">
-                {birimler.map((b) => (
-                  <option key={b.id} value={b.birim_adi} />
-                ))}
-              </datalist>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">Telefon</label>
-                <Input
-                  placeholder="Örn: 0555..."
-                  value={formData.telefon || ''}
-                  onChange={(e) => setFormData({ ...formData, telefon: e.target.value })}
-                  className="bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-sm py-2 h-11"
-                />
-              </div>
-
-              <div>
-                <label className="block text-sm font-semibold text-slate-700 dark:text-slate-300 mb-2">E-Posta</label>
-                <Input
-                  type="email"
-                  placeholder="Örn: ornek@kurum.gov.tr"
-                  value={formData.eposta || ''}
-                  onChange={(e) => setFormData({ ...formData, eposta: e.target.value })}
-                  className="bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-sm py-2 h-11"
-                />
-              </div>
-            </div>
-
-            <div className="p-6 bg-slate-50 dark:bg-slate-900/50 rounded-2xl border border-slate-200 dark:border-slate-800 flex flex-col gap-4 mt-8">
-              <h4 className="text-sm font-bold text-slate-800 dark:text-slate-200 flex items-center gap-2">
-                <Shield className="w-5 h-5 text-blue-500" /> Şablonlarda Varsayılan Görev (Yetkilendirme)
-              </h4>
-              <p className="text-xs text-slate-500">Seçtiğiniz roller, yeni oluşturulan belgelerde bu personel adıyla otomatik doldurulacaktır.</p>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-2">
-                {rollerList.map(rol => (
-                  <label key={rol.rol_kodu} className="flex items-start gap-3 p-4 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-xl cursor-pointer hover:border-blue-400 dark:hover:border-blue-800 transition-colors group">
-                    <input
-                      type="checkbox"
-                      className="w-5 h-5 mt-0.5 text-blue-600 rounded border-slate-300 dark:border-slate-700 bg-transparent cursor-pointer"
-                      checked={formData.assignedRoles?.includes(rol.rol_kodu)}
-                      onChange={(e) => toggleRole(rol.rol_kodu, e.target.checked)}
-                    />
-                    <div className="flex flex-col">
-                      <span className="text-sm font-bold text-slate-800 dark:text-slate-200 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">{rol.rol_adi}</span>
-                      <span className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed mt-1">
-                        {rol.aciklama}
-                      </span>
-                    </div>
-                  </label>
-                ))}
-              </div>
-            </div>
-          </div>
-
-          <div className="flex justify-end gap-4 pt-6 border-t border-slate-100 dark:border-slate-800 mt-8">
-            <Button type="button" variant="outline" className="px-6 py-2.5 h-11" onClick={closeForm}>
-              <X className="w-4 h-4 mr-2" /> İptal
-            </Button>
-            <Button type="submit" className="bg-blue-600 hover:bg-blue-700 shadow-md px-8 py-2.5 h-11 text-sm">
-              <Save className="w-4 h-4 mr-2" /> {editingPersonel ? 'Değişiklikleri Kaydet' : 'Personeli Ekle'}
-            </Button>
-          </div>
-        </form>
-      </div>
-    )
-  }
-
   return (
     <div className="p-8 max-w-7xl mx-auto flex flex-col gap-6 w-full animate-in fade-in slide-in-from-bottom-4 duration-500 overflow-y-auto max-h-full">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 dark:border-slate-800 pb-4">
@@ -328,7 +183,7 @@ export default function PersonelScreen(): React.ReactNode {
           </p>
         </div>
         <Button
-          onClick={(e) => openForm(e)}
+          onClick={() => openModal()}
           className="gap-2 bg-blue-600 hover:bg-blue-700 shadow-md flex items-center px-4 py-2 text-sm shrink-0"
         >
           <Plus className="w-4 h-4" /> Yeni Personel Ekle
@@ -362,7 +217,7 @@ export default function PersonelScreen(): React.ReactNode {
                     title="Düzenle"
                     variant="ghost"
                     size="sm"
-                    onClick={(e) => openForm(e, p)}
+                    onClick={(e) => openModal(e, p)}
                     className="h-7 w-7 p-0 text-slate-400 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20"
                   >
                     <Edit className="w-3.5 h-3.5" />
@@ -409,6 +264,129 @@ export default function PersonelScreen(): React.ReactNode {
           )}
         </div>
       </div>
+
+      <Modal
+        isOpen={isModalOpen}
+        onClose={closeModal}
+        title={editingPersonel ? 'Personel Düzenle' : 'Yeni Personel Ekle'}
+        description="Personel bilgilerini ve yetkilerini belirleyin."
+      >
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div className="space-y-3">
+            <div>
+              <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5">Ad Soyad *</label>
+              <Input
+                required
+                autoFocus
+                placeholder="Örn: Ahmet Yılmaz"
+                value={formData.ad_soyad}
+                onChange={(e) => setFormData({ ...formData, ad_soyad: e.target.value })}
+                className="bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-xs py-1.5 h-9"
+              />
+            </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5">Unvan / Görevi</label>
+                <Input
+                  placeholder="Örn: İnşaat Mühendisi"
+                  value={formData.unvan || ''}
+                  onChange={(e) => setFormData({ ...formData, unvan: e.target.value })}
+                  className="bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-xs py-1.5 h-9"
+                />
+              </div>
+
+              <div>
+                <label className="text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5 flex items-center gap-1.5">
+                  Kurum Sicil No 
+                  <span className="text-[10px] text-slate-400 font-normal">(İsteğe Bağlı)</span>
+                  <span title="Personelin kurum içi sicil numarası"><HelpCircle className="w-3.5 h-3.5 text-blue-500 cursor-help ml-auto" /></span>
+                </label>
+                <Input
+                  placeholder="Örn: 12345"
+                  value={formData.sicil_no || ''}
+                  onChange={(e) => setFormData({ ...formData, sicil_no: e.target.value })}
+                  className="bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-xs py-1.5 h-9"
+                />
+              </div>
+            </div>
+
+              <div className="relative">
+                <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5">Birim / Müdürlük</label>
+                <Input
+                  list="birimler-list"
+                  placeholder="-- Birim Seçin veya Arayın --"
+                  value={formData.birim || ''}
+                  onChange={(e) => setFormData({ ...formData, birim: e.target.value })}
+                  className="bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-xs py-1.5 h-9"
+                />
+                <datalist id="birimler-list">
+                  {birimler.map((b) => (
+                    <option key={b.id} value={b.birim_adi} />
+                  ))}
+                </datalist>
+              </div>
+
+            <div className="grid grid-cols-2 gap-3">
+              <div>
+                <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5">Telefon</label>
+                <Input
+                  placeholder="Örn: 0555..."
+                  value={formData.telefon || ''}
+                  onChange={(e) => setFormData({ ...formData, telefon: e.target.value })}
+                  className="bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-xs py-1.5 h-9"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-slate-600 dark:text-slate-400 mb-1.5">E-Posta</label>
+                <Input
+                  type="email"
+                  placeholder="Örn: ornek@kurum.gov.tr"
+                  value={formData.eposta || ''}
+                  onChange={(e) => setFormData({ ...formData, eposta: e.target.value })}
+                  className="bg-slate-50 dark:bg-slate-950 border-slate-200 dark:border-slate-800 text-xs py-1.5 h-9"
+                />
+              </div>
+            </div>
+
+            <div className="p-4 bg-slate-50 dark:bg-slate-900/50 rounded-xl border border-slate-200 dark:border-slate-800 flex flex-col gap-3 mt-4">
+              <h4 className="text-xs font-bold text-slate-800 dark:text-slate-200 flex items-center gap-2">
+                <Shield className="w-3.5 h-3.5 text-blue-500" /> Şablonlarda Varsayılan Görev (Yetkilendirme)
+              </h4>
+              <p className="text-[10px] text-slate-500">Seçtiğiniz roller, yeni oluşturulan belgelerde bu personel adıyla otomatik doldurulacaktır.</p>
+              
+              <div className="grid grid-cols-2 gap-3 max-h-[160px] overflow-y-auto pr-1 custom-scrollbar">
+                {rollerList.map(rol => (
+                  <label key={rol.rol_kodu} className="flex items-start gap-3 p-3 bg-white dark:bg-slate-950 border border-slate-200 dark:border-slate-800 rounded-lg cursor-pointer hover:border-blue-400 dark:hover:border-blue-800 transition-colors group">
+                    <input
+                      type="checkbox"
+                      className="w-4 h-4 mt-0.5 text-blue-600 rounded border-slate-300 dark:border-slate-700 bg-transparent"
+                      checked={formData.assignedRoles?.includes(rol.rol_kodu)}
+                      onChange={(e) => toggleRole(rol.rol_kodu, e.target.checked)}
+                    />
+                    <div className="flex flex-col">
+                      <span className="text-xs font-bold text-slate-800 dark:text-slate-200 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">{rol.rol_adi}</span>
+                      <span className="text-[10px] text-slate-500 dark:text-slate-400 leading-tight mt-0.5">
+                        {rol.aciklama}
+                      </span>
+                    </div>
+                  </label>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          <div className="flex justify-end gap-3 pt-4 border-t border-slate-100 dark:border-slate-800 mt-6">
+            <Button type="button" variant="outline" onClick={closeModal}>
+              İptal
+            </Button>
+            <Button type="submit" className="bg-blue-600 hover:bg-blue-700 shadow-md">
+              {editingPersonel ? 'Değişiklikleri Kaydet' : 'Personeli Ekle'}
+            </Button>
+          </div>
+        </form>
+      </Modal>
     </div>
   )
 }

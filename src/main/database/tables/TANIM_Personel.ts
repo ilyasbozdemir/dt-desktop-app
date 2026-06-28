@@ -10,9 +10,7 @@ export const TANIM_Personel = {
     { name: 'sicil_no', type: 'TEXT', description: 'Kurum Sicil Numarası' },
     { name: 'telefon', type: 'TEXT', description: 'Telefon Numarası' },
     { name: 'eposta', type: 'TEXT', description: 'E-Posta Adresi' },
-    // İmza yetkileri (0 = hayır, 1 = evet)
-    { name: 'ihale_yetkilisi_mi', type: 'INTEGER', notNull: true, default: 0, description: 'Ihale Yetkilisi mı?' },
-    { name: 'harcama_yetkilisi_mi', type: 'INTEGER', notNull: true, default: 0, description: 'Harcama Yetkilisi mı?' },
+    // İmza yetkileri dinamik Roller tablosuna taşındı
     { name: 'aktif_mi', type: 'INTEGER', notNull: true, default: 1, description: 'Aktif Personel mi?' },
     { name: 'notlar', type: 'TEXT', description: 'Notlar' },
     { name: 'created_at', type: 'DATETIME', default: 'CURRENT_TIMESTAMP', description: 'Created At' },
