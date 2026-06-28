@@ -6,9 +6,7 @@ export const IhtiyacTalepFormuMapping: ProcessMapping = {
     sutun: 'kurum_anteti',
     aciklama: 'Dosyanın antet satırları'
   },
-  dosyaKonusu: {
-    deger: 'İhtiyaç Talep Formu'
-  },
+
   ihtiyacKalemleri: {
     tablo: 'DATA_TeminKalem',
     sutun: '*',
