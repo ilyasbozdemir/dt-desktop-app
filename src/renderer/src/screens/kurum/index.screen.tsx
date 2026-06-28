@@ -11,7 +11,7 @@ import { useSettingsStore } from "../../store/settingsStore";
 type TabType = "idari" | "mali" | "iletisim";
 
 export default function KurumScreen(): React.JSX.Element {
-  const { kurumData, isLoadingKurum, saveKurum } = useKurumHooks();
+  const { kurumData, isLoadingKurum, fetchKurum, saveKurum } = useKurumHooks();
   const { loadSettings: reloadSettingsStore } = useSettingsStore();
 
   const [activeTab, setActiveTab] = useState<TabType>("idari");
@@ -21,6 +21,11 @@ export default function KurumScreen(): React.JSX.Element {
   const [localData, setLocalData] = useState<Partial<KurumVerisi>>({});
   const [institutionLetterhead, setInstitutionLetterhead] = useState<string[]>([]);
   const [sozlukData, setSozlukData] = useState<any[]>([]);
+
+  // Fetch initial data
+  React.useEffect(() => {
+    fetchKurum();
+  }, [fetchKurum]);
 
   // Initialize form when data loads
   React.useEffect(() => {
