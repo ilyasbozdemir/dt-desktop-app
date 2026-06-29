@@ -17,7 +17,9 @@ protocol.registerSchemesAsPrivileged([
   }
 ])
 
-import icon from '../../resources/icon.png?asset'
+const icon = app.isPackaged
+  ? join(process.resourcesPath, 'icon.png')
+  : join(__dirname, '../../resources/icon.png')
 import { workspaceManager } from './database/workspace'
 import { CURRENT_SCHEMA_VERSION } from './database/migrate'
 import { manifests } from './database/schema-manifest/index'
@@ -40,7 +42,10 @@ import { TANIM_Placeholder } from './database/tables/TANIM_Placeholder'
 
 // --- LOG SYSTEM & USERDATA SETUP ---
 const isMultiInstance = process.argv.includes('--multi-instance')
-const initialFilePath = process.argv.find((arg) => isSupportedFile(arg)) ?? null
+const rawInitialFilePath = process.argv.find((arg) => isSupportedFile(arg)) ?? null
+const initialFilePath = rawInitialFilePath
+  ? rawInitialFilePath.replace(/^"+|"+$/g, '').trim()
+  : null
 
 try {
   let userDataPath = app.getPath('userData')
@@ -122,7 +127,24 @@ app.on('will-quit', () => {
   try {
     closeAllSecondaryWindows()
     workspaceManager.close()
-  } catch (e) {}
+  } catch {
+    //
+  }
+  try {
+    stopServer()
+  } catch {
+    //
+  }
+  try {
+    stopExpressServer()
+  } catch {
+    //
+  }
+  try {
+    disconnectFromServer()
+  } catch {
+    //
+  }
 })
 
 // Süreç herhangi bir sebeple çökerse veya kapanırsa son bir temizlik şansı
@@ -130,7 +152,24 @@ process.on('exit', () => {
   try {
     closeAllSecondaryWindows()
     workspaceManager.close()
-  } catch (e) {}
+  } catch {
+    //
+  }
+  try {
+    stopServer()
+  } catch {
+    //
+  }
+  try {
+    stopExpressServer()
+  } catch {
+    //
+  }
+  try {
+    disconnectFromServer()
+  } catch {
+    //
+  }
 })
 
 function createWindow(): void {
@@ -242,8 +281,9 @@ if (!gotTheLock && !isMultiInstance) {
       const mainWindow = windows[0]
 
       // Eğer desteklenen bir dosya çift tıklandıysa, yeni bir süreç (pencere) olarak başlat
-      const filePath = commandLine.find((arg) => isSupportedFile(arg))
-      if (filePath) {
+      const rawFilePath = commandLine.find((arg) => isSupportedFile(arg))
+      if (rawFilePath) {
+        const filePath = rawFilePath.replace(/^"+|"+$/g, '').trim()
         const currentWorkspace = workspaceManager.getCurrentFilePath()
         const normalizedTarget = join(filePath)
         const normalizedCurrent = currentWorkspace ? join(currentWorkspace) : null
@@ -288,6 +328,14 @@ if (!gotTheLock && !isMultiInstance) {
         if (commandLine.includes('--new-dosya')) {
           mainWindow.webContents.send('app:navigate', '/dosyalar/yeni')
         }
+      }
+    } else {
+      writeLog('INFO', 'No windows open. Recreating main window.')
+      createWindow()
+      const rawFilePath = commandLine.find((arg) => isSupportedFile(arg))
+      if (rawFilePath) {
+        const filePath = rawFilePath.replace(/^"+|"+$/g, '').trim()
+        process.argv.push(filePath)
       }
     }
   })
@@ -366,9 +414,19 @@ if (!gotTheLock && !isMultiInstance) {
         }
       }
     })
+    tray.on('double-click', () => {
+      const windows = BrowserWindow.getAllWindows()
+      if (windows.length > 0) {
+        const mainWindow = windows[0]
+        if (!mainWindow.isVisible()) {
+          mainWindow.show()
+        }
+        if (mainWindow.isMinimized()) mainWindow.restore()
+        mainWindow.focus()
+      }
+    })
 
     // İlk açılışta desteklenen bir dosyanın çift tıklanarak açılıp açılmadığını kontrol et
-    const initialFilePath = process.argv.find((arg) => isSupportedFile(arg)) ?? null
     // Use handle (not handleOnce) so renderer HMR reloads don't cause "No handler" errors.
     // The handler removes itself after the first real call to stay clean.
     const initialFileHandler = (): string | null => {

@@ -59,10 +59,10 @@ export const perFormatFilters = SUPPORTED_FORMATS.map((f) => ({
   extensions: [f.ext]
 }))
 
-/**
- * Verilen dosya yolunun desteklenen bir uzantıya sahip olup olmadığını kontrol eder.
- */
 export function isSupportedFile(filePath: string): boolean {
-  const lower = filePath.toLowerCase()
+  if (!filePath) return false
+  const cleanPath = filePath.replace(/^"+|"+$/g, '').trim()
+  const lower = cleanPath.toLowerCase()
   return allExtensions.some((ext) => lower.endsWith('.' + ext))
 }
+
