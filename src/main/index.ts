@@ -2469,6 +2469,21 @@ if (!gotTheLock && !isMultiInstance) {
       }
     })
 
+    // Genel çalıştırma işlemi (Parametreleri dizi veya ayrı ayrı alan alternatif)
+    ipcMain.handle('db:execute', async (_, sql: string, ...params: any[]) => {
+      try {
+        const db = workspaceManager.getDb()
+        const stmt = db.prepare(sql)
+        const actualParams = (params.length === 1 && Array.isArray(params[0])) ? params[0] : params
+        const info = stmt.run(...actualParams)
+        broadcastDbChange()
+        workspaceManager.save()
+        return { success: true, lastInsertRowid: info.lastInsertRowid, changes: info.changes }
+      } catch (error: any) {
+        return { success: false, error: error.message }
+      }
+    })
+
     // Transaction işlemi (Çoklu INSERT, UPDATE, DELETE)
     ipcMain.handle('db:transaction', async (_, queries: { sql: string; params: any[] }[]) => {
       try {
