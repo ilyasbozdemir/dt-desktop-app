@@ -38,8 +38,65 @@ import { startExpressServer, stopExpressServer } from './network/expressServer'
 import { registerArchiveHandlers } from './archive'
 import { TANIM_Placeholder } from './database/tables/TANIM_Placeholder'
 
+// --- LOG SYSTEM & USERDATA SETUP ---
+const isMultiInstance = process.argv.includes('--multi-instance')
+const initialFilePath = process.argv.find((arg) => isSupportedFile(arg)) ?? null
+
+try {
+  let userDataPath = app.getPath('userData')
+  let changed = false
+
+  if (is.dev) {
+    userDataPath += '-dev'
+    changed = true
+  }
+
+  if (isMultiInstance && initialFilePath) {
+    let hash = 0
+    const normalizedPath = join(initialFilePath)
+    for (let i = 0; i < normalizedPath.length; i++) {
+      hash = (hash << 5) - hash + normalizedPath.charCodeAt(i)
+      hash |= 0
+    }
+    userDataPath += `-multi-${Math.abs(hash)}`
+    changed = true
+  }
+
+  if (changed) {
+    app.setPath('userData', userDataPath)
+  }
+} catch (e) {
+  console.error('Failed to configure userData path:', e)
+}
+
+const logDir = join(app.getPath('userData'), 'logs')
+try {
+  fs.mkdirSync(logDir, { recursive: true })
+} catch (e) {}
+const logPath = join(logDir, 'main.log')
+
+export function writeLog(level: string, message: string, details?: any): void {
+  const time = new Date().toISOString()
+  const detailStr = details ? ` | Details: ${JSON.stringify(details)}` : ''
+  const logLine = `[${time}] [${level}] ${message}${detailStr}\n`
+  try {
+    fs.appendFileSync(logPath, logLine, 'utf8')
+  } catch (e) {}
+}
+
+writeLog('INFO', 'App startup initialized', {
+  argv: process.argv,
+  execPath: process.execPath,
+  isPackaged: app.isPackaged,
+  userData: app.getPath('userData')
+})
+
 process.on('uncaughtException', (error) => {
   console.error('UNCAUGHT EXCEPTION:', error)
+  writeLog('ERROR', 'Uncaught Exception', {
+    message: error?.message,
+    stack: error?.stack
+  })
 })
 
 let tray: Tray | null = null
@@ -170,24 +227,16 @@ function createWindow(): void {
   })
 }
 
-// Set separate userData folder for development to avoid single-instance lock conflicts with production installation
-if (is.dev) {
-  try {
-    const defaultUserData = app.getPath('userData')
-    app.setPath('userData', defaultUserData + '-dev')
-  } catch (e) {
-    console.error('Failed to set userData path in dev mode:', e)
-  }
-}
+// Dev-mode userData path configured at startup log block
 
 // Single Instance Lock
-const isMultiInstance = process.argv.includes('--multi-instance')
 const gotTheLock = isMultiInstance ? true : app.requestSingleInstanceLock()
 
 if (!gotTheLock && !isMultiInstance) {
   app.quit()
 } else {
   app.on('second-instance', (_event, commandLine) => {
+    writeLog('INFO', 'Second instance event received', { commandLine })
     const windows = BrowserWindow.getAllWindows()
     if (windows.length > 0) {
       const mainWindow = windows[0]
@@ -195,16 +244,41 @@ if (!gotTheLock && !isMultiInstance) {
       // Eğer desteklenen bir dosya çift tıklandıysa, yeni bir süreç (pencere) olarak başlat
       const filePath = commandLine.find((arg) => isSupportedFile(arg))
       if (filePath) {
-        const { spawn } = require('child_process')
-        const args = app.isPackaged
-          ? [filePath, '--multi-instance']
-          : [app.getAppPath(), filePath, '--multi-instance']
+        const currentWorkspace = workspaceManager.getCurrentFilePath()
+        const normalizedTarget = join(filePath)
+        const normalizedCurrent = currentWorkspace ? join(currentWorkspace) : null
 
-        spawn(process.execPath, args, {
-          detached: true,
-          stdio: 'ignore'
-        }).unref()
+        writeLog('INFO', 'Attempting to open file from second instance', {
+          target: normalizedTarget,
+          currentWorkspace: normalizedCurrent
+        })
+
+        if (
+          normalizedCurrent &&
+          normalizedTarget.toLowerCase() === normalizedCurrent.toLowerCase()
+        ) {
+          writeLog('INFO', 'File is already open in main instance. Focusing window.')
+          if (!mainWindow.isVisible()) {
+            mainWindow.show()
+          }
+          if (mainWindow.isMinimized()) mainWindow.restore()
+          mainWindow.focus()
+        } else {
+          writeLog('INFO', 'File is different/new. Spawning multi-instance process.', {
+            execPath: process.execPath
+          })
+          const { spawn } = require('child_process')
+          const args = app.isPackaged
+            ? [filePath, '--multi-instance']
+            : [app.getAppPath(), filePath, '--multi-instance']
+
+          spawn(process.execPath, args, {
+            detached: true,
+            stdio: 'ignore'
+          }).unref()
+        }
       } else {
+        writeLog('INFO', 'No supported file found in commandLine arguments.')
         if (!mainWindow.isVisible()) {
           mainWindow.show()
         }

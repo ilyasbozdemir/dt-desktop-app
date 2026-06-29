@@ -1,55 +1,52 @@
-import React, { useEffect, useState } from "react";
-import { useWorkspaceStore } from "../../store/workspaceStore";
-import { Link } from "@tanstack/react-router";
-import { AlertCircle, ArrowLeft, FileText, Star } from "lucide-react";
-import { cn } from "../../utils/cn";
+import React, { useEffect, useState } from 'react'
+import { useWorkspaceStore } from '../../store/workspaceStore'
+import { Link } from '@tanstack/react-router'
+import { AlertCircle, ArrowLeft, FileText, Star } from 'lucide-react'
+import { cn } from '../../utils/cn'
 
 interface SubScreenProps {
-  title: string;
-  icon: React.ElementType;
-  description: string;
-  children?: React.ReactNode;
+  title: string
+  icon: React.ElementType
+  description: string
+  children?: React.ReactNode
 }
 
 export function SubScreen({
   title,
   icon: Icon,
   description,
-  children,
+  children
 }: SubScreenProps): React.JSX.Element {
-  const { activeDosyaId, activeStarredDocs, setActiveStarredDocs } =
-    useWorkspaceStore();
-  const [activeDosya, setActiveDosya] = useState<any>(null);
-  const [loading, setLoading] = useState(false);
+  const { activeDosyaId, activeStarredDocs, setActiveStarredDocs } = useWorkspaceStore()
+  const [activeDosya, setActiveDosya] = useState<any>(null)
+  const [loading, setLoading] = useState(false)
 
   useEffect(() => {
-    document.title = `${title} - Doğrudan Temin`;
-  }, [title]);
+    document.title = `${title} - Doğrudan Temin`
+  }, [title])
 
   useEffect(() => {
-    if (!activeDosyaId) return;
-    setLoading(true);
+    if (!activeDosyaId) return
+    setLoading(true)
     window.electron.ipcRenderer
       .invoke(
-        "db:query",
-        "SELECT id, konu, temin_no, starred_docs FROM DATA_TeminDosyasi WHERE id = ?",
-        [activeDosyaId],
+        'db:query',
+        'SELECT id, konu, temin_no, starred_docs FROM DATA_TeminDosyasi WHERE id = ?',
+        [activeDosyaId]
       )
       .then((res) => {
         if (res.success && res.data.length > 0) {
-          setActiveDosya(res.data[0]);
+          setActiveDosya(res.data[0])
           try {
-            const docs = res.data[0].starred_docs
-              ? JSON.parse(res.data[0].starred_docs)
-              : [];
-            setActiveStarredDocs(docs);
+            const docs = res.data[0].starred_docs ? JSON.parse(res.data[0].starred_docs) : []
+            setActiveStarredDocs(docs)
           } catch (e) {}
         }
       })
       .finally(() => {
-        setLoading(false);
-      });
-  }, [activeDosyaId, title, setActiveStarredDocs]);
+        setLoading(false)
+      })
+  }, [activeDosyaId, title, setActiveStarredDocs])
 
   return (
     <div className="p-6 md:p-8 w-full flex flex-col gap-6 animate-in fade-in slide-in-from-bottom-4 duration-500">
@@ -68,9 +65,7 @@ export function SubScreen({
               <Icon className="w-7 h-7 text-blue-600" />
               {title}
             </h1>
-            <p className="text-slate-500 dark:text-slate-400 mt-1 text-xs">
-              {description}
-            </p>
+            <p className="text-slate-500 dark:text-slate-400 mt-1 text-xs">{description}</p>
           </div>
         </div>
       </div>
@@ -80,14 +75,11 @@ export function SubScreen({
         <div className="bg-amber-50/50 dark:bg-amber-955/10 border border-amber-200 dark:border-amber-900/20 rounded-2xl p-4 flex items-start gap-2.5 text-xs text-amber-800 dark:text-amber-400 font-semibold shadow-sm print:hidden">
           <AlertCircle className="w-5 h-5 shrink-0 text-amber-600" />
           <div>
-            Aktif bir doğrudan temin dosyası seçmediniz. Bu ekranda işlem
-            yapabilmek için lütfen önce{" "}
-            <Link
-              to="/dosyalar"
-              className="underline font-bold text-blue-600 dark:text-blue-400"
-            >
+            Aktif bir doğrudan temin dosyası seçmediniz. Bu ekranda işlem yapabilmek için lütfen
+            önce{' '}
+            <Link to="/dosyalar" className="underline font-bold text-blue-600 dark:text-blue-400">
               dosyalar listesinden
-            </Link>{" "}
+            </Link>{' '}
             bir dosya seçin.
           </div>
         </div>
@@ -96,5 +88,5 @@ export function SubScreen({
       {/* CHILDREN VIEW */}
       {activeDosyaId && children}
     </div>
-  );
+  )
 }

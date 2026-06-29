@@ -1,6 +1,15 @@
 import React, { useState, useMemo } from 'react'
 import { Link } from '@tanstack/react-router'
-import { Star, FileText, Plus, Trash2, FolderOpen, ChevronUp, ChevronDown, ChevronRight } from 'lucide-react'
+import {
+  Star,
+  FileText,
+  Plus,
+  Trash2,
+  FolderOpen,
+  ChevronUp,
+  ChevronDown,
+  ChevronRight
+} from 'lucide-react'
 import { useQuery } from '@tanstack/react-query'
 import { useWorkspaceStore } from '../../store/workspaceStore'
 import { useSablonlar } from '../sablonlar/sablonlar.hooks'
@@ -12,11 +21,7 @@ const FALLBACK_ROUTE = '/dosya/cikti-merkezi'
 export default function TaslakYoneticisi(): React.JSX.Element {
   const [activeTab, setActiveTab] = useState<'kisayollar' | 'taslaklar'>('kisayollar')
   const [isAddModalOpen, setIsAddModalOpen] = useState(false)
-  const {
-    activeDosyaId,
-    setActiveDosyaId,
-    setActiveStarredDocs
-  } = useWorkspaceStore()
+  const { activeDosyaId, setActiveDosyaId, setActiveStarredDocs } = useWorkspaceStore()
 
   // Şablonları çek — route_path DB'den geliyor
   const { data: sablonlar = [] } = useSablonlar()
@@ -38,7 +43,11 @@ export default function TaslakYoneticisi(): React.JSX.Element {
   }, [sablonlar])
 
   // Tüm aktif temin dosyalarını çekelim
-  const { data: dosyalar = [], isLoading: dosyalarLoading, refetch: refetchDosyalar } = useQuery({
+  const {
+    data: dosyalar = [],
+    isLoading: dosyalarLoading,
+    refetch: refetchDosyalar
+  } = useQuery({
     queryKey: ['dosyalar_all_active_shortcuts'],
     queryFn: async () => {
       const res = await window.electron.ipcRenderer.invoke(
@@ -140,15 +149,46 @@ export default function TaslakYoneticisi(): React.JSX.Element {
 
     sablonlar.forEach((s) => {
       const cat = (s.kategori || '').toLowerCase()
-      if (cat.includes('1') || cat.includes('ihtiyac') || cat.includes('başlangıç') || cat.includes('baslangic')) {
+      if (
+        cat.includes('1') ||
+        cat.includes('ihtiyac') ||
+        cat.includes('başlangıç') ||
+        cat.includes('baslangic')
+      ) {
         groups['1. İhtiyaç Tespiti & Başlangıç'].push(s)
-      } else if (cat.includes('2') || cat.includes('fiyat') || cat.includes('araştırma') || cat.includes('arastirma') || cat.includes('maliyet') || cat.includes('piyasa')) {
+      } else if (
+        cat.includes('2') ||
+        cat.includes('fiyat') ||
+        cat.includes('araştırma') ||
+        cat.includes('arastirma') ||
+        cat.includes('maliyet') ||
+        cat.includes('piyasa')
+      ) {
         groups['2. Piyasa Fiyat Araştırması'].push(s)
-      } else if (cat.includes('3') || cat.includes('sipariş') || cat.includes('siparis') || cat.includes('sözleşme') || cat.includes('sozlesme') || cat.includes('ihale') || cat.includes('onay')) {
+      } else if (
+        cat.includes('3') ||
+        cat.includes('sipariş') ||
+        cat.includes('siparis') ||
+        cat.includes('sözleşme') ||
+        cat.includes('sozlesme') ||
+        cat.includes('ihale') ||
+        cat.includes('onay')
+      ) {
         groups['3. Sipariş & Sözleşme'].push(s)
-      } else if (cat.includes('4') || cat.includes('kabul') || cat.includes('ödeme') || cat.includes('odeme') || cat.includes('teslim')) {
+      } else if (
+        cat.includes('4') ||
+        cat.includes('kabul') ||
+        cat.includes('ödeme') ||
+        cat.includes('odeme') ||
+        cat.includes('teslim')
+      ) {
         groups['4. Kabul & Ödeme İşlemleri'].push(s)
-      } else if (cat.includes('5') || cat.includes('klasör') || cat.includes('klasor') || cat.includes('kapak')) {
+      } else if (
+        cat.includes('5') ||
+        cat.includes('klasör') ||
+        cat.includes('klasor') ||
+        cat.includes('kapak')
+      ) {
         groups['5. Klasör & Kapaklar'].push(s)
       } else {
         groups['1. İhtiyaç Tespiti & Başlangıç'].push(s)
@@ -263,7 +303,12 @@ export default function TaslakYoneticisi(): React.JSX.Element {
                                     </button>
                                     <button
                                       onClick={() =>
-                                        moveShortcut(activeDosya.id, activeDosya.starred, idx, 'down')
+                                        moveShortcut(
+                                          activeDosya.id,
+                                          activeDosya.starred,
+                                          idx,
+                                          'down'
+                                        )
                                       }
                                       disabled={idx === activeDosya.starred.length - 1}
                                       className="p-1 hover:bg-slate-700 rounded text-slate-400 hover:text-slate-200 disabled:opacity-30 disabled:pointer-events-none cursor-pointer"
@@ -314,7 +359,8 @@ export default function TaslakYoneticisi(): React.JSX.Element {
                         Kısayol Önizleme
                       </h2>
                       <p className="text-xs text-slate-500 mb-6">
-                        Seçtiğiniz belgeler, temin dosyalarında çalışırken üst menüde şu şekilde listelenir:
+                        Seçtiğiniz belgeler, temin dosyalarında çalışırken üst menüde şu şekilde
+                        listelenir:
                       </p>
 
                       {/* Mock Toolbar */}
@@ -326,7 +372,9 @@ export default function TaslakYoneticisi(): React.JSX.Element {
                         </div>
                         <span className="text-slate-300 dark:text-slate-700">|</span>
                         {activeDosya.starred.length === 0 ? (
-                          <span className="text-xs italic text-slate-400">Henüz eklenmiş kısayol yok.</span>
+                          <span className="text-xs italic text-slate-400">
+                            Henüz eklenmiş kısayol yok.
+                          </span>
                         ) : (
                           activeDosya.starred.map((docName: string, idx: number) => (
                             <div
@@ -350,7 +398,9 @@ export default function TaslakYoneticisi(): React.JSX.Element {
                           <span className="font-bold text-slate-700 dark:text-slate-300 block mb-1">
                             Pratik Belge Üretimi
                           </span>
-                          Sol paneldeki &apos;Kısayol Belgelerini Düzenle&apos; butonuna tıklayarak yeni belgeler ekleyebilir, ok işaretleriyle çıktı alma sıranızı belirleyebilirsiniz. Kısayollar her dosyaya özel olarak kaydedilir.
+                          Sol paneldeki &apos;Kısayol Belgelerini Düzenle&apos; butonuna tıklayarak
+                          yeni belgeler ekleyebilir, ok işaretleriyle çıktı alma sıranızı
+                          belirleyebilirsiniz. Kısayollar her dosyaya özel olarak kaydedilir.
                         </div>
                       </div>
                     </div>
@@ -370,7 +420,8 @@ export default function TaslakYoneticisi(): React.JSX.Element {
                           Kısayol Belgelerini Düzenle
                         </h2>
                         <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-                          Aktif temin dosyasında hızlı erişim (kısayol) olarak göstermek istediğiniz belgeleri seçin.
+                          Aktif temin dosyasında hızlı erişim (kısayol) olarak göstermek istediğiniz
+                          belgeleri seçin.
                         </p>
                       </div>
                       <button
@@ -410,7 +461,9 @@ export default function TaslakYoneticisi(): React.JSX.Element {
                                     <span className="truncate pr-2">{sablon.ad}</span>
                                     <Star
                                       className={`w-3.5 h-3.5 shrink-0 ${
-                                        isStarred ? 'fill-amber-500 text-amber-500' : 'text-slate-400'
+                                        isStarred
+                                          ? 'fill-amber-500 text-amber-500'
+                                          : 'text-slate-400'
                                       }`}
                                     />
                                   </button>
@@ -449,7 +502,8 @@ export default function TaslakYoneticisi(): React.JSX.Element {
                   Aktif Temin Dosyası Bulunamadı
                 </h3>
                 <p className="text-slate-500 text-xs">
-                  Kısayolları ve hızlı erişim evraklarını yönetebilmek için lütfen aşağıdaki listeden çalışmak istediğiniz dosyayı seçiniz.
+                  Kısayolları ve hızlı erişim evraklarını yönetebilmek için lütfen aşağıdaki
+                  listeden çalışmak istediğiniz dosyayı seçiniz.
                 </p>
               </div>
 

@@ -66,8 +66,6 @@ export function MalzemeListesi(): React.JSX.Element {
     setPreviewModalOpen(true)
   }
 
-
-
   const executePrint = async (html: string) => {
     await (window as any).electron.ipcRenderer.invoke('print-html', html, { silent: false })
   }
