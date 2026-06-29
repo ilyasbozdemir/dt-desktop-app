@@ -38,6 +38,104 @@ const normalizeForMatch = (str: string) => {
     .replace(/[^a-z0-9]/g, '')
 }
 
+const getSablonGroup = (sablon: Sablon): string => {
+  const cat = (sablon.kategori || '').toLowerCase()
+  const ad = sablon.ad.toLowerCase()
+
+  if (
+    cat.includes('1') ||
+    cat.includes('ihtiyac') ||
+    cat.includes('başlangıç') ||
+    cat.includes('baslangic') ||
+    ad.includes('talep formu') ||
+    ad.includes('son alim') ||
+    ad.includes('luzum muzekkeresi') ||
+    ad.includes('gorevlendirme') ||
+    ad.includes('ihtiyac listesi') ||
+    ad.includes('harcama talimati') ||
+    ad.includes('cetvel') ||
+    ad.includes('master')
+  ) {
+    if (
+      ad.includes('yaklasik maliyet') ||
+      ad.includes('yaklaşık maliyet') ||
+      ad.includes('birim fiyat teklif') ||
+      ad.includes('teklif mektubu') ||
+      ad.includes('piyasa fiyat') ||
+      ad.includes('araştirma') ||
+      ad.includes('arastirma')
+    ) {
+      return '2. Piyasa Fiyat Araştırması'
+    }
+    return '1. İhtiyaç Tespiti & Başlangıç'
+  }
+
+  if (
+    cat.includes('2') ||
+    cat.includes('fiyat') ||
+    cat.includes('araştırma') ||
+    cat.includes('arastirma') ||
+    cat.includes('maliyet') ||
+    cat.includes('piyasa') ||
+    ad.includes('maliyet') ||
+    ad.includes('teklif mektubu') ||
+    ad.includes('arastirma') ||
+    ad.includes('fiyat cetveli') ||
+    ad.includes('dağitilim') ||
+    ad.includes('dagitil') ||
+    ad.includes('mektubu')
+  ) {
+    return '2. Piyasa Fiyat Araştırması'
+  }
+
+  if (
+    cat.includes('3') ||
+    cat.includes('sipariş') ||
+    cat.includes('siparis') ||
+    cat.includes('sözleşme') ||
+    cat.includes('sozlesme') ||
+    cat.includes('ihale') ||
+    cat.includes('onay') ||
+    ad.includes('sozlesme') ||
+    ad.includes('davet') ||
+    ad.includes('komisyon karari') ||
+    ad.includes('onay belgesi') ||
+    ad.includes('sorgusu')
+  ) {
+    return '3. Sipariş & Sözleşme'
+  }
+
+  if (
+    cat.includes('4') ||
+    cat.includes('kabul') ||
+    cat.includes('ödeme') ||
+    cat.includes('odeme') ||
+    cat.includes('teslim') ||
+    ad.includes('muayene') ||
+    ad.includes('odeme emri') ||
+    ad.includes('tasinir islem') ||
+    ad.includes('pusulasi') ||
+    ad.includes('hakedis') ||
+    ad.includes('tutanak')
+  ) {
+    return '4. Kabul & Ödeme İşlemleri'
+  }
+
+  if (
+    cat.includes('5') ||
+    cat.includes('klasör') ||
+    cat.includes('klasor') ||
+    cat.includes('kapak') ||
+    ad.includes('klasor') ||
+    ad.includes('indeks') ||
+    ad.includes('kapagi')
+  ) {
+    return '5. Klasör & Kapaklar'
+  }
+
+  return '1. İhtiyaç Tespiti & Başlangıç'
+}
+
 export function CiktiMerkeziScreen(): React.JSX.Element {
   const { activeDosyaId, activeStarredDocs, setActiveStarredDocs } = useWorkspaceStore()
   const { sablons, loading, masterHtml, dosyaContext, activeDosya } =
@@ -109,7 +207,7 @@ export function CiktiMerkeziScreen(): React.JSX.Element {
       )
       if (found && !selectedIds.has(found.id)) {
         setSelectedIds((prev) => new Set([...prev, found.id]))
-        const cat = found.kategori || 'Diğer'
+        const cat = getSablonGroup(found)
         setExpandedCategories((prev) => new Set([...prev, cat]))
       }
     }
@@ -158,14 +256,27 @@ export function CiktiMerkeziScreen(): React.JSX.Element {
     )
   }
 
-  const groupedSablons = useMemo(() => {
-    const groups: Record<string, Sablon[]> = {}
+  const groupedSablons = useMemo((): Record<string, Sablon[]> => {
+    const groups: Record<string, Sablon[]> = {
+      '1. İhtiyaç Tespiti & Başlangıç': [],
+      '2. Piyasa Fiyat Araştırması': [],
+      '3. Sipariş & Sözleşme': [],
+      '4. Kabul & Ödeme İşlemleri': [],
+      '5. Klasör & Kapaklar': []
+    }
     sablons.forEach((s) => {
-      const cat = s.kategori || 'Diğer'
+      const cat = getSablonGroup(s)
       if (!groups[cat]) groups[cat] = []
       groups[cat].push(s)
     })
-    return groups
+
+    const cleanGroups: Record<string, Sablon[]> = {}
+    Object.entries(groups).forEach(([name, items]) => {
+      if (items.length > 0) {
+        cleanGroups[name] = items
+      }
+    })
+    return cleanGroups
   }, [sablons])
 
   const toggleGroup = (cat: string) => {
