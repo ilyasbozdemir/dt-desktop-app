@@ -83,23 +83,27 @@ export const LuzumMuzekkeresiMapping: ProcessMapping = {
     aciklama: 'Kurum kep adresi'
   },
   hazirlayanTelefon: {
-    tablo: 'DATA_TeminDosyasi',
-    sutun: 'hazirlayan_telefon',
+    tablo: 'TANIM_Personel',
+    sutun: 'telefon',
+    iliskili_id: 'd.hazirlayan_personel_id',
     aciklama: 'Hazırlayan personelin irtibat numarası'
   },
   ilgiliTelefon: {
-    tablo: 'DATA_TeminDosyasi',
-    sutun: 'irtibat_telefon',
+    tablo: 'TANIM_Personel',
+    sutun: 'telefon',
+    iliskili_id: 'd.irtibat_yetkilisi_id',
     aciklama: 'İrtibat yetkilisinin telefon numarası'
   },
   talepEdenTelefon: {
-    tablo: 'DATA_TeminDosyasi',
-    sutun: 'talep_eden_telefon',
+    tablo: 'TANIM_Personel',
+    sutun: 'telefon',
+    iliskili_id: 'd.talep_eden_personel_id',
     aciklama: 'Talep eden personelin telefon numarası'
   },
   sunanTelefon: {
-    tablo: 'DATA_TeminDosyasi',
-    sutun: 'sunan_telefon',
+    tablo: 'TANIM_Personel',
+    sutun: 'telefon',
+    iliskili_id: 'd.sunan_personel_id',
     aciklama: 'Sunan personelin telefon numarası'
   }
 }
