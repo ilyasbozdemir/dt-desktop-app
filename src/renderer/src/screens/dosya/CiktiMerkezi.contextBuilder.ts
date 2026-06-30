@@ -312,7 +312,7 @@ export function buildDocumentContext(
     hazirlayanTelefon: dosyaResData?.hazirlayan_telefon || '',
     hazirlayanEposta: dosyaResData?.hazirlayan_eposta || '',
     // Turkish characters compatibility helper
-    hazırlayanPersonelAdi: dosyaResData?.hazirlayan_ad_soyad || 'Görevli Personel',
+    hazirlayanPersonelAdi: dosyaResData?.hazirlayan_ad_soyad || 'Görevli Personel',
     hazırlayanPersonelUnvan: dosyaResData?.hazirlayan_unvan || 'Unvan Belirtilmedi',
     hazırlayanTelefon: dosyaResData?.hazirlayan_telefon || '',
     hazırlayanEposta: dosyaResData?.hazirlayan_eposta || '',
