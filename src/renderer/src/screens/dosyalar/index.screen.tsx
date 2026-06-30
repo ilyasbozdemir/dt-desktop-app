@@ -1011,9 +1011,16 @@ export default function DosyalarScreen(): React.ReactNode {
                         selectedDosya.is_ekap_sent !== 1 &&
                         selectedDosya.status !== "tamamlandi" && (
                         <button
-                          onClick={() =>
-                            handleUpdateStatus(selectedDosya.id, "tamamlandi")}
-                          className="col-span-2 px-4 py-2.5 bg-primary-200 border border-primary-300 hover:bg-primary-300 text-bg-100 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+                          onClick={() => {
+                            if ((selectedDosya.durum_asama_id || 1) < 5) {
+                              alert("Dosya süreçleri tamamlanmadan (5. aşamaya gelmeden) tamamlandı olarak işaretlenemez.");
+                              return;
+                            }
+                            handleUpdateStatus(selectedDosya.id, "tamamlandi");
+                          }}
+                          disabled={(selectedDosya.durum_asama_id || 1) < 5}
+                          className="col-span-2 px-4 py-2.5 bg-primary-200 border border-primary-300 hover:bg-primary-300 text-bg-100 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                          title={(selectedDosya.durum_asama_id || 1) < 5 ? "Süreçler tamamlanmadan tamamlandı işaretlenemez" : ""}
                         >
                           <CheckCircle2 size={14} />
                           Tamamlandı İşaretle
@@ -1035,8 +1042,16 @@ export default function DosyalarScreen(): React.ReactNode {
                             Aktife Al
                           </button>
                           <button
-                            onClick={() => handleEkapGonder(selectedDosya.id)}
-                            className="px-4 py-2.5 bg-bg-200 border border-bg-300 hover:bg-bg-300 text-text-100 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer"
+                            onClick={() => {
+                              if ((selectedDosya.durum_asama_id || 1) < 5) {
+                                alert("Dosya süreçleri tamamlanmadan (5. aşamaya gelmeden) EKAP kilitlemesi yapılamaz.");
+                                return;
+                              }
+                              handleEkapGonder(selectedDosya.id);
+                            }}
+                            disabled={(selectedDosya.durum_asama_id || 1) < 5}
+                            className="px-4 py-2.5 bg-bg-200 border border-bg-300 hover:bg-bg-300 text-text-100 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                            title={(selectedDosya.durum_asama_id || 1) < 5 ? "Süreçler tamamlanmadan kilitleme yapılamaz" : ""}
                           >
                             <Lock size={14} />
                             Kilitle (EKAP)
