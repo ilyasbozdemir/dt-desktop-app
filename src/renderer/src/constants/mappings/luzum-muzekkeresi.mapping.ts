@@ -81,5 +81,25 @@ export const LuzumMuzekkeresiMapping: ProcessMapping = {
     sutun: 'kep_adresi',
     varsayilan: '[Kep Adresi Belirtilmedi]',
     aciklama: 'Kurum kep adresi'
+  },
+  hazirlayanTelefon: {
+    tablo: 'DATA_TeminDosyasi',
+    sutun: 'hazirlayan_telefon',
+    aciklama: 'Hazırlayan personelin irtibat numarası'
+  },
+  ilgiliTelefon: {
+    tablo: 'DATA_TeminDosyasi',
+    sutun: 'irtibat_telefon',
+    aciklama: 'İrtibat yetkilisinin telefon numarası'
+  },
+  talepEdenTelefon: {
+    tablo: 'DATA_TeminDosyasi',
+    sutun: 'talep_eden_telefon',
+    aciklama: 'Talep eden personelin telefon numarası'
+  },
+  sunanTelefon: {
+    tablo: 'DATA_TeminDosyasi',
+    sutun: 'sunan_telefon',
+    aciklama: 'Sunan personelin telefon numarası'
   }
 }
