@@ -1,8 +1,7 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect } from 'react'
 import { useWorkspaceStore } from '../../store/workspaceStore'
 import { Link } from '@tanstack/react-router'
-import { AlertCircle, ArrowLeft, FileText, Star } from 'lucide-react'
-import { cn } from '../../utils/cn'
+import { AlertCircle, ArrowLeft } from 'lucide-react'
 
 interface SubScreenProps {
   title: string
@@ -17,9 +16,7 @@ export function SubScreen({
   description,
   children
 }: SubScreenProps): React.JSX.Element {
-  const { activeDosyaId, activeStarredDocs, setActiveStarredDocs } = useWorkspaceStore()
-  const [activeDosya, setActiveDosya] = useState<any>(null)
-  const [loading, setLoading] = useState(false)
+  const { activeDosyaId, setActiveStarredDocs } = useWorkspaceStore()
 
   useEffect(() => {
     document.title = `${title} - Doğrudan Temin`
@@ -27,25 +24,13 @@ export function SubScreen({
 
   useEffect(() => {
     if (!activeDosyaId) return
-    setLoading(true)
-    window.electron.ipcRenderer
-      .invoke(
-        'db:query',
-        'SELECT id, konu, temin_no, starred_docs FROM DATA_TeminDosyasi WHERE id = ?',
-        [activeDosyaId]
-      )
-      .then((res) => {
-        if (res.success && res.data.length > 0) {
-          setActiveDosya(res.data[0])
-          try {
-            const docs = res.data[0].starred_docs ? JSON.parse(res.data[0].starred_docs) : []
-            setActiveStarredDocs(docs)
-          } catch (e) {}
-        }
-      })
-      .finally(() => {
-        setLoading(false)
-      })
+    try {
+      const saved = localStorage.getItem('global_starred_docs')
+      const docs = saved ? JSON.parse(saved) : ['İhtiyaç Listesi', 'Lüzum Müzekkeresi Belgesi']
+      setActiveStarredDocs(docs)
+    } catch (err) {
+      console.error('Failed to load global starred docs:', err)
+    }
   }, [activeDosyaId, title, setActiveStarredDocs])
 
   return (

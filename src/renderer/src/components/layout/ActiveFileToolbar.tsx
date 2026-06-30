@@ -264,81 +264,22 @@ export function ActiveFileToolbar(): React.JSX.Element | null {
         className="flex-1 flex items-center gap-2 flex-wrap"
         ref={dropdownRef}
       >
-        {activeStarredDocs.length > 0 && (
-          <div className="relative inline-block mr-2">
-            <button
-              onClick={() =>
-                setOpenDropdown(
-                  openDropdown === "hizli_erisim" ? null : "hizli_erisim",
-                )}
-              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold transition-colors ${
-                openDropdown === "hizli_erisim"
-                  ? "bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300"
-                  : "text-amber-600 hover:bg-amber-50 dark:text-amber-400 dark:hover:bg-amber-900/20"
-              }`}
-            >
-              <Star
-                className={`w-3.5 h-3.5 ${
-                  openDropdown === "hizli_erisim" ? "fill-current" : ""
-                }`}
-              />
-              Hızlı Erişim
-              <ChevronDown
-                className={`w-3 h-3 transition-transform ${
-                  openDropdown === "hizli_erisim" ? "rotate-180" : ""
-                }`}
-              />
-            </button>
-
-            {openDropdown === "hizli_erisim" && (
-              <div className="absolute top-full left-0 mt-1 w-64 bg-white dark:bg-slate-900 border border-amber-200 dark:border-amber-700/50 shadow-xl rounded-lg py-1 z-50">
-                {activeStarredDocs.map((docName, idx) => {
-                  const { status, cleanName } = parseStatusAndName(docName);
-                  return (
-                    <Link
-                      key={idx}
-                      to="/cikti-merkezi"
-                      search={{ sablonAd: docName }}
-                      onClick={() => setOpenDropdown(null)}
-                      className="flex items-center justify-between px-3 py-2 text-xs text-slate-700 hover:bg-amber-50 hover:text-amber-700 dark:text-slate-300 dark:hover:bg-amber-900/30 dark:hover:text-amber-300"
-                    >
-                      <div className="flex items-center gap-2 truncate flex-1 min-w-0 pr-2">
-                        <Star className="w-3.5 h-3.5 text-amber-400 fill-amber-400 shrink-0" />
-                        <span className="truncate">{cleanName}</span>
-                      </div>
-                      {status && (
-                        <span
-                          className={`px-1 py-0.5 rounded text-[8px] font-extrabold uppercase tracking-wide shrink-0 ${
-                            getStatusBadgeClass(status)
-                          }`}
-                        >
-                          {status}
-                        </span>
-                      )}
-                    </Link>
-                  );
-                })}
-              </div>
-            )}
-          </div>
-        )}
-
         {stagesToUse.map((asama) => {
-          let targetPath = '/dosyalar'
-          let IconComponent = FolderTree
+          let targetPath = "/dosyalar";
+          let IconComponent = FolderTree;
 
           if (asama.asama_sira === 1) {
-            targetPath = APP_ROUTES.MALZEME_LISTESI
-            IconComponent = FolderTree
+            targetPath = APP_ROUTES.MALZEME_LISTESI;
+            IconComponent = FolderTree;
           } else if (asama.asama_sira === 2) {
-            targetPath = APP_ROUTES.KOMISYON_FIYAT_ARASTIRMA
-            IconComponent = PackageSearch
+            targetPath = APP_ROUTES.KOMISYON_FIYAT_ARASTIRMA;
+            IconComponent = PackageSearch;
           } else if (asama.asama_sira === 3) {
-            targetPath = APP_ROUTES.KOMISYON_ONAY_EKI
-            IconComponent = FileCheck
+            targetPath = APP_ROUTES.KOMISYON_ONAY_EKI;
+            IconComponent = FileCheck;
           } else if (asama.asama_sira === 4) {
-            targetPath = APP_ROUTES.KOMISYON_MUAYENE_KABUL
-            IconComponent = CreditCard
+            targetPath = APP_ROUTES.KOMISYON_MUAYENE_KABUL;
+            IconComponent = CreditCard;
           }
 
           return (
@@ -350,7 +291,7 @@ export function ActiveFileToolbar(): React.JSX.Element | null {
               <IconComponent className="w-3.5 h-3.5" />
               {asama.asama_sira}. {asama.asama_adi}
             </Link>
-          )
+          );
         })}
 
         {/* 5. Aşama: Klasör & Kapaklar (BETA) */}

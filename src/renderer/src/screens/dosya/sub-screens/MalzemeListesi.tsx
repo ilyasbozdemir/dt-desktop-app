@@ -13,11 +13,11 @@ import { DocumentPreviewModal } from '../components/DocumentPreviewModal'
 const normalizeForMatch = (str: string): string => {
   return str
     .toLocaleLowerCase('tr-TR')
+    .toLowerCase()
     .replace(/ğ/g, 'g')
     .replace(/ü/g, 'u')
     .replace(/ş/g, 's')
     .replace(/ı/g, 'i')
-    .replace(/i̇/g, 'i')
     .replace(/ö/g, 'o')
     .replace(/ç/g, 'c')
     .replace(/[^a-z0-9]/g, '')
@@ -117,12 +117,12 @@ export function MalzemeListesi(): React.JSX.Element {
               to="/taslakyonetim"
               className="text-[10px] font-black text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300 flex items-center gap-1 transition-colors underline decoration-dotted"
             >
-              Kısayol & Taslak Yönetimi ↗
+              Şablon Listesi ve Süreçler ↗
             </Link>
           </div>
           {activeStarredDocs.length === 0 ? (
             <div className="text-xs text-slate-400 dark:text-slate-500 italic py-1">
-              Henüz hızlı erişim belgesi seçilmemiş. Kısayol & Taslak Yönetimi panelinden istediğiniz belgeleri yıldızlayarak buraya ekleyebilirsiniz.
+              Henüz hızlı erişim belgesi seçilmemiş. Şablon Listesi ve Süreçler panelinden istediğiniz belgeleri yıldızlayarak buraya ekleyebilirsiniz.
             </div>
           ) : (
             <div className="flex items-center gap-2 flex-wrap">

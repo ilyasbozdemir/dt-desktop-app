@@ -96,7 +96,7 @@ const menuGroups: MenuGroup[] = [
     title: 'Sistem',
     items: [
       { name: 'Raporlar', path: '/raporlar', icon: BarChart3 },
-      { name: 'Kısayol & Taslaklar', path: '/taslakyonetim', icon: Star },
+      { name: 'Şablon Listesi ve Süreçler', path: '/taslakyonetim', icon: Star },
       { name: 'Sürüm Notları', path: '/changelog', icon: Megaphone },
       { name: 'Yardım & Kılavuzlar', path: '/yardim', icon: HelpCircle },
       {
