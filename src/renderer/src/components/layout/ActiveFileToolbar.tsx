@@ -338,13 +338,13 @@ export function ActiveFileToolbar(): React.JSX.Element | null {
               let targetPath = "/dosyalar"
 
               if (asama.asama_sira === 1) {
-                targetPath = APP_ROUTES.MALZEME_LISTESI
+                targetPath = APP_ROUTES.HAZIRLIK_VE_IHTIYAC
               } else if (asama.asama_sira === 2) {
-                targetPath = APP_ROUTES.KOMISYON_FIYAT_ARASTIRMA
+                targetPath = APP_ROUTES.PIYASA_FIYAT_ARASTIRMASI
               } else if (asama.asama_sira === 3) {
-                targetPath = APP_ROUTES.KOMISYON_ONAY_EKI
+                targetPath = APP_ROUTES.SIPARIS_VE_SOZLESME
               } else if (asama.asama_sira === 4) {
-                targetPath = APP_ROUTES.KOMISYON_MUAYENE_KABUL
+                targetPath = APP_ROUTES.KABUL_VE_ODEME
               }
 
               return (

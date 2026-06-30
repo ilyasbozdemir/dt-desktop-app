@@ -195,22 +195,11 @@ const kurumRoute = createRoute({
 })
 
 import {
-  FiyatArastirmaKomisyonu,
-  MuayeneKabulKomisyonu,
-  FiyatArastirmaMuayeneKomisyonu,
-  KomisyonAtamaOnayEki,
   HazirlikVeIhtiyac,
-  LuzumMuzekkeresiBelgesi,
-  LuzumOnayEki,
-  LuzumTeslimTesellum,
-  IstekliFirmalar,
-  YaklasikMaliyetCetveli,
-  PiyasaArastirmaTutanagi,
-  DogrudanTeminOnayBelgesi,
-  IhaleOnayBelgesi,
-  ButceSorgusu,
-  HarcamaTalimati,
-  HarcamaPusulasi
+  PiyasaFiyatArastirmasi,
+  SiparisVeSozlesme,
+  KabulVeOdeme,
+  YaklasikMaliyetCetveli
 } from './screens/dosya/SubScreens.screen'
 
 const profilRoute = createRoute({
@@ -225,96 +214,36 @@ const dosyaRoute = createRoute({
   component: DosyaScreen
 })
 
-// 1. Komisyon
-const fiyatArastirmaRoute = createRoute({
+// Dosya Aşamaları
+const hazirlikVeIhtiyacRoute = createRoute({
   getParentRoute: () => rootRoute,
-  path: APP_ROUTES.KOMISYON_FIYAT_ARASTIRMA,
-  component: FiyatArastirmaKomisyonu
-})
-const muayeneKabulRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: APP_ROUTES.KOMISYON_MUAYENE_KABUL,
-  component: MuayeneKabulKomisyonu
-})
-const fiyatMuayeneRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: APP_ROUTES.KOMISYON_FIYAT_MUAYENE,
-  component: FiyatArastirmaMuayeneKomisyonu
-})
-const komisyonOnayEkiRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: APP_ROUTES.KOMISYON_ONAY_EKI,
-  component: KomisyonAtamaOnayEki
-})
-
-// 2. Malzemeler
-const malzemeListesiRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: APP_ROUTES.MALZEME_LISTESI,
+  path: APP_ROUTES.HAZIRLIK_VE_IHTIYAC,
   component: HazirlikVeIhtiyac
 })
 
-// 3. Luzum
-const luzumBelgeRoute = createRoute({
+const piyasaFiyatArastirmasiRoute = createRoute({
   getParentRoute: () => rootRoute,
-  path: APP_ROUTES.LUZUM_BELGESI,
-  component: LuzumMuzekkeresiBelgesi
-})
-const luzumOnayEkiRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: APP_ROUTES.LUZUM_ONAY_EKI,
-  component: LuzumOnayEki
-})
-const luzumTeslimTesellumRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: APP_ROUTES.LUZUM_TESLIM_TESELLUM,
-  component: LuzumTeslimTesellum
+  path: APP_ROUTES.PIYASA_FIYAT_ARASTIRMASI,
+  component: PiyasaFiyatArastirmasi
 })
 
-// 4. Firmalar & Maliyet
-const istekliFirmalarRoute = createRoute({
+const siparisVeSozlesmeRoute = createRoute({
   getParentRoute: () => rootRoute,
-  path: APP_ROUTES.ISTEKLI_FIRMALAR,
-  component: IstekliFirmalar
+  path: APP_ROUTES.SIPARIS_VE_SOZLESME,
+  component: SiparisVeSozlesme
 })
+
+const kabulVeOdemeRoute = createRoute({
+  getParentRoute: () => rootRoute,
+  path: APP_ROUTES.KABUL_VE_ODEME,
+  component: KabulVeOdeme
+})
+
+// Diğer Alt Modüller
 const yaklasikMaliyetRoute = createRoute({
   getParentRoute: () => rootRoute,
   path: APP_ROUTES.YAKLASIK_MALIYET,
   component: YaklasikMaliyetCetveli
-})
-const piyasaArastirmaTutanakRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: APP_ROUTES.PIYASA_ARASTIRMA_TUTANAGI,
-  component: PiyasaArastirmaTutanagi
-})
-
-// 5. Onay
-const dtOnayRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: APP_ROUTES.DT_ONAY,
-  component: DogrudanTeminOnayBelgesi
-})
-const ihaleOnayRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: APP_ROUTES.IHALE_ONAY,
-  component: IhaleOnayBelgesi
-})
-const butceSorguRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: APP_ROUTES.BUTCE_SORGU,
-  component: ButceSorgusu
-})
-
-// 6. Harcama
-const harcamaTalimatRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: APP_ROUTES.HARCAMA_TALIMATI,
-  component: HarcamaTalimati
-})
-const harcamaPusulaRoute = createRoute({
-  getParentRoute: () => rootRoute,
-  path: APP_ROUTES.HARCAMA_PUSULASI,
-  component: HarcamaPusulasi
 })
 
 const ciktiMerkeziRoute = createRoute({
@@ -365,22 +294,11 @@ const routeTree = rootRoute.addChildren([
   kurumRoute,
   profilRoute,
   dosyaRoute,
-  fiyatArastirmaRoute,
-  muayeneKabulRoute,
-  fiyatMuayeneRoute,
-  komisyonOnayEkiRoute,
-  malzemeListesiRoute,
-  luzumBelgeRoute,
-  luzumOnayEkiRoute,
-  luzumTeslimTesellumRoute,
-  istekliFirmalarRoute,
+  hazirlikVeIhtiyacRoute,
+  piyasaFiyatArastirmasiRoute,
+  siparisVeSozlesmeRoute,
+  kabulVeOdemeRoute,
   yaklasikMaliyetRoute,
-  piyasaArastirmaTutanakRoute,
-  dtOnayRoute,
-  ihaleOnayRoute,
-  butceSorguRoute,
-  harcamaTalimatRoute,
-  harcamaPusulaRoute,
   ciktiMerkeziRoute,
   yardimRoute
 ])

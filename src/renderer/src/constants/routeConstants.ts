@@ -36,36 +36,14 @@ export const APP_ROUTES = {
   PROFIL: '/profil',
 
   // Dosya Alt Süreçleri (SubScreens)
-  // 1. Komisyon
-  KOMISYON_FIYAT_ARASTIRMA: '/dosya/komisyon/fiyat-arastirma',
-  KOMISYON_MUAYENE_KABUL: '/dosya/komisyon/muayene-kabul',
-  KOMISYON_FIYAT_MUAYENE: '/dosya/komisyon/fiyat-muayene',
-  KOMISYON_ONAY_EKI: '/dosya/komisyon/onay-eki',
+  // Aşamalar
+  HAZIRLIK_VE_IHTIYAC: '/dosya/hazirlik-ve-ihtiyac',
+  PIYASA_FIYAT_ARASTIRMASI: '/dosya/piyasa-fiyat-arastirmasi',
+  SIPARIS_VE_SOZLESME: '/dosya/siparis-ve-sozlesme',
+  KABUL_VE_ODEME: '/dosya/kabul-ve-odeme',
 
-  // 2. Malzemeler
-  MALZEME_LISTESI: '/dosya/malzemeler/liste',
-  SON_ALIM_FIYAT_CETVELI: '/dosya/malzemeler/son-alim',
-
-  // 3. Lüzum
-  LUZUM_TALEP_FORMU: '/dosya/luzum/talep-formu',
-  LUZUM_BELGESI: '/dosya/luzum/belge',
-  LUZUM_ONAY_EKI: '/dosya/luzum/onay-eki',
-  LUZUM_TESLIM_TESELLUM: '/dosya/luzum/teslim-tesellum',
-
-  // 4. Firmalar & Maliyet
-  ISTEKLI_FIRMALAR: '/dosya/firmalar-maliyet/istekliler',
+  // Diğer Alt Modüller
   YAKLASIK_MALIYET: '/dosya/firmalar-maliyet/yaklasik',
-  PIYASA_ARASTIRMA_TUTANAGI: '/dosya/firmalar-maliyet/tutanak',
-
-  // 5. Onay
-  DT_ONAY: '/dosya/onay/dt-onay',
-  IHALE_ONAY: '/dosya/onay/ihale-onay',
-  BUTCE_SORGU: '/dosya/onay/butce-sorgu',
-
-  // 6. Harcama
-  HARCAMA_TALIMATI: '/dosya/harcama/talimat',
-  HARCAMA_PUSULASI: '/dosya/harcama/pusula',
-
   DOSYA_CIKTI_MERKEZI: '/dosya/cikti-merkezi'
 } as const
 

@@ -6,15 +6,15 @@ import { LuzumMuzekkeresiMapping } from './luzum-muzekkeresi.mapping'
 import { LuzumOnayEkiMapping } from './luzum-muzekkeresi-onay-eki.mapping'
 import { LuzumTeslimTesellumMapping } from './luzum-muzekkeresi-teslim-tesellum.mapping'
 import { SonAlimFiyatCetveliMapping } from './son-alim-fiyat-cetveli.mapping'
-import { APP_ROUTES } from '../routeConstants'
 
 export const processMappingRegistry: Record<string, ProcessMapping> = {
-  [APP_ROUTES.MALZEME_LISTESI]: IhtiyacListesiMapping,
-  [APP_ROUTES.LUZUM_TALEP_FORMU]: IhtiyacTalepFormuMapping,
-  [APP_ROUTES.LUZUM_BELGESI]: LuzumMuzekkeresiMapping,
-  [APP_ROUTES.LUZUM_ONAY_EKI]: LuzumOnayEkiMapping,
-  [APP_ROUTES.LUZUM_TESLIM_TESELLUM]: LuzumTeslimTesellumMapping,
-  [APP_ROUTES.SON_ALIM_FIYAT_CETVELI]: SonAlimFiyatCetveliMapping
+  '/dosya/hazirlik-ve-ihtiyac': IhtiyacListesiMapping,
+  '/dosya/malzemeler/liste': IhtiyacListesiMapping,
+  '/dosya/luzum/talep-formu': IhtiyacTalepFormuMapping,
+  '/dosya/luzum/belge': LuzumMuzekkeresiMapping,
+  '/dosya/luzum/onay-eki': LuzumOnayEkiMapping,
+  '/dosya/luzum/teslim-tesellum': LuzumTeslimTesellumMapping,
+  '/dosya/malzemeler/son-alim': SonAlimFiyatCetveliMapping
 }
 
 export function getDefaultMappingForProcess(processPath: string): ProcessMapping {
