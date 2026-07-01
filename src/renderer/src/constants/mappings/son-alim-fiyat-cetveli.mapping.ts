@@ -18,7 +18,7 @@ export const SonAlimFiyatCetveliMapping: ProcessMapping = {
   tarih: {
     tablo: 'DATA_TeminDosyasi',
     sutun: 'olusturma_tarihi',
-    aciklama: 'Belge tarihi'
+    aciklama: 'Dosya tarihi'
   },
   kurumIci: {
     deger: false,

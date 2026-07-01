@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import Mustache from "mustache";
 import Editor from "@monaco-editor/react";
+import { useWorkspaceStore } from "../../../store/workspaceStore";
 
 interface DocumentPreviewModalProps {
   isOpen: boolean;
@@ -110,12 +111,13 @@ export function DocumentPreviewModal({
         console.error("Failed to parse template test verisi:", e);
       }
     }
-    // Eğer gerçek dosya verisi varsa, dummy test verilerini karıştırmayalım ki kullanıcının yaptığı mapping net görünsün.
-    const hasRealData = baseContext && Object.keys(baseContext).length > 2; // logo vb. harici dosya verisi varsa
+    // Eğer gerçek dosya verisi varsa (activeDosyaId null değilse), dummy test verilerini karıştırmayalım.
+    const activeDosyaId = useWorkspaceStore.getState().activeDosyaId;
+    const hasRealData = activeDosyaId !== null && baseContext && Object.keys(baseContext).length > 2; 
     if (hasRealData) {
       return { ...baseContext };
     }
-    return { ...testData, ...baseContext };
+    return { ...baseContext, ...testData };
   }, [baseContext, templateTestVerisi]);
 
   // Initialization: Format context to JSON on open

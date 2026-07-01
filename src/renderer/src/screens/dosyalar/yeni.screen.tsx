@@ -1037,7 +1037,7 @@ export default function YeniDosyaScreen(): React.JSX.Element {
                               'konu',
                               'Konuyu AI ile Üret',
                               'İhale Konusu',
-                              'Verilen metin veya alım işlemine göre en uygun, resmi ve kısa ihale / doğrudan temin konusunu (İşin Adı) üret. Başka hiçbir açıklama yazma, sadece ihale adını ver.'
+                              'Verilen metin veya alım işlemine göre en uygun, resmi ve kısa ihale konusunu (İşin Adı) üret. Başka hiçbir açıklama yazma. KESİNLİKLE metnin içerisine veya sonuna "Doğrudan Temin", "Doğrudan Temini" veya "Doğrudan Temin İşi" gibi ifadeler EKLEME. (Örn: "Bez Bayrak ve Sopalı Bayrak Alımı", "Kırtasiye Malzemesi Alımı" şeklinde bitir).'
                             )
                           }
                           className="text-[10px] text-blue-600 hover:text-blue-700 font-bold flex items-center gap-1 cursor-pointer bg-blue-50 dark:bg-blue-900/20 px-2 py-1 rounded border-none"
