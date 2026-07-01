@@ -110,8 +110,6 @@ export async function renderPdfBuffer(htmlContent: string): Promise<Buffer> {
     }
 
     return pdfBufferFirstPass
-
-    return pdfBuffer
   } finally {
     if (!win.isDestroyed()) {
       win.destroy()
