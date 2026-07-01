@@ -4,6 +4,11 @@ Bu dosyada Doğrudan Temin (DT) Masaüstü Uygulaması'nın her sürümünde yap
 
 ## [Unreleased]
 
+### Planlanan / Gelecek Sürüm (v1.0.0 Backlog)
+
+- **Fatura ve İrsaliye Yönetimi**: İlgili doğrudan temin dosyalarına ödeme faturaları ve irsaliyelerin yüklenmesi için sistematik bir dosya yönetim alanı.
+- **İmzalı Belge Yönetimi**: İmzalanan evrakların toplu olarak ZIP dosyası ile sisteme yüklenebilmesi ve yönetimi.
+
 ## [1.0.0-beta.15] - 2026-06-30
 
 ### Eklenenler (Added)
