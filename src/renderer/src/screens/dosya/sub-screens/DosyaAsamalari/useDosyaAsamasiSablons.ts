@@ -53,20 +53,7 @@ export interface PreviewData {
 }
 
 export const checkIsSablonDisabled = (cleanName: string, dosyaContext: any): boolean => {
-    if (!dosyaContext) return false;
-
-    const normalizedName = normalizeForMatch(cleanName);
-    
-    if (
-        normalizedName.includes("ihtiyaclistesi") ||
-        normalizedName.includes("luzummuzekkeresi")
-    ) {
-        if (!dosyaContext.kalemSayisi || dosyaContext.kalemSayisi === 0) {
-            return true;
-        }
-    }
-
-    // İleride buraya diğer şablonlar için de kurallar eklenecek
+    // Kullanıcının talebi üzerine: "Veriler eksik olsa bile butonu disabled yapma, kullanıcı girip eksikliği kendi görsün."
     return false;
 };
 
