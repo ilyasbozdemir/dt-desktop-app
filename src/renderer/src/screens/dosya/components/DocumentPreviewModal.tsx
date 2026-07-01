@@ -736,7 +736,13 @@ export function DocumentPreviewModal({
             {onRefreshSnapshot && (
               <button
                 onClick={async () => {
-                  await onRefreshSnapshot();
+                  const isConfirmed = window.confirm(
+                    "Güncel dosya verilerini şablona aktarmak istediğinize emin misiniz?\n\nNOT: Onaylarsanız bu şablona özel yaptığınız manuel değişiklikler silinecek ve dosyanın güncel verisi üzerine yazılacaktır.\n\nDevam etmek için 'Tamam', iptal etmek için 'İptal'e tıklayın."
+                  );
+                  if (isConfirmed) {
+                    await onRefreshSnapshot();
+                    setOverrideData({});
+                  }
                 }}
                 disabled={isProcessingPdf || isProcessingPrint || !!jsonError}
                 className="px-6 py-2 bg-teal-600 hover:bg-teal-700 text-white rounded-xl font-bold transition-all flex items-center gap-2 disabled:opacity-50 text-sm shadow-sm"
@@ -1160,7 +1166,13 @@ export function DocumentPreviewModal({
             {onRefreshSnapshot && (
               <button
                 onClick={async () => {
-                  await onRefreshSnapshot();
+                  const isConfirmed = window.confirm(
+                    "Güncel dosya verilerini şablona aktarmak istediğinize emin misiniz?\n\nNOT: Onaylarsanız bu şablona özel yaptığınız manuel değişiklikler silinecek ve dosyanın güncel verisi üzerine yazılacaktır.\n\nDevam etmek için 'Tamam', iptal etmek için 'İptal'e tıklayın."
+                  );
+                  if (isConfirmed) {
+                    await onRefreshSnapshot();
+                    setOverrideData({});
+                  }
                 }}
                 disabled={isProcessingPdf || isProcessingPrint || !!jsonError}
                 className="px-6 py-2 bg-teal-600 hover:bg-teal-700 text-white rounded-xl font-bold transition-all flex items-center gap-2 disabled:opacity-50 text-sm shadow-sm"
